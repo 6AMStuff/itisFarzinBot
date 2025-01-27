@@ -1,0 +1,26 @@
+FROM alpine:3.21
+
+RUN apk update && apk upgrade
+
+RUN apk add \
+    python3 \
+    py3-pip
+
+ENV PIP_ROOT_USER_ACTION=ignore
+
+RUN pip install --upgrade --no-cache-dir --break-system-packages \
+    kurigram==v2.1.37 \
+    python-dotenv==1.0.0
+
+WORKDIR /home
+
+COPY main.py .
+COPY config.py .
+
+RUN mkdir data plugins
+RUN ln -s /data data
+RUN ln -s /plugins plugins
+
+VOLUME [ "/data", "/plugins" ]
+
+ENTRYPOINT [ "python3", "main.py" ]
