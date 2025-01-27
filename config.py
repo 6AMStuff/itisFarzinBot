@@ -19,6 +19,7 @@ logging.getLogger("pyrogram").setLevel(logging.ERROR)
 API_ID = os.getenv("api_id")
 API_HASH = os.getenv("api_hash")
 BOT_TOKEN = os.getenv("bot_token")
+PLUGIN_FOLDER = os.getenv("plugin_folder", "plugins")
 
 IS_ADMIN = filters.user(
     os.getenv("admins", "@itisFarzin").split(",")
