@@ -8,9 +8,11 @@ from dotenv import load_dotenv
 load_dotenv("data/.env")
 
 logger = logging.getLogger(os.getenv("log_name", "bot"))
+log_level = os.getenv("log_level")
+log_level = int(log_level) if log_level.isdigit() else logging.INFO
 logging.basicConfig(
     filename=f"{os.getenv("log_path", ".")}/{logger.name}.log",
-    level=logging.INFO,
+    level=log_level,
     format="[%(asctime)s] %(levelname)s: %(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p"
 )
