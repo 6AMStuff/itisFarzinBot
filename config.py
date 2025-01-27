@@ -9,7 +9,7 @@ load_dotenv("data/.env")
 
 logger = logging.getLogger(os.getenv("log_name", "bot"))
 log_level = os.getenv("log_level")
-log_level = int(log_level) if log_level.isdigit() else logging.INFO
+log_level = int(log_level) if str(log_level).isdigit() else logging.INFO
 logging.basicConfig(
     filename=f"{os.getenv("log_path", ".")}/{logger.name}.log",
     level=log_level,
