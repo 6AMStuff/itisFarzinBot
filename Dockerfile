@@ -18,8 +18,8 @@ COPY main.py .
 COPY config.py .
 
 RUN mkdir data plugins
-RUN ln -s /data data
-RUN ln -s /plugins plugins
+RUN ln -s /home/data /
+RUN ln -s /home/plugins /
 
 VOLUME [ "/data", "/plugins" ]
 
