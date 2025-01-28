@@ -16,6 +16,7 @@ WORKDIR /home
 
 COPY main.py .
 COPY config.py .
+ADD bot bot
 
 RUN mkdir data plugins
 RUN ln -s /home/data /
