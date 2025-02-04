@@ -18,7 +18,7 @@ async def plugins(app: Bot, message: Message):
 async def handlers(app: Bot, message: Message):
     responce = "**Handlers**:\n" + "\n".join([
         f"{handler.callback.__name__}: "
-        f"{'Loaded' if app.is_loaded(handler, group) else 'Not loaded'}"
+        + "Loaded" if app.handler_is_loaded(handler, group) else "Not loaded"
         for handler, group in app.get_handlers(app.plugin_list())
     ])
     await message.reply(responce)
@@ -28,9 +28,11 @@ async def handlers(app: Bot, message: Message):
     Config.IS_ADMIN & filters.command("load", Config.CMD_PREFIXES)
 )
 async def load(app: Bot, message: Message):
-    plugins = (",".join(message.command[-1:])
-               if len(message.command) > 1 else None)
-    result = app.load_plugins(plugins)
+    plugins = (
+        ",".join(message.command[-1:])
+        if len(message.command) > 1 else None
+    )
+    result = app.load_plugins(plugins, force_load=True)
     responce = "\n".join([
         f"**{plugin}**: {result[plugin]}" for plugin in result
     ])
@@ -41,8 +43,10 @@ async def load(app: Bot, message: Message):
     Config.IS_ADMIN & filters.command("unload", Config.CMD_PREFIXES)
 )
 async def unload(app: Bot, message: Message):
-    plugins = (",".join(message.command[-1:])
-               if len(message.command) > 1 else None)
+    plugins = (
+        ",".join(message.command[-1:])
+        if len(message.command) > 1 else None
+    )
     result = app.unload_plugins(plugins)
     responce = "\n".join([
         f"**{plugin}**: {result[plugin]}" for plugin in result

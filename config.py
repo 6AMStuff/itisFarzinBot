@@ -3,8 +3,8 @@ import re
 import logging
 from pyrogram import filters
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import create_engine, String, Boolean
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 load_dotenv("data/.env")
@@ -66,3 +66,10 @@ class Config:
 
 class DataBase(DeclarativeBase):
     pass
+
+
+class PluginDatabase(DataBase):
+    __tablename__ = "plugins"
+
+    name: Mapped[str] = mapped_column(String(40), primary_key=True)
+    enabled: Mapped[bool] = mapped_column(Boolean())

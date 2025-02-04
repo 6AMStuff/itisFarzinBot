@@ -1,10 +1,12 @@
 import logging
+import importlib
 from pathlib import Path
 from pyrogram import Client
 from typing import Generator
-from importlib import import_module
-from config import Config, DataBase
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 from pyrogram.handlers.handler import Handler
+from config import Config, DataBase, PluginDatabase
 
 
 class Bot(Client):
@@ -32,18 +34,19 @@ class Bot(Client):
             plugins = plugins.split(",")
 
         _plugins = self.plugin_list(folder=folder)
+        if plugins is None:
+            plugins = _plugins
 
-        if plugins:
-            for plugin in plugins:
-                if plugin not in _plugins:
-                    yield (plugin, "Plugin not found")
+        for plugin in plugins:
+            if plugin not in _plugins:
+                yield (plugin, "Plugin not found")
 
         for path in self.plugin_list(folder=folder, only_name=False):
-            if path.stem not in (plugins or _plugins):
+            if path.stem not in plugins:
                 continue
 
             module_path = '.'.join(path.parent.parts + (path.stem,))
-            module = import_module(module_path)
+            module = importlib.import_module(module_path)
 
             for name in vars(module).keys():
                 target_attr = getattr(module, name)
@@ -55,15 +58,38 @@ class Bot(Client):
                         ):
                             yield (handler, group)
 
-    def is_loaded(self, handler: Handler, group: int = 0) -> bool:
+    def handler_is_loaded(self, handler: Handler, group: int = 0) -> bool:
         if group not in self.dispatcher.groups:
             return False
         return handler in self.dispatcher.groups[group]
 
+    def set_plugin_status(self, plugin: str, enabled: bool = True):
+        with Session(Config.engine) as session:
+            session.merge(PluginDatabase(name=plugin, enabled=enabled))
+            session.commit()
+
     def load_plugins(
-        self, plugins: str | list[str] = None, folder: str = None
+        self, plugins: str | list[str] = None, folder: str = None,
+        force_load: bool = False
     ) -> dict[str, str]:
         result = {}
+        if isinstance(plugins, str):
+            plugins = plugins.split(",")
+
+        _plugins = self.plugin_list(folder=folder)
+        if plugins is None:
+            plugins = _plugins
+
+        for plugin in plugins:
+            if plugin in _plugins:
+                with Session(Config.engine) as session:
+                    if session.execute(
+                        select(PluginDatabase.enabled)
+                        .where(PluginDatabase.name == plugin)
+                    ).scalar() is False and not force_load:
+                        plugins.remove(plugin)
+                    else:
+                        self.set_plugin_status(plugin, True)
 
         for handler in self.get_handlers(plugins, folder=folder):
             if isinstance(handler[0], str):
@@ -71,7 +97,7 @@ class Bot(Client):
                 logging.warning(handler[1])
             else:
                 callback_name = handler[0].callback.__name__
-                if not self.is_loaded(*handler):
+                if not self.handler_is_loaded(*handler):
                     self.add_handler(*handler)
                     result[callback_name] = "Handler loaded"
                     logging.info(f"{callback_name} handler has been loaded")
@@ -87,6 +113,16 @@ class Bot(Client):
         self, plugins: str | list[str] = None, folder: str = None
     ):
         result = {}
+        if isinstance(plugins, str):
+            plugins = plugins.split(",")
+
+        _plugins = self.plugin_list(folder=folder)
+        if plugins is None:
+            plugins = _plugins
+
+        for plugin in plugins:
+            if plugin in _plugins:
+                self.set_plugin_status(plugin, False)
 
         for handler in self.get_handlers(plugins, folder=folder):
             if isinstance(handler[0], str):
@@ -94,7 +130,7 @@ class Bot(Client):
                 logging.warning(handler[1])
             else:
                 callback_name = handler[0].callback.__name__
-                if self.is_loaded(*handler):
+                if self.handler_is_loaded(*handler):
                     self.remove_handler(*handler)
                     result[callback_name] = "Handler unloaded"
                     logging.info(f"{callback_name} handler has been unloaded")
