@@ -10,7 +10,8 @@ ENV PIP_ROOT_USER_ACTION=ignore
 
 RUN pip install --upgrade --no-cache-dir --break-system-packages \
     kurigram==v2.1.37 \
-    python-dotenv==1.0.0
+    python-dotenv==1.0.0 \
+    sqlalchemy==2.0.36
 
 WORKDIR /home
 

@@ -3,6 +3,8 @@ import re
 import logging
 from pyrogram import filters
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase
 
 
 load_dotenv("data/.env")
@@ -48,6 +50,8 @@ class Config:
     def getenv(key: str, default=None):
         return os.environ.get(key, default)
 
+    engine = create_engine(getenv("db_uri", "sqlite:///data/database.db"))
+
     PROXY = getenv(
         "proxy",
         getenv("http_proxy") or getenv("HTTP_PROXY")
@@ -58,3 +62,7 @@ class Config:
         getenv("admins", "@itisFarzin").split(",")
     )
     CMD_PREFIXES = getenv("cmd_prefixes", "/").split(" ")
+
+
+class DataBase(DeclarativeBase):
+    pass

@@ -1,6 +1,7 @@
-.env
+__pycache__/
+plugins/
+venv/
 *.session*
 *.log
-__pycache__/
-venv/
-plugins/
+*.db
+.env

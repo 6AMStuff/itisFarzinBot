@@ -1,15 +1,18 @@
 import logging
 from pathlib import Path
+from pyrogram import Client
 from typing import Generator
 from importlib import import_module
-
-from pyrogram import Client
+from config import Config, DataBase
 from pyrogram.handlers.handler import Handler
 
 
 class Bot(Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        DataBase.metadata.create_all(Config.engine)
+
         self.load_plugins(folder="bot/builtin_plugins")
 
     def plugin_list(
