@@ -1,9 +1,12 @@
 import os
 import re
+import inspect
 import logging
 from pyrogram import filters
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, String, Boolean
+from sqlalchemy.orm import Session
+from sqlalchemy import select, update
+from sqlalchemy import create_engine, String, Boolean, JSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -50,6 +53,35 @@ class Config:
     def getenv(key: str, default=None):
         return os.environ.get(key, default)
 
+    @staticmethod
+    def setdata(key: str, value) -> bool:
+        caller_frame = inspect.currentframe().f_back
+        plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+        with Session(Config.engine) as session:
+            data: dict = session.execute(
+                select(PluginDatabase.custom_data)
+                .where(PluginDatabase.name == plugin_name)
+            ).scalar()
+            data[key] = value
+            result = session.execute(
+                update(PluginDatabase)
+                .where(PluginDatabase.name == plugin_name)
+                .values(custom_data=data)
+            )
+            session.commit()
+            return result.rowcount > 0
+
+    @staticmethod
+    def getdata(key: str, default=None) -> dict:
+        caller_frame = inspect.currentframe().f_back
+        plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+        with Session(Config.engine) as session:
+            data: dict = session.execute(
+                select(PluginDatabase.custom_data)
+                .where(PluginDatabase.name == plugin_name)
+            ).scalar()
+            return data.get(key, default)
+
     engine = create_engine(getenv("db_uri", "sqlite:///data/database.db"))
 
     PROXY = getenv(
@@ -73,3 +105,4 @@ class PluginDatabase(DataBase):
 
     name: Mapped[str] = mapped_column(String(40), primary_key=True)
     enabled: Mapped[bool] = mapped_column(Boolean())
+    custom_data: Mapped[JSON] = mapped_column(JSON(), default=dict())
