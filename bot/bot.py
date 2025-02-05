@@ -18,10 +18,10 @@ class Bot(Client):
         self.load_plugins(folder="bot/builtin_plugins")
 
     def plugin_list(
-        self, folder: str = None, only_name: bool = True
+        self, folder: str = None, path_only: bool = False
     ) -> list[str | Path]:
         return sorted([
-            path.stem if only_name else path
+            path if path_only else path.stem
             for path in Path(
                 (folder or self.plugins["root"]).replace(".", "/")
             ).rglob("*.py")
@@ -41,7 +41,7 @@ class Bot(Client):
             if plugin not in _plugins:
                 yield (plugin, "Plugin not found")
 
-        for path in self.plugin_list(folder=folder, only_name=False):
+        for path in self.plugin_list(folder=folder, path_only=True):
             if path.stem not in plugins:
                 continue
 
