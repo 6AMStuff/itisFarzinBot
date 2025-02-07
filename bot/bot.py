@@ -9,12 +9,16 @@ from pyrogram.handlers.handler import Handler
 from config import Config, DataBase, PluginDatabase
 
 
-class Bot(Client):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class BotMeta(type):
+    def __call__(cls, *args, **kwargs):
+        instance: Bot = super().__call__(*args, **kwargs)
+        instance._post_init()
+        return instance
 
+
+class Bot(Client, metaclass=BotMeta):
+    def _post_init(self):
         DataBase.metadata.create_all(Config.engine)
-
         self.load_plugins(folder="bot/builtin_plugins")
 
     def plugin_list(
@@ -47,6 +51,7 @@ class Bot(Client):
 
             module_path = '.'.join(path.parent.parts + (path.stem,))
             module = importlib.import_module(module_path)
+            # TODO: reload the module after import
 
             for name in vars(module).keys():
                 target_attr = getattr(module, name)
