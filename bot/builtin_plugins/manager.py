@@ -18,7 +18,7 @@ async def plugins(app: Bot, message: Message):
 async def handlers(app: Bot, message: Message):
     responce = "**Handlers**:\n" + "\n".join([
         f"{handler.callback.__name__}: "
-        + "Loaded" if app.handler_is_loaded(handler, group) else "Not loaded"
+        + ("Loaded" if app.handler_is_loaded(handler, group) else "Not loaded")
         for handler, group in app.get_handlers(app.plugin_list())
     ])
     await message.reply(responce)
