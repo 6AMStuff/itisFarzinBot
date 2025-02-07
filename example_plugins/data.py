@@ -10,6 +10,7 @@ from config import Config
 async def setdata(_, message: Message):
     if len(message.command) != 3:
         await message.reply(f"{Config.CMD_PREFIXES[0]}setdata [key] [value]")
+        return
     _, key, value = message.command
     result = Config.setdata(key, value)
     await message.reply("Done." if result else "Failed.")
@@ -34,4 +35,4 @@ async def deldata(_, message: Message):
         await message.reply(f"{Config.CMD_PREFIXES[0]}deldata [key]")
         return
     result = Config.deldata(message.command[1])
-    await message.reply(result)
+    await message.reply("Done." if result else "Failed.")
