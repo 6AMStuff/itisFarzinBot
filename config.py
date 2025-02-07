@@ -82,6 +82,27 @@ class Config:
             ).scalar()
             return data.get(key, default)
 
+    @staticmethod
+    def deldata(key: str) -> dict:
+        caller_frame = inspect.currentframe().f_back
+        plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+        with Session(Config.engine) as session:
+            data: dict = session.execute(
+                select(PluginDatabase.custom_data)
+                .where(PluginDatabase.name == plugin_name)
+            ).scalar()
+            if key in data:
+                del data[key]
+            else:
+                return False
+            result = session.execute(
+                update(PluginDatabase)
+                .where(PluginDatabase.name == plugin_name)
+                .values(custom_data=data)
+            )
+            session.commit()
+            return result.rowcount > 0
+
     engine = create_engine(getenv("db_uri", "sqlite:///data/database.db"))
 
     PROXY = getenv(
