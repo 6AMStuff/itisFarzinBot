@@ -72,7 +72,7 @@ class Config:
             return result.rowcount > 0
 
     @staticmethod
-    def getdata(key: str, default=None) -> dict:
+    def getdata(key: str, default=None, use_env: bool = False) -> dict:
         caller_frame = inspect.currentframe().f_back
         plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
         with Session(Config.engine) as session:
@@ -80,7 +80,10 @@ class Config:
                 select(PluginDatabase.custom_data)
                 .where(PluginDatabase.name == plugin_name)
             ).scalar()
-            return data.get(key, default)
+            return data.get(
+                key,
+                Config.getenv(key, default) if use_env else default
+            )
 
     @staticmethod
     def deldata(key: str) -> dict:
