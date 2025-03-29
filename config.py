@@ -72,7 +72,7 @@ class Config:
             return result.rowcount > 0
 
     @staticmethod
-    def getdata(key: str, default=None, use_env: bool = False) -> dict:
+    def getdata(key: str, default=None, use_env: bool = False):
         caller_frame = inspect.currentframe().f_back
         plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
         with Session(Config.engine) as session:
@@ -86,7 +86,7 @@ class Config:
             )
 
     @staticmethod
-    def deldata(key: str) -> dict:
+    def deldata(key: str) -> bool:
         caller_frame = inspect.currentframe().f_back
         plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
         with Session(Config.engine) as session:
