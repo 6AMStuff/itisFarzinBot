@@ -118,6 +118,7 @@ class Config:
         getenv("admins", "@itisFarzin").split(",")
     )
     CMD_PREFIXES = getenv("cmd_prefixes", "/").split(" ")
+    REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
 
 
 class DataBase(DeclarativeBase):
