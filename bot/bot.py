@@ -1,3 +1,4 @@
+import os
 import logging
 import importlib
 from pathlib import Path
@@ -22,14 +23,21 @@ class Bot(Client, metaclass=BotMeta):
         self.load_plugins(folder="bot/builtin_plugins")
 
     def plugin_list(
-        self, folder: str = None, path_only: bool = False
+        self,
+        folder: str = None,
+        path_only: bool = False
     ) -> list[str | Path]:
-        return sorted([
-            path if path_only else path.stem
-            for path in Path(
-                (folder or self.plugins["root"]).replace(".", "/")
-            ).rglob("*.py")
-        ])
+        plugins = []
+        for root, _, files in os.walk(
+            (folder or self.plugins["root"]).replace(".", "/"),
+            followlinks=True
+        ):
+            for file in files:
+                if file.endswith(".py"):
+                    full_path = Path(root) / file
+                    plugins.append(full_path if path_only else full_path.stem)
+
+        return sorted(plugins)
 
     def get_handlers(
         self, plugins: str | list[str], folder: str = None
