@@ -24,23 +24,29 @@ class Bot(Client, metaclass=BotMeta):
 
     def plugin_list(
         self,
-        folder: str = None,
-        path_only: bool = False
+        folder: str | list[str] = None,
+        full_path: bool = False
     ) -> list[str | Path]:
         plugins = []
-        for root, _, files in os.walk(
-            (folder or self.plugins["root"]).replace(".", "/"),
-            followlinks=True
-        ):
-            for file in files:
-                if file.endswith(".py"):
-                    full_path = Path(root) / file
-                    plugins.append(full_path if path_only else full_path.stem)
+
+        folders = folder if isinstance(folder, list) else [
+            folder or self.plugins["root"]
+        ]
+
+        for f in folders:
+            for root, _, files in os.walk(
+                f.replace(".", "/"),
+                followlinks=True
+            ):
+                for file in files:
+                    if file.endswith(".py"):
+                        path = Path(root) / file
+                        plugins.append(path if full_path else path.stem)
 
         return sorted(plugins)
 
     def get_handlers(
-        self, plugins: str | list[str], folder: str = None
+        self, plugins: str | list[str], folder: str | list[str] = None,
     ) -> Generator[tuple[str, str] | tuple[Handler, int], None, None]:
         if isinstance(plugins, str):
             plugins = plugins.split(",")
@@ -53,7 +59,7 @@ class Bot(Client, metaclass=BotMeta):
             if plugin not in _plugins:
                 yield (plugin, "Plugin not found")
 
-        for path in self.plugin_list(folder=folder, path_only=True):
+        for path in self.plugin_list(folder=folder, full_path=True):
             if path.stem not in plugins:
                 continue
 
@@ -82,7 +88,9 @@ class Bot(Client, metaclass=BotMeta):
             session.commit()
 
     def load_plugins(
-        self, plugins: str | list[str] = None, folder: str = None,
+        self,
+        plugins: str | list[str] = None,
+        folder: str | list[str] = None,
         force_load: bool = False
     ) -> dict[str, str]:
         result = {}
@@ -123,7 +131,7 @@ class Bot(Client, metaclass=BotMeta):
         return result
 
     def unload_plugins(
-        self, plugins: str | list[str] = None, folder: str = None
+        self, plugins: str | list[str] = None, folder: str | list[str] = None
     ):
         result = {}
         if isinstance(plugins, str):
