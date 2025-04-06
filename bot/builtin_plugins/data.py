@@ -43,7 +43,7 @@ async def getdata(app: Bot, message: Message):
     globals()["__name__"] = plugin_name
     result = Config.getdata(key)
     globals()["__name__"] = original___name__
-    await message.reply("Value: " + str(result))
+    await message.reply(f"Value: `{result}`")
 
 
 @Client.on_message(
