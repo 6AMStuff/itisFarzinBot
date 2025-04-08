@@ -66,3 +66,4 @@ async def deldata(app: Bot, message: Message):
 
 
 __all__ = ["setdata", "getdata", "deldata"]
+__plugin__ = True

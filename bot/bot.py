@@ -26,7 +26,9 @@ class Bot(Client, metaclass=BotMeta):
     def plugin_list(
         self,
         folder: str | list[str] = None,
-        full_path: bool = False
+        full_path: bool = False,
+        with_non_plugins: bool = True,
+        load: bool = True
     ) -> list[str | Path]:
         plugins = []
 
@@ -40,9 +42,18 @@ class Bot(Client, metaclass=BotMeta):
                 followlinks=True
             ):
                 for file in files:
-                    if file.endswith(".py"):
-                        path = Path(root) / file
-                        plugins.append(path if full_path else path.stem)
+                    if not file.endswith(".py"):
+                        continue
+                    path = Path(root) / file
+                    if load:
+                        module_path = ".".join(
+                            path.parent.parts + (path.stem,)
+                        )
+                        module = importlib.import_module(module_path)
+                        if not with_non_plugins:
+                            if not getattr(module, "__plugin__", False):
+                                continue
+                    plugins.append(path if full_path else path.stem)
 
         return sorted(plugins)
 

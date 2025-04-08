@@ -9,7 +9,9 @@ from config import Config
     Config.IS_ADMIN & filters.command("plugins", Config.CMD_PREFIXES)
 )
 async def plugins(app: Bot, message: Message):
-    await message.reply("**Plugins**: " + ", ".join(app.plugin_list()))
+    await message.reply(
+        "**Plugins**: " + ", ".join(app.plugin_list(with_non_plugins=False))
+    )
 
 
 @Bot.on_message(
@@ -19,7 +21,9 @@ async def handlers(app: Bot, message: Message):
     responce = "**Handlers**:\n" + "\n".join([
         f"{handler.callback.__name__}: "
         + ("Loaded" if app.handler_is_loaded(handler, group) else "Not loaded")
-        for handler, group in app.get_handlers(app.plugin_list())
+        for handler, group in app.get_handlers(
+            app.plugin_list(with_non_plugins=False)
+        )
     ])
     await message.reply(responce)
 
@@ -55,3 +59,4 @@ async def unload(app: Bot, message: Message):
 
 
 __all__ = ["plugins", "handlers", "load", "unload"]
+__plugin__ = True

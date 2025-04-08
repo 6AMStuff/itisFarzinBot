@@ -12,3 +12,4 @@ async def pong(_, message: Message):
 
 
 __all__ = ["pong"]
+__plugin__ = True

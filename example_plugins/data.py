@@ -39,3 +39,4 @@ async def deldata(_, message: Message):
 
 
 __all__ = ["setdata", "getdata", "deldata"]
+__plugin__ = True
