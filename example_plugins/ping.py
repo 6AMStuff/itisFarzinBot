@@ -9,3 +9,6 @@ from config import Config
 )
 async def pong(_, message: Message):
     await message.reply("Pong!")
+
+
+__all__ = ["pong"]

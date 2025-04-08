@@ -52,3 +52,6 @@ async def unload(app: Bot, message: Message):
         f"**{plugin}**: {result[plugin]}" for plugin in result
     ])
     await message.reply(responce)
+
+
+__all__ = ["plugins", "handlers", "load", "unload"]

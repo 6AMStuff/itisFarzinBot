@@ -63,3 +63,6 @@ async def deldata(app: Bot, message: Message):
     result = Config.deldata(key)
     globals()["__name__"] = original___name__
     await message.reply("Done." if result else "Failed.")
+
+
+__all__ = ["setdata", "getdata", "deldata"]

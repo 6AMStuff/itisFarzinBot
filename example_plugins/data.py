@@ -36,3 +36,6 @@ async def deldata(_, message: Message):
         return
     result = Config.deldata(message.command[1])
     await message.reply("Done." if result else "Failed.")
+
+
+__all__ = ["setdata", "getdata", "deldata"]
