@@ -19,8 +19,9 @@ class BotMeta(type):
 
 class Bot(Client, metaclass=BotMeta):
     def _post_init(self):
+        self.builtin_plugin = "bot/builtin_plugins"
         DataBase.metadata.create_all(Config.engine)
-        self.load_plugins(folder="bot/builtin_plugins")
+        self.load_plugins(folder=self.builtin_plugin)
 
     def plugin_list(
         self,
@@ -51,6 +52,7 @@ class Bot(Client, metaclass=BotMeta):
         if isinstance(plugins, str):
             plugins = plugins.split(",")
 
+        group_offset = 0 if folder == self.builtin_plugin else 1
         _plugins = self.plugin_list(folder=folder)
         if plugins is None:
             plugins = _plugins
@@ -75,7 +77,7 @@ class Bot(Client, metaclass=BotMeta):
                             isinstance(handler, Handler)
                             and isinstance(group, int)
                         ):
-                            yield (handler, group)
+                            yield (handler, group + group_offset)
 
     def handler_is_loaded(self, handler: Handler, group: int = 0) -> bool:
         if group not in self.dispatcher.groups:
