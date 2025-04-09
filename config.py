@@ -13,7 +13,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 load_dotenv("data/.env")
 
 logger = logging.getLogger(os.getenv("log_name", "bot"))
-log_level = os.getenv("log_level")
+log_level = str(os.getenv("log_level"))
 log_level = int(log_level) if str(log_level).isdigit() else logging.INFO
 logging.basicConfig(
     filename=f"{os.getenv("log_path", ".")}/{logger.name}.log",
@@ -26,7 +26,7 @@ logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
 class Config:
     @staticmethod
-    def url_parser(url: str, proxy_mode: bool = False):
+    def url_parser(url: str, is_a_proxy: bool = False):
         pattern = re.compile(
             r'^(?:(?P<scheme>[a-zA-Z0-9]+)://)?'  # Optional scheme
             r'(?:(?P<username>[^:]+)'  # Optional username
@@ -41,13 +41,15 @@ class Config:
         if not result:
             return None
 
-        if proxy_mode and (
+        if is_a_proxy and (
             result["scheme"] not in ["http", "socks5", "socks4"]
         ):
             return None
 
-        return {key: int(value) if str(value).isdigit() else value
-                for key, value in result.groupdict().items()}
+        return {
+            key: int(value) if str(value).isdigit() else value
+            for key, value in result.groupdict().items()
+        }
 
     @staticmethod
     def getenv(key: str, default=None):
@@ -108,16 +110,16 @@ class Config:
 
     engine = create_engine(getenv("db_uri", "sqlite:///data/database.db"))
 
-    PROXY = getenv(
+    PROXY = str(getenv(
         "proxy",
         getenv("http_proxy") or getenv("HTTP_PROXY")
-        if getenv("use_system_proxy", "yes").lower() == "yes"
+        if str(getenv("use_system_proxy", "yes")).lower() == "yes"
         else None
-    )
+    ))
     IS_ADMIN = filters.user(
-        getenv("admins", "@itisFarzin").split(",")
+        str(getenv("admins", "@itisFarzin")).split(",")
     )
-    CMD_PREFIXES = getenv("cmd_prefixes", "/").split(" ")
+    CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
 
 
