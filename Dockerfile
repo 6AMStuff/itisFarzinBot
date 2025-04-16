@@ -3,9 +3,9 @@ FROM python:alpine
 ENV PIP_ROOT_USER_ACTION=ignore
 
 RUN pip install --upgrade --no-cache-dir --break-system-packages \
-    kurigram==v2.1.37 \
-    python-dotenv==1.0.0 \
-    sqlalchemy==2.0.36
+    kurigram==2.2.0 \
+    python-dotenv==1.1.0 \
+    sqlalchemy==2.0.40
 
 WORKDIR /home
 
