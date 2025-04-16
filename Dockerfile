@@ -1,10 +1,4 @@
-FROM alpine:3.21
-
-RUN apk update && apk upgrade
-
-RUN apk add \
-    python3 \
-    py3-pip
+FROM python:alpine
 
 ENV PIP_ROOT_USER_ACTION=ignore
 
