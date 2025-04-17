@@ -2,6 +2,8 @@ FROM python:alpine
 
 ENV PIP_ROOT_USER_ACTION=ignore
 
+RUN touch /IS_CONTAINER
+
 RUN pip install --upgrade --no-cache-dir --break-system-packages \
     kurigram==2.2.0 \
     python-dotenv==1.1.0 \
