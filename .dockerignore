@@ -2,3 +2,5 @@ __pycache__/
 downloads/
 data/
 venv/
+
+!data/.env.example
