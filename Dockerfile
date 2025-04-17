@@ -1,23 +1,17 @@
 FROM python:alpine
 
-ENV PIP_ROOT_USER_ACTION=ignore
-
 RUN touch /IS_CONTAINER
-
-RUN pip install --upgrade --no-cache-dir --break-system-packages \
-    kurigram==2.2.0 \
-    python-dotenv==1.1.0 \
-    sqlalchemy==2.0.40
 
 WORKDIR /home
 
-COPY main.py .
-COPY config.py .
+COPY *.py ./
 ADD bot bot
 
 RUN mkdir data plugins
 RUN ln -s /home/data /
 RUN ln -s /home/plugins /
+
+RUN python3 setup.py
 
 VOLUME [ "/data", "/plugins" ]
 
