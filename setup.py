@@ -12,7 +12,12 @@ pip_command = [
 ]
 
 if os.path.exists("/IS_CONTAINER"):
-    pip_command += ["--no-cache-dir", "--break-system-packages"]
+    pip_command += [
+        "--no-cache-dir",
+        "--break-system-packages",
+        "--root-user-action",
+        "ignore"
+    ]
 else:
     os.system("python -m venv venv")
     os.system("source venv/bin/activate")
