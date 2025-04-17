@@ -5,9 +5,11 @@ RUN touch /IS_CONTAINER
 WORKDIR /home
 
 COPY *.py ./
+COPY requirements.txt .
 ADD bot bot
+ADD data data
 
-RUN mkdir data plugins
+RUN mkdir plugins
 RUN ln -s /home/data /
 RUN ln -s /home/plugins /
 
