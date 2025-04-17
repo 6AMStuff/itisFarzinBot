@@ -14,6 +14,7 @@ parser.add_argument(
     action=argparse.BooleanOptionalAction,
     default=True
 )
+parser.add_argument("--requirement", type=str, default="requirements.txt")
 
 args = parser.parse_args()
 
@@ -23,7 +24,7 @@ pip_command = [
     "--disable-pip-version-check",
     "--upgrade",
     "--requirement",
-    "requirements.txt"
+    args.requirement or ""
 ]
 
 if os.path.exists("/IS_CONTAINER"):
@@ -47,7 +48,8 @@ if args.verbose:
 else:
     pip_command.append("-q")
 
-subprocess.call(pip_command)
+if args.requirement:
+    subprocess.call(pip_command)
 
 if not os.path.isfile("data/.env"):
     shutil.copy("data/.env.example", "data/.env")
