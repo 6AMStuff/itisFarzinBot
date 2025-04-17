@@ -20,6 +20,7 @@ args = parser.parse_args()
 pip_command = [
     "pip",
     "install",
+    "--disable-pip-version-check",
     "--upgrade",
     "--requirement",
     "requirements.txt"
