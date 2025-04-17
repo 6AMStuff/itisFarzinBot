@@ -56,6 +56,12 @@ class Config:
         return os.environ.get(key, default)
 
     @staticmethod
+    def _createdata(plugin_name: str):
+        with Session(Config.engine) as session:
+            session.merge(PluginDatabase(name=plugin_name, enabled=True))
+            session.commit()
+
+    @staticmethod
     def setdata(key: str, value) -> bool:
         caller_frame = inspect.currentframe().f_back
         plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
@@ -64,6 +70,9 @@ class Config:
                 select(PluginDatabase.custom_data)
                 .where(PluginDatabase.name == plugin_name)
             ).scalar()
+            if not data:
+                Config._createdata(plugin_name)
+                data = {}
             data[key] = value
             result = session.execute(
                 update(PluginDatabase)
@@ -82,6 +91,9 @@ class Config:
                 select(PluginDatabase.custom_data)
                 .where(PluginDatabase.name == plugin_name)
             ).scalar()
+            if not data:
+                Config._createdata(plugin_name)
+                data = {}
             return data.get(
                 key,
                 Config.getenv(key, default) if use_env else default
@@ -96,6 +108,9 @@ class Config:
                 select(PluginDatabase.custom_data)
                 .where(PluginDatabase.name == plugin_name)
             ).scalar()
+            if not data:
+                Config._createdata(plugin_name)
+                return 1
             if key in data:
                 del data[key]
             else:
