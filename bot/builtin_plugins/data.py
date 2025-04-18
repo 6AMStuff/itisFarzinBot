@@ -1,8 +1,6 @@
-import os
 import inspect
 import importlib
 from bot import Bot
-from pathlib import Path
 from typing import Callable
 from pyrogram import filters
 from pyrogram.types import Message
@@ -13,24 +11,22 @@ from config import Config
 original___name__ = __name__
 
 
-async def notify_module_data_change(folder: str, name: str) -> bool:
-    name = name.rsplit(".py", 1)[0] + ".py"
+async def notify_module_data_change(app: Bot, name: str) -> bool:
+    name = name.rsplit(".py", 1)[0]
 
-    for root, _, files in os.walk(folder, followlinks=True):
-        for file in files:
-            if file == name:
-                path = Path(root) / file
-                module_path = ".".join(path.with_suffix("").parts)
-                module = importlib.import_module(module_path)
-                if on_data_change := getattr(module, "on_data_change", None):
-                    if not isinstance(on_data_change, Callable):
-                        pass
-                    if inspect.iscoroutinefunction(on_data_change):
-                        await on_data_change()
-                    else:
-                        on_data_change()
-                    return True
-                break
+    for path in app.modules_list():
+        if path.stem == name:
+            module_path = ".".join(path.with_suffix("").parts)
+            module = importlib.import_module(module_path)
+            if on_data_change := getattr(module, "on_data_change", None):
+                if not isinstance(on_data_change, Callable):
+                    pass
+                if inspect.iscoroutinefunction(on_data_change):
+                    await on_data_change()
+                else:
+                    on_data_change()
+                return True
+            break
     return False
 
 
@@ -50,7 +46,7 @@ async def setdata(app: Bot, message: Message):
     globals()["__name__"] = plugin_name
     result = Config.setdata(key, value)
     globals()["__name__"] = original___name__
-    await notify_module_data_change(app.plugins["root"], plugin_name)
+    await notify_module_data_change(app, plugin_name)
     await message.reply("Done." if result else "Failed.")
 
 
@@ -89,7 +85,7 @@ async def deldata(app: Bot, message: Message):
     globals()["__name__"] = plugin_name
     result = Config.deldata(key)
     globals()["__name__"] = original___name__
-    await notify_module_data_change(app.plugins["root"], plugin_name)
+    await notify_module_data_change(app, plugin_name)
     await message.reply("Done." if result else "Failed.")
 
 
