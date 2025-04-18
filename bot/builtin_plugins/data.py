@@ -44,7 +44,7 @@ async def setdata(app: Bot, message: Message):
         )
         return
     _, plugin_name, key, value = message.command
-    if plugin_name not in app.plugin_list():
+    if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
     globals()["__name__"] = plugin_name
@@ -64,7 +64,7 @@ async def getdata(app: Bot, message: Message):
         )
         return
     _, plugin_name, key = message.command
-    if plugin_name not in app.plugin_list():
+    if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
     globals()["__name__"] = plugin_name
@@ -83,7 +83,7 @@ async def deldata(app: Bot, message: Message):
         )
         return
     _, plugin_name, key = message.command
-    if plugin_name not in app.plugin_list():
+    if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
     globals()["__name__"] = plugin_name

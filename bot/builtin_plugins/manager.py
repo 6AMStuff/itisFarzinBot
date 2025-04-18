@@ -10,7 +10,7 @@ from config import Config
 )
 async def plugins(app: Bot, message: Message):
     await message.reply(
-        "**Plugins**: " + ", ".join(app.plugin_list(with_non_plugins=False))
+        "**Plugins**: " + ", ".join(app.get_plugins())
     )
 
 
@@ -21,9 +21,7 @@ async def handlers(app: Bot, message: Message):
     responce = "**Handlers**:\n" + "\n".join([
         f"{handler.callback.__name__}: "
         + ("Loaded" if app.handler_is_loaded(handler, group) else "Not loaded")
-        for handler, group in app.get_handlers(
-            app.plugin_list(with_non_plugins=False)
-        )
+        for handler, group in app.get_handlers(app.get_plugins())
     ])
     await message.reply(responce)
 

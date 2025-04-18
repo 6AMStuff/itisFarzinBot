@@ -23,14 +23,11 @@ class Bot(Client, metaclass=BotMeta):
         DataBase.metadata.create_all(Config.engine)
         self.load_plugins(folder=self.builtin_plugin)
 
-    def plugin_list(
+    def modules_list(
         self,
-        folder: Optional[str | list[str]] = None,
-        full_path: bool = False,
-        with_non_plugins: bool = True,
-        load: bool = True
-    ) -> list[str] | list[Path]:
-        plugins = []
+        folder: Optional[str | list[str]] = None
+    ) -> list[Path]:
+        modules = []
 
         folders = folder if isinstance(folder, list) else [
             folder or self.plugins["root"]
@@ -45,15 +42,25 @@ class Bot(Client, metaclass=BotMeta):
                     if not file.endswith(".py"):
                         continue
                     path = Path(root) / file
-                    if load:
-                        module_path = ".".join(
-                            path.parent.parts + (path.stem,)
-                        )
-                        module = importlib.import_module(module_path)
-                        if not with_non_plugins:
-                            if not getattr(module, "__plugin__", False):
-                                continue
-                    plugins.append(path if full_path else path.stem)
+                    modules.append(path)
+
+        return sorted(modules)
+
+    def get_plugins(
+        self,
+        folder: Optional[str | list[str]] = None
+    ) -> list[str] | list[Path]:
+        plugins = []
+
+        folders = folder if isinstance(folder, list) else [
+            folder or self.plugins["root"]
+        ]
+
+        for path in self.modules_list(folders):
+            module_path = ".".join(path.with_suffix("").parts)
+            module = importlib.import_module(module_path)
+            if getattr(module, "__plugin__", False):
+                plugins.append(path.stem)
 
         return sorted(plugins)
 
@@ -66,14 +73,14 @@ class Bot(Client, metaclass=BotMeta):
             plugins = plugins.split(",")
 
         group_offset = 0 if folder == self.builtin_plugin else 1
-        _plugins = self.plugin_list(folder=folder)
+        _plugins = self.get_plugins(folder=folder)
 
         if plugins:
             for plugin in plugins:
                 if plugin not in _plugins:
                     yield (plugin, "Plugin not found")
 
-        for path in self.plugin_list(folder=folder, full_path=True):
+        for path in self.modules_list(folder=folder):
             if plugins and path.stem not in plugins:
                 continue
 
@@ -111,7 +118,7 @@ class Bot(Client, metaclass=BotMeta):
         if isinstance(plugins, str):
             plugins = plugins.split(",")
 
-        _plugins = self.plugin_list(folder=folder)
+        _plugins = self.get_plugins(folder=folder)
         plugins = plugins or _plugins
 
         for plugin in plugins:
@@ -152,7 +159,7 @@ class Bot(Client, metaclass=BotMeta):
         if isinstance(plugins, str):
             plugins = plugins.split(",")
 
-        _plugins = self.plugin_list(folder=folder)
+        _plugins = self.get_plugins(folder=folder)
         plugins = plugins or _plugins
 
         for plugin in plugins:
