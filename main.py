@@ -16,8 +16,9 @@ app = Bot(
 
 
 if __name__ == "__main__":
-    for root, _, files in os.walk(plugins_folder, followlinks=True):
-        for file in files:
-            if file == "requirements.txt":
-                setup_environment(f"{root}/{file}", False)
+    if Config.getenv("test_mode", "").lower() not in ["true", "1"]:
+        for root, _, files in os.walk(plugins_folder, followlinks=True):
+            for file in files:
+                if file == "requirements.txt":
+                    setup_environment(f"{root}/{file}", False)
     app.run()
