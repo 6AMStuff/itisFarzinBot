@@ -20,8 +20,8 @@ class BotMeta(type):
 class Bot(Client, metaclass=BotMeta):
     def _post_init(self):
         self.builtin_plugin = "bot/builtin_plugins"
-        DataBase.metadata.create_all(Config.engine)
         self.load_plugins(folder=self.builtin_plugin)
+        DataBase.metadata.create_all(Config.engine)
 
     def modules_list(
         self,
@@ -148,6 +148,7 @@ class Bot(Client, metaclass=BotMeta):
                         f"Failed to load {callback_name} handler, "
                         "because it is already loaded"
                     )
+        DataBase.metadata.create_all(Config.engine)
         return result
 
     def unload_plugins(
