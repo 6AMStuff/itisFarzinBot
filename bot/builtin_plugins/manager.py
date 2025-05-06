@@ -60,34 +60,22 @@ async def handlers(app: Bot, message: Message):
 
 
 @Bot.on_message(
-    Config.IS_ADMIN & filters.command("load", Config.CMD_PREFIXES)
+    Config.IS_ADMIN & filters.command(["load", "unload"], Config.CMD_PREFIXES)
 )
-async def load(app: Bot, message: Message):
+async def load_unload(app: Bot, message: Message):
     plugins = (
         ",".join(message.command[-1:])
         if len(message.command) > 1 else None
     )
-    result = app.load_plugins(plugins, force_load=True)
+    if message.command[0] == "load":
+        result = app.load_plugins(plugins, force_load=True)
+    else:
+        result = app.unload_plugins(plugins)
     responce = "\n".join([
         f"**{plugin}**: {result[plugin]}" for plugin in result
     ])
     await message.reply(responce)
 
 
-@Bot.on_message(
-    Config.IS_ADMIN & filters.command("unload", Config.CMD_PREFIXES)
-)
-async def unload(app: Bot, message: Message):
-    plugins = (
-        ",".join(message.command[-1:])
-        if len(message.command) > 1 else None
-    )
-    result = app.unload_plugins(plugins)
-    responce = "\n".join([
-        f"**{plugin}**: {result[plugin]}" for plugin in result
-    ])
-    await message.reply(responce)
-
-
-__all__ = ["plugins", "plugins_callback", "handlers", "load", "unload"]
+__all__ = ["plugins", "plugins_callback", "handlers", "load_unload"]
 __plugin__ = True
