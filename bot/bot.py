@@ -108,6 +108,14 @@ class Bot(Client, metaclass=BotMeta):
             session.merge(PluginDatabase(name=plugin, enabled=enabled))
             session.commit()
 
+    def get_plugin_status(self, plugin: str) -> bool:
+        with Session(Config.engine) as session:
+            enabled = session.execute(
+                select(PluginDatabase.enabled)
+                .where(PluginDatabase.name == plugin)
+            ).scalar()
+            return enabled or False
+
     def load_plugins(
         self,
         plugins: Optional[str | list[str]] = None,

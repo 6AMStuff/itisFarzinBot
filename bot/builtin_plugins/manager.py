@@ -1,8 +1,25 @@
 from bot import Bot
 from pyrogram import filters
-from pyrogram.types import Message
+from pyrogram.types import (
+    Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+)
 
 from config import Config
+
+
+def plugins_keyboard(app: Bot):
+    plugins = app.get_plugins()
+    keyboard = [
+        [
+            InlineKeyboardButton(plugin, f"plugins {plugin}"),
+            InlineKeyboardButton(
+                {True: "✅", False: "❌"}[app.get_plugin_status(plugin)],
+                f"plugins {plugin}"
+            )
+        ]
+        for plugin in plugins
+    ]
+    return keyboard
 
 
 @Bot.on_message(
@@ -10,7 +27,23 @@ from config import Config
 )
 async def plugins(app: Bot, message: Message):
     await message.reply(
-        "**Plugins**: " + ", ".join(app.get_plugins())
+        "**Plugins**:",
+        reply_markup=InlineKeyboardMarkup(plugins_keyboard(app))
+    )
+
+
+@Bot.on_callback_query(
+    filters.regex(r"^plugins (?P<plugin>\w+)$")
+)
+async def plugins_callback(app: Bot, query: CallbackQuery):
+    plugin: str = query.matches[0].group("plugin")
+    if app.get_plugin_status(plugin):
+        app.unload_plugins(plugin)
+    else:
+        app.load_plugins(plugin)
+    await query.edit_message_text(
+        "**Plugins**:",
+        reply_markup=InlineKeyboardMarkup(plugins_keyboard(app))
     )
 
 
@@ -56,5 +89,5 @@ async def unload(app: Bot, message: Message):
     await message.reply(responce)
 
 
-__all__ = ["plugins", "handlers", "load", "unload"]
+__all__ = ["plugins", "plugins_callback", "handlers", "load", "unload"]
 __plugin__ = True
