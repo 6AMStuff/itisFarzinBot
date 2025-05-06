@@ -40,7 +40,7 @@ async def plugins_callback(app: Bot, query: CallbackQuery):
     if app.get_plugin_status(plugin):
         app.unload_plugins(plugin)
     else:
-        app.load_plugins(plugin)
+        app.load_plugins(plugin, force_load=True)
     await query.edit_message_text(
         "**Plugins**:",
         reply_markup=InlineKeyboardMarkup(plugins_keyboard(app))
