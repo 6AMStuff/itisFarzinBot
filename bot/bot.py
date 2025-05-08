@@ -20,6 +20,7 @@ class BotMeta(type):
 class Bot(Client, metaclass=BotMeta):
     def _post_init(self):
         self.builtin_plugin = "bot/builtin_plugins"
+        DataBase.metadata.create_all(Config.engine)
         self.load_plugins(folder=self.builtin_plugin)
         DataBase.metadata.create_all(Config.engine)
 
