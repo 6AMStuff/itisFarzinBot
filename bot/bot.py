@@ -25,19 +25,19 @@ class Bot(Client, metaclass=BotMeta):
         DataBase.metadata.create_all(Config.engine)
 
     def modules_list(
-        self,
-        folder: Optional[str | list[str]] = None
+        self, folder: Optional[str | list[str]] = None
     ) -> list[Path]:
         modules = []
 
-        folders = folder if isinstance(folder, list) else [
-            folder or self.plugins["root"]
-        ]
+        folders = (
+            folder
+            if isinstance(folder, list)
+            else [folder or self.plugins["root"]]
+        )
 
         for f in folders:
             for root, _, files in os.walk(
-                f.replace(".", "/"),
-                followlinks=True
+                f.replace(".", "/"), followlinks=True
             ):
                 for file in files:
                     if not file.endswith(".py"):
@@ -48,14 +48,15 @@ class Bot(Client, metaclass=BotMeta):
         return sorted(modules)
 
     def get_plugins(
-        self,
-        folder: Optional[str | list[str]] = None
+        self, folder: Optional[str | list[str]] = None
     ) -> list[str] | list[Path]:
         plugins = []
 
-        folders = folder if isinstance(folder, list) else [
-            folder or self.plugins["root"]
-        ]
+        folders = (
+            folder
+            if isinstance(folder, list)
+            else [folder or self.plugins["root"]]
+        )
 
         for path in self.modules_list(folders):
             module_path = ".".join(path.with_suffix("").parts)
@@ -68,7 +69,7 @@ class Bot(Client, metaclass=BotMeta):
     def get_handlers(
         self,
         plugins: Optional[str | list[str]] = None,
-        folder: Optional[str | list[str]] = None
+        folder: Optional[str | list[str]] = None,
     ) -> Generator[tuple[str, str] | tuple[Handler, int], None, None]:
         if isinstance(plugins, str):
             plugins = plugins.split(",")
@@ -85,7 +86,7 @@ class Bot(Client, metaclass=BotMeta):
             if plugins and path.stem not in plugins:
                 continue
 
-            module_path = '.'.join(path.parent.parts + (path.stem,))
+            module_path = ".".join(path.parent.parts + (path.stem,))
             module = importlib.import_module(module_path)
             # TODO: reload the module after import
 
@@ -93,9 +94,8 @@ class Bot(Client, metaclass=BotMeta):
                 target_attr = getattr(module, name)
                 if hasattr(target_attr, "handlers"):
                     for handler, group in target_attr.handlers:
-                        if (
-                            isinstance(handler, Handler)
-                            and isinstance(group, int)
+                        if isinstance(handler, Handler) and isinstance(
+                            group, int
                         ):
                             yield (handler, group + group_offset)
 
@@ -112,8 +112,9 @@ class Bot(Client, metaclass=BotMeta):
     def get_plugin_status(self, plugin: str) -> bool:
         with Session(Config.engine) as session:
             enabled = session.execute(
-                select(PluginDatabase.enabled)
-                .where(PluginDatabase.name == plugin)
+                select(PluginDatabase.enabled).where(
+                    PluginDatabase.name == plugin
+                )
             ).scalar()
             return enabled or False
 
@@ -121,7 +122,7 @@ class Bot(Client, metaclass=BotMeta):
         self,
         plugins: Optional[str | list[str]] = None,
         folder: Optional[str | list[str]] = None,
-        force_load: bool = False
+        force_load: bool = False,
     ) -> dict[str, str]:
         result = {}
         if isinstance(plugins, str):
@@ -133,10 +134,15 @@ class Bot(Client, metaclass=BotMeta):
         for plugin in plugins:
             if plugin in _plugins:
                 with Session(Config.engine) as session:
-                    if session.execute(
-                        select(PluginDatabase.enabled)
-                        .where(PluginDatabase.name == plugin)
-                    ).scalar() is False and not force_load:
+                    if (
+                        session.execute(
+                            select(PluginDatabase.enabled).where(
+                                PluginDatabase.name == plugin
+                            )
+                        ).scalar()
+                        is False
+                        and not force_load
+                    ):
                         plugins.remove(plugin)
                     else:
                         self.set_plugin_status(plugin, True)
@@ -163,7 +169,7 @@ class Bot(Client, metaclass=BotMeta):
     def unload_plugins(
         self,
         plugins: Optional[str | list[str]] = None,
-        folder: Optional[str | list[str]] = None
+        folder: Optional[str | list[str]] = None,
     ):
         result = {}
         if isinstance(plugins, str):

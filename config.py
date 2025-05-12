@@ -19,7 +19,7 @@ logging.basicConfig(
     filename=f"{os.getenv("log_path", "data")}/{logger.name}.log",
     level=log_level,
     format="[%(asctime)s] %(levelname)s: %(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p"
+    datefmt="%m/%d/%Y %I:%M:%S %p",
 )
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
@@ -28,11 +28,11 @@ class Config:
     @staticmethod
     def url_parser(url: str, is_a_proxy: bool = False):
         pattern = re.compile(
-            r'^(?:(?P<scheme>[a-zA-Z0-9]+)://)?'  # Optional scheme
-            r'(?:(?P<username>[^:]+)'  # Optional username
-            r'(?::(?P<password>[^@]+))?@)?'  # Optional password
-            r'(?P<hostname>[^:]+)'  # Hostname
-            r':(?P<port>\d+)$'  # Port
+            r"^(?:(?P<scheme>[a-zA-Z0-9]+)://)?"  # Optional scheme
+            r"(?:(?P<username>[^:]+)"  # Optional username
+            r"(?::(?P<password>[^@]+))?@)?"  # Optional password
+            r"(?P<hostname>[^:]+)"  # Hostname
+            r":(?P<port>\d+)$"  # Port
         )
         if not url:
             return None
@@ -67,8 +67,9 @@ class Config:
         plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
         with Session(Config.engine) as session:
             data: dict = session.execute(
-                select(PluginDatabase.custom_data)
-                .where(PluginDatabase.name == plugin_name)
+                select(PluginDatabase.custom_data).where(
+                    PluginDatabase.name == plugin_name
+                )
             ).scalar()
             if not data:
                 Config._createdata(plugin_name)
@@ -88,15 +89,15 @@ class Config:
         plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
         with Session(Config.engine) as session:
             data: dict = session.execute(
-                select(PluginDatabase.custom_data)
-                .where(PluginDatabase.name == plugin_name)
+                select(PluginDatabase.custom_data).where(
+                    PluginDatabase.name == plugin_name
+                )
             ).scalar()
             if not data:
                 Config._createdata(plugin_name)
                 data = {}
             return data.get(
-                key,
-                Config.getenv(key, default) if use_env else default
+                key, Config.getenv(key, default) if use_env else default
             )
 
     @staticmethod
@@ -105,8 +106,9 @@ class Config:
         plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
         with Session(Config.engine) as session:
             data: dict = session.execute(
-                select(PluginDatabase.custom_data)
-                .where(PluginDatabase.name == plugin_name)
+                select(PluginDatabase.custom_data).where(
+                    PluginDatabase.name == plugin_name
+                )
             ).scalar()
             if not data:
                 Config._createdata(plugin_name)
@@ -125,15 +127,17 @@ class Config:
 
     engine = create_engine(getenv("db_uri", "sqlite:///data/database.db"))
 
-    PROXY = str(getenv(
-        "proxy",
-        getenv("http_proxy") or getenv("HTTP_PROXY")
-        if str(getenv("use_system_proxy", "yes")).lower() == "yes"
-        else None
-    ))
-    IS_ADMIN = filters.user(
-        str(getenv("admins", "@itisFarzin")).split(",")
+    PROXY = str(
+        getenv(
+            "proxy",
+            (
+                getenv("http_proxy") or getenv("HTTP_PROXY")
+                if str(getenv("use_system_proxy", "yes")).lower() == "yes"
+                else None
+            ),
+        )
     )
+    IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(","))
     CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
 

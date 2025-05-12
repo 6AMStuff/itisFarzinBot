@@ -11,7 +11,7 @@ app = Bot(
     api_hash=Config.getenv("api_hash"),
     bot_token=Config.getenv("bot_token"),
     proxy=Config.url_parser(Config.PROXY, is_a_proxy=True),
-    plugins=dict(root=plugins_folder)
+    plugins=dict(root=plugins_folder),
 )
 
 

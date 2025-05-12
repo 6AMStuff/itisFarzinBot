@@ -5,14 +5,11 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(
-    prog="setup.py",
-    description="Help to set up basics"
+    prog="setup.py", description="Help to set up basics"
 )
 
 parser.add_argument(
-    "--verbose",
-    action=argparse.BooleanOptionalAction,
-    default=True
+    "--verbose", action=argparse.BooleanOptionalAction, default=True
 )
 parser.add_argument("--requirement", type=str, default="requirements.txt")
 
@@ -26,7 +23,7 @@ def setup_environment(requirement="requirements.txt", verbose=True):
         "--disable-pip-version-check",
         "--upgrade",
         "--requirement",
-        requirement or ""
+        requirement or "",
     ]
 
     if os.path.exists("/IS_CONTAINER"):
@@ -36,7 +33,7 @@ def setup_environment(requirement="requirements.txt", verbose=True):
             "--no-cache-dir",
             "--break-system-packages",
             "--root-user-action",
-            "ignore"
+            "ignore",
         ]
     else:
         if verbose:
