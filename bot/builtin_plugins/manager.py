@@ -11,7 +11,10 @@ def plugins_keyboard(app: Bot):
     plugins = app.get_plugins()
     keyboard = [
         [
-            InlineKeyboardButton(plugin, f"plugins {plugin}"),
+            InlineKeyboardButton(
+                plugin.replace("-", " ").replace("_", " "),
+                f"plugins {plugin}"
+            ),
             InlineKeyboardButton(
                 {True: "✅", False: "❌"}[app.get_plugin_status(plugin)],
                 f"plugins {plugin}"
