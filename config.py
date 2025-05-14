@@ -6,8 +6,8 @@ from pyrogram import filters
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
-from sqlalchemy import create_engine, String, Boolean, JSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import create_engine, String, Boolean, JSON, BigInteger, Text
 
 
 load_dotenv("data/.env")
@@ -152,3 +152,12 @@ class PluginDatabase(DataBase):
     name: Mapped[str] = mapped_column(String(40), primary_key=True)
     enabled: Mapped[bool] = mapped_column(Boolean())
     custom_data: Mapped[JSON] = mapped_column(JSON(), default=dict())
+
+
+class AdminDatabase(DataBase):
+    __tablename__ = "admins"
+
+    id: Mapped[int] = mapped_column(BigInteger(), primary_key=True)
+    by_user: Mapped[int] = mapped_column(BigInteger())
+    full_name: Mapped[str] = mapped_column(Text())
+    promote_time: Mapped[int] = mapped_column(BigInteger())
