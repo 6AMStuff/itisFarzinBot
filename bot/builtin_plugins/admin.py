@@ -1,17 +1,17 @@
 import time
 from pyrogram.types import Message
 from sqlalchemy.orm import Session
-from pyrogram import Client, filters
 from sqlalchemy import delete, select
+from pyrogram import Client, filters, errors
 
 from config import Config, AdminDatabase
 
 
 @Client.on_message(
     Config.IS_ADMIN
-    & filters.command(["addadmin", "deladmin"], Config.CMD_PREFIXES)
+    & filters.command(["addadmin", "deladmin", "admins"], Config.CMD_PREFIXES)
 )
-async def admin(_: Client, message: Message):
+async def admin(app: Client, message: Message):
     action = message.command[0]
 
     match action:
@@ -64,12 +64,28 @@ async def admin(_: Client, message: Message):
                     return
 
                 session.execute(
-                    delete(AdminDatabase).where(
-                        AdminDatabase.id == user.id
-                    )
+                    delete(AdminDatabase).where(AdminDatabase.id == user.id)
                 )
                 session.commit()
                 await message.reply("Done.")
+        case "admins":
+            with Session(Config.engine) as session:
+                admins = session.execute(select(AdminDatabase.id)).all()
+                admin_ids = [admin[0] for admin in admins]
+                if len(admin_ids) == 0:
+                    msg = "There are no admin."
+                else:
+                    msg = "List of admins:\n"
+                    for i, admin_id in enumerate(admin_ids, start=1):
+                        try:
+                            admin = await app.get_users(admin_id)
+                            if admin:
+                                msg += f"{i}. {admin.mention}\n"
+                            continue
+                        except errors.PeerIdInvalid:
+                            pass
+                        msg += f"{i}. `{admin_id}`\n"
+                await message.reply(msg)
 
 
 __all__ = ["admin"]
