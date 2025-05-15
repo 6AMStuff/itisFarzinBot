@@ -62,9 +62,11 @@ class Config:
             session.commit()
 
     @staticmethod
-    def setdata(key: str, value) -> bool:
-        caller_frame = inspect.currentframe().f_back
-        plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+    def setdata(key: str, value, plugin_name: str = None) -> bool:
+        if not plugin_name:
+            caller_frame = inspect.currentframe().f_back
+            plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+
         with Session(Config.engine) as session:
             data: dict = session.execute(
                 select(PluginDatabase.custom_data).where(
@@ -84,9 +86,13 @@ class Config:
             return result.rowcount > 0
 
     @staticmethod
-    def getdata(key: str, default=None, use_env: bool = False):
-        caller_frame = inspect.currentframe().f_back
-        plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+    def getdata(
+        key: str, default=None, use_env: bool = False, plugin_name: str = None
+    ):
+        if not plugin_name:
+            caller_frame = inspect.currentframe().f_back
+            plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+
         with Session(Config.engine) as session:
             data: dict = session.execute(
                 select(PluginDatabase.custom_data).where(
@@ -101,9 +107,11 @@ class Config:
             )
 
     @staticmethod
-    def deldata(key: str) -> bool:
-        caller_frame = inspect.currentframe().f_back
-        plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+    def deldata(key: str, plugin_name: str = None) -> bool:
+        if not plugin_name:
+            caller_frame = inspect.currentframe().f_back
+            plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+
         with Session(Config.engine) as session:
             data: dict = session.execute(
                 select(PluginDatabase.custom_data).where(

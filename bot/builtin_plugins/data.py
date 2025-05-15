@@ -43,9 +43,7 @@ async def setdata(app: Bot, message: Message):
     if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
-    globals()["__name__"] = plugin_name
-    result = Config.setdata(key, value)
-    globals()["__name__"] = original___name__
+    result = Config.setdata(key, value, plugin_name=plugin_name)
     await notify_module_data_change(app, plugin_name)
     await message.reply("Done." if result else "Failed.")
 
@@ -63,9 +61,7 @@ async def getdata(app: Bot, message: Message):
     if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
-    globals()["__name__"] = plugin_name
-    result = Config.getdata(key)
-    globals()["__name__"] = original___name__
+    result = Config.getdata(key, plugin_name=plugin_name)
     await message.reply(f"Value: `{result}`")
 
 
@@ -82,9 +78,7 @@ async def deldata(app: Bot, message: Message):
     if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
-    globals()["__name__"] = plugin_name
-    result = Config.deldata(key)
-    globals()["__name__"] = original___name__
+    result = Config.deldata(key, plugin_name=plugin_name)
     await notify_module_data_change(app, plugin_name)
     await message.reply("Done." if result else "Failed.")
 
