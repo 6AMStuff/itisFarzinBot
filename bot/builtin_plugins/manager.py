@@ -24,7 +24,9 @@ def plugins_keyboard(app: Bot):
         ]
         for plugin in plugins
     ]
-    return keyboard
+    return keyboard or [
+        [InlineKeyboardButton("No were plugin found.", "None")]
+    ]
 
 
 @Bot.on_message(
