@@ -32,6 +32,7 @@ def setup_environment(requirement="requirements.txt", verbose=True):
         pip_command += [
             "--no-cache-dir",
             "--break-system-packages",
+            "--no-warn-script-location",
             "--root-user-action",
             "ignore",
         ]

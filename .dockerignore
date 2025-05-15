@@ -1,6 +1,12 @@
-__pycache__/
-downloads/
+example_plugins
+__pycache__
+downloads
+plugins/
 data/
-venv/
+venv
+.git
 
-!data/.env.example
+.pre-commit-config.yaml
+pyproject.toml
+.gitignore
+Dockerfile

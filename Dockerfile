@@ -1,20 +1,25 @@
 FROM python:alpine
 
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=off
+
+WORKDIR /app
+
+RUN mkdir /data /plugins
 RUN touch /IS_CONTAINER
 
-WORKDIR /home
+RUN adduser -D farzin
 
-COPY *.py ./
-COPY requirements.txt .
-ADD bot bot
-ADD data data
+COPY . .
 
-RUN mkdir plugins
-RUN ln -s /home/data /
-RUN ln -s /home/plugins /
+RUN chown -R farzin:farzin /app
 
-RUN python3 setup.py
+VOLUME ["/data", "/plugins"]
 
-VOLUME [ "/data", "/plugins" ]
+USER farzin
 
-ENTRYPOINT [ "python3", "main.py" ]
+RUN python setup.py
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+
+CMD ["python3", "main.py"]
