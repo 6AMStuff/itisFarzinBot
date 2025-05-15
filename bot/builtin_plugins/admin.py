@@ -81,7 +81,7 @@ async def admin(app: Client, message: Message):
                             admin = await app.get_users(admin_id)
                             if admin:
                                 msg += f"{i}. {admin.mention}\n"
-                            continue
+                                continue
                         except errors.PeerIdInvalid:
                             pass
                         msg += f"{i}. `{admin_id}`\n"
