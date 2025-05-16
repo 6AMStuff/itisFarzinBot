@@ -16,7 +16,7 @@ logger = logging.getLogger(os.getenv("log_name", "bot"))
 log_level = str(os.getenv("log_level"))
 log_level = int(log_level) if str(log_level).isdigit() else logging.INFO
 logging.basicConfig(
-    filename=f"{os.getenv("log_path", "data")}/{logger.name}.log",
+    filename=f'{os.getenv("log_path", "data")}/{logger.name}.log',
     level=log_level,
     format="[%(asctime)s] %(levelname)s: %(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p",
