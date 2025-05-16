@@ -39,7 +39,7 @@ async def plugins(app: Bot, message: Message):
     )
 
 
-@Bot.on_callback_query(filters.regex(r"^plugins (?P<plugin>\w+)$"))
+@Bot.on_callback_query(filters.regex(r"^plugins (?P<plugin>[\w\-]+)$"))
 async def plugins_callback(app: Bot, query: CallbackQuery):
     plugin: str = query.matches[0].group("plugin")
     if app.get_plugin_status(plugin):
