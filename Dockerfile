@@ -12,6 +12,7 @@ RUN adduser -D farzin
 
 COPY . .
 
+RUN chmod +x ./docker-entrypoint.sh
 RUN chown -R farzin:farzin /app
 
 VOLUME ["/data", "/plugins"]

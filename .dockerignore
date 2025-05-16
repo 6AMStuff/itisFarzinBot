@@ -10,3 +10,5 @@ venv
 pyproject.toml
 .gitignore
 Dockerfile
+
+!data/.env.example
