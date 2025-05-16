@@ -1,3 +1,10 @@
+## v0.11.6 (2025-05-16)
+
+### Fix
+
+- **settings**: correct a nested double quotes
+- **manager**: support - (dash) in plugins callback regex
+
 ## v0.11.5 (2025-05-15)
 
 ## v0.11.4 (2025-05-15)
