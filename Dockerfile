@@ -1,26 +1,21 @@
-FROM python:alpine
+FROM python:3.13-alpine
 
 ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=off
+    PIP_NO_CACHE_DIR=off \
+    PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-RUN mkdir /data /plugins
 RUN touch /IS_CONTAINER
 
-RUN adduser -D farzin
+RUN mkdir -p data plugins
 
-COPY . .
-
-RUN chmod +x ./docker-entrypoint.sh
-RUN chown -R farzin:farzin /app
+RUN ln -s /app/data /data && ln -s /app/plugins /plugins
 
 VOLUME ["/data", "/plugins"]
 
-USER farzin
+COPY . .
 
 RUN python setup.py
-
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 CMD ["python3", "main.py"]
