@@ -1,3 +1,9 @@
+## v0.11.7 (2025-05-17)
+
+### Fix
+
+- **manager**: add admin filter to plugins callback
+
 ## v0.11.6 (2025-05-16)
 
 ### Fix
