@@ -97,7 +97,10 @@ class Bot(Client, metaclass=BotMeta):
                         if isinstance(handler, Handler) and isinstance(
                             group, int
                         ):
-                            yield (handler, group + group_offset)
+                            if group < 0 and group_offset != 0:
+                                yield (handler, 0)
+                            else:
+                                yield (handler, group + group_offset)
 
     def handler_is_loaded(self, handler: Handler, group: int = 0) -> bool:
         if group not in self.dispatcher.groups:
