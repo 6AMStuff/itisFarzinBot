@@ -1,3 +1,10 @@
+## v0.11.8 (2025-05-21)
+
+### Feat
+
+- **bot**: Clamp plugin handler groups at 0
+- **settings**: enable pool_pre_ping
+
 ## v0.11.7 (2025-05-17)
 
 ### Fix
