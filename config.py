@@ -133,7 +133,9 @@ class Config:
             session.commit()
             return result.rowcount > 0
 
-    engine = create_engine(getenv("db_uri", "sqlite:///data/database.db"))
+    engine = create_engine(
+        getenv("db_uri", "sqlite:///data/database.db"), pool_pre_ping=True
+    )
 
     PROXY = str(
         getenv(
