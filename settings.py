@@ -2,6 +2,7 @@ import os
 import re
 import inspect
 import logging
+import logging.handlers
 from pyrogram import filters
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
@@ -13,13 +14,27 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 load_dotenv("data/.env")
 
 logger = logging.getLogger(os.getenv("log_name", "bot"))
+log_dir = os.getenv("log_dir", "data")
 log_level = str(os.getenv("log_level"))
-log_level = int(log_level) if str(log_level).isdigit() else logging.INFO
+log_level = int(log_level) if log_level.isdigit() else logging.INFO
+log_max_size_mb = float(os.getenv("log_max_size_mb", 1)) * 1024 * 1024
+log_backup_count = int(os.getenv("log_backup_count", 2))
+file_handler = logging.handlers.RotatingFileHandler(
+    filename=f"{log_dir}/{logger.name}.log",
+    maxBytes=log_max_size_mb,
+    backupCount=log_backup_count
+)
+file_handler.setLevel(log_level)
+formatter = logging.Formatter(
+    fmt="[%(asctime)s] %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+)
+file_handler.setFormatter(formatter)
 logging.basicConfig(
-    filename=f'{os.getenv("log_path", "data")}/{logger.name}.log',
     level=log_level,
     format="[%(asctime)s] %(levelname)s: %(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p",
+    handlers=[file_handler],
 )
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
