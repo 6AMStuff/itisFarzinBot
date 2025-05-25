@@ -1,3 +1,17 @@
+## v0.11.9 (2025-05-25)
+
+### Feat
+
+- **settings**: improve logging
+
+### Fix
+
+- **settings**: correct proxy variable type for None
+
+### Refactor
+
+- **settings**: config.py -> settings.py
+
 ## v0.11.8 (2025-05-21)
 
 ### Feat
