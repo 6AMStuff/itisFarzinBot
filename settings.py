@@ -22,7 +22,7 @@ log_backup_count = int(os.getenv("log_backup_count", 2))
 file_handler = logging.handlers.RotatingFileHandler(
     filename=f"{log_dir}/{logger.name}.log",
     maxBytes=log_max_size_mb,
-    backupCount=log_backup_count
+    backupCount=log_backup_count,
 )
 file_handler.setLevel(log_level)
 formatter = logging.Formatter(
@@ -152,15 +152,13 @@ class Settings:
         getenv("db_uri", "sqlite:///data/database.db"), pool_pre_ping=True
     )
 
-    PROXY = str(
-        getenv(
-            "proxy",
-            (
-                getenv("http_proxy") or getenv("HTTP_PROXY")
-                if str(getenv("use_system_proxy", "yes")).lower() == "yes"
-                else None
-            ),
-        )
+    PROXY = getenv(
+        "proxy",
+        (
+            getenv("http_proxy") or getenv("HTTP_PROXY")
+            if str(getenv("use_system_proxy", "yes")).lower() == "yes"
+            else None
+        ),
     )
     IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(","))
     CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
