@@ -5,7 +5,7 @@ from pathlib import Path
 from pyrogram import Client
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from typing import Generator, Optional
+from typing import Any, Generator, Optional
 from pyrogram.handlers.handler import Handler
 from config import Config, DataBase, PluginDatabase
 
@@ -101,19 +101,25 @@ class PluginManager(Client):
             return False
         return handler in self.dispatcher.groups[group]
 
-    def set_plugin_status(self, plugin: str, enabled: bool = True):
+    def set_plugin_data(self, plugin: str, key: str, value: Any):
         with Session(Config.engine) as session:
-            session.merge(PluginDatabase(name=plugin, enabled=enabled))
+            session.merge(PluginDatabase(**{"name": plugin, key: value}))
             session.commit()
 
-    def get_plugin_status(self, plugin: str) -> bool:
+    def get_plugin_data(self, plugin: str, key: str) -> bool:
         with Session(Config.engine) as session:
             enabled = session.execute(
-                select(PluginDatabase.enabled).where(
+                select(getattr(PluginDatabase, key)).where(
                     PluginDatabase.name == plugin
                 )
             ).scalar()
             return enabled or False
+
+    def set_plugin_status(self, plugin: str, enabled: bool = True):
+        self.set_plugin_data(plugin, "enabled", enabled)
+
+    def get_plugin_status(self, plugin: str) -> bool:
+        return self.get_plugin_data(plugin, "enabled")
 
     def load_plugins(
         self,
