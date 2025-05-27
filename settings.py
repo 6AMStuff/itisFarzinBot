@@ -175,4 +175,4 @@ class PluginDatabase(DataBase):
     name: Mapped[str] = mapped_column(String(40), primary_key=True)
     enabled: Mapped[bool] = mapped_column(Boolean())
     custom_data: Mapped[JSON] = mapped_column(JSON(), default=dict())
-    is_public_use: Mapped[bool] = mapped_column(Boolean(), default=False)
+    is_public_use: Mapped[bool] = mapped_column(Boolean(), default=True)
