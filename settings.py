@@ -1,9 +1,11 @@
 import os
 import re
+import time
 import inspect
 import logging
 import logging.handlers
 from pyrogram import filters
+from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
@@ -37,6 +39,14 @@ logging.basicConfig(
     handlers=[file_handler],
 )
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
+
+tz = os.getenv("TZ", "Europe/London")
+try:
+    ZoneInfo(tz)
+except Exception:
+    tz = "Europe/London"
+os.environ["TZ"] = tz
+time.tzset()
 
 
 class Settings:
@@ -163,6 +173,7 @@ class Settings:
     IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(","))
     CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
+    TIMEZONE = ZoneInfo(tz)
 
 
 class DataBase(DeclarativeBase):
