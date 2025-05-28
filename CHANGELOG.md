@@ -1,3 +1,9 @@
+## v0.11.10 (2025-05-28)
+
+### Feat
+
+- **settings**: add support for timezones
+
 ## v0.11.9 (2025-05-25)
 
 ### Feat
