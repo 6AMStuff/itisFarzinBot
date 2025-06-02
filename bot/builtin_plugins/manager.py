@@ -1,4 +1,5 @@
 from bot import Bot
+from typing import Optional
 from pyrogram import filters
 from pyrogram.types import (
     Message,
@@ -6,27 +7,79 @@ from pyrogram.types import (
     InlineKeyboardButton,
     CallbackQuery,
 )
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from config import Config
+from config import Config, PluginDatabase
 
 
-def plugins_keyboard(app: Bot):
-    plugins = app.get_plugins()
-    keyboard = [
-        [
-            InlineKeyboardButton(
-                plugin.replace("-", " ").replace("_", " "), f"plugins {plugin}"
-            ),
-            InlineKeyboardButton(
-                {True: "✅", False: "❌"}[app.get_plugin_status(plugin)],
-                f"plugins {plugin}",
-            ),
+def plugins_keyboard(client: Bot, plugin: Optional[str] = None):
+
+    with Session(Config.engine) as session:
+        if plugin:
+            enabled, public = session.execute(
+                select(
+                    PluginDatabase.enabled,
+                    PluginDatabase.is_public_use,
+                ).where(PluginDatabase.name == plugin)
+            ).one()
+
+            return [
+                [
+                    InlineKeyboardButton(
+                        "Status", f"plugins {plugin} status2"
+                    ),
+                    InlineKeyboardButton(
+                        {True: "✅", False: "❌"}[enabled],
+                        f"plugins {plugin} status2",
+                    ),
+                ],
+                [
+                    InlineKeyboardButton(
+                        "Public Use", f"plugins {plugin} public"
+                    ),
+                    InlineKeyboardButton(
+                        {True: "✅", False: "❌"}[public],
+                        f"plugins {plugin} public",
+                    ),
+                ],
+                [
+                    InlineKeyboardButton("Back", "plugins"),
+                ],
+            ]
+
+        keyboard = [[InlineKeyboardButton("No were plugin found.", "None")]]
+        _plugins = client.get_plugins()
+        plugins = session.execute(
+            select(
+                PluginDatabase.name,
+                PluginDatabase.enabled,
+                PluginDatabase.is_public_use,
+            )
+        ).all()
+        plugins: dict[str, list[bool]] = {
+            plugin[0]: plugin[1] for plugin in plugins
+        }
+
+        if len(plugins) == 0:
+            return keyboard
+
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    plugin.replace("-", " ").replace("_", " "),
+                    f"plugins {plugin}",
+                ),
+                InlineKeyboardButton(
+                    {True: "✅", False: "❌"}[plugins[plugin]],
+                    f"plugins {plugin} status1",
+                ),
+            ]
+            for plugin in plugins
+            if plugin in _plugins
         ]
-        for plugin in plugins
-    ]
-    return keyboard or [
-        [InlineKeyboardButton("No were plugin found.", "None")]
-    ]
+
+    return keyboard
 
 
 @Bot.on_message(
@@ -40,17 +93,36 @@ async def plugins(app: Bot, message: Message):
 
 
 @Bot.on_callback_query(
-    Config.IS_ADMIN & filters.regex(r"^plugins (?P<plugin>[\w\-]+)$")
+    Config.IS_ADMIN
+    & filters.regex(r"^plugins(?: (?P<plugin>[\w\-]+))?(?: (?P<mode>\w+))?$")
 )
 async def plugins_callback(app: Bot, query: CallbackQuery):
     plugin: str = query.matches[0].group("plugin")
-    if app.get_plugin_status(plugin):
-        app.unload_plugins(plugin)
+    mode: str = query.matches[0].group("mode")
+    text = "**Plugins**:"
+
+    if not plugin:
+        keyboard = plugins_keyboard(app)
+    elif mode == "status1":
+        if app.get_plugin_status(plugin):
+            app.unload_plugins(plugin)
+        else:
+            app.load_plugins(plugin, force_load=True)
+        keyboard = plugins_keyboard(app)
     else:
-        app.load_plugins(plugin, force_load=True)
+        text = f"Plugin **{plugin}**:"
+        if mode == "status2":
+            if app.get_plugin_status(plugin):
+                app.unload_plugins(plugin)
+            else:
+                app.load_plugins(plugin, force_load=True)
+        elif mode == "public":
+            is_public_use = app.get_plugin_data(plugin, "is_public_use")
+            app.set_plugin_data(plugin, "is_public_use", not is_public_use)
+        keyboard = plugins_keyboard(app, plugin=plugin)
+
     await query.edit_message_text(
-        "**Plugins**:",
-        reply_markup=InlineKeyboardMarkup(plugins_keyboard(app)),
+        text, reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
 
