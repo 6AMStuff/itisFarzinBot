@@ -1,3 +1,9 @@
+## v0.12.0 (2025-06-08)
+
+### Feat
+
+- **deps**: [TMP] update `kurigram` to `4db3f39`
+
 ## v0.11.10 (2025-05-28)
 
 ### Feat
