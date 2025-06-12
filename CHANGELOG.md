@@ -1,3 +1,10 @@
+## v0.12.1 (2025-06-12)
+
+### Feat
+
+- **bot**: use uvloop instead of built-in asyncio
+- **bot**: add uptime variable
+
 ## v0.12.0 (2025-06-08)
 
 ### Feat
