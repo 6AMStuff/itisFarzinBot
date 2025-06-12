@@ -3,3 +3,4 @@ python-dotenv==1.1.0
 sqlalchemy==2.0.40
 PyMySQL==1.1.1
 socksio==1.0.0
+uvloop==0.21.0

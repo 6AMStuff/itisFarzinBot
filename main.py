@@ -1,4 +1,6 @@
 import os
+import uvloop
+import asyncio
 from bot import Bot
 from setup import setup_environment
 
@@ -21,4 +23,6 @@ if __name__ == "__main__":
             for file in files:
                 if file == "requirements.txt":
                     setup_environment(f"{root}/{file}", False)
-    app.run()
+
+    with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:
+        runner.run(app.run())
