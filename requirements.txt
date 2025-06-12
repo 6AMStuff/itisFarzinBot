@@ -1,4 +1,4 @@
-kurigram @ https://github.com/KurimuzonAkuma/pyrogram/archive/4db3f39ff8779a988a39d510688553177259ed32.zip
+kurigram==2.2.5
 python-dotenv==1.1.0
 sqlalchemy==2.0.40
 PyMySQL==1.1.1
