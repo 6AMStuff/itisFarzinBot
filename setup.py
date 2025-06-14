@@ -12,18 +12,26 @@ parser.add_argument(
     "--verbose", action=argparse.BooleanOptionalAction, default=True
 )
 parser.add_argument("--requirement", type=str, default="requirements.txt")
+parser.add_argument(
+    "--optional-requirement", type=str, default="requirements-optional.txt"
+)
 
 args = parser.parse_args()
 
 
 def setup_environment(requirement="requirements.txt", verbose=True):
+    if not requirement or not os.path.exists(requirement):
+        print(f"WARNING: {requirement} doesn't exist!")
+        return
+
+    requirements = []
+    optional = "optional" in requirement
+
     pip_command = [
         "pip",
         "install",
         "--disable-pip-version-check",
         "--upgrade",
-        "--requirement",
-        requirement or "",
     ]
 
     if os.path.exists("/IS_CONTAINER"):
@@ -48,12 +56,19 @@ def setup_environment(requirement="requirements.txt", verbose=True):
     else:
         pip_command.append("-q")
 
-    if requirement:
-        subprocess.call(pip_command)
+    with open(requirement, "r") as f:
+        requirements = f.readlines()
+
+    if optional:
+        for req in requirements:
+            subprocess.call(pip_command + [req])
+    else:
+        subprocess.call(pip_command + requirements)
 
 
 if __name__ == "__main__":
     setup_environment(args.requirement, args.verbose)
+    setup_environment(args.optional_requirement, args.verbose)
 
     if not os.path.isfile("data/.env"):
         shutil.copy("data/.env.example", "data/.env")

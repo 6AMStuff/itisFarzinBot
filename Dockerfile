@@ -1,8 +1,14 @@
-FROM python:3.13-slim
+FROM python:3.13-alpine
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=off \
     PYTHONDONTWRITEBYTECODE=1
+
+RUN apk add --no-cache \
+    build-base \
+    python3-dev \
+    libffi-dev \
+    openssl-dev
 
 WORKDIR /app
 
