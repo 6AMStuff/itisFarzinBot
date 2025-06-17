@@ -68,7 +68,7 @@ def setup_environment(requirement="requirements.txt", verbose=True):
 
 if __name__ == "__main__":
     setup_environment(args.requirement, args.verbose)
-    setup_environment(args.optional_requirement, args.verbose)
+    setup_environment(args.optional_requirement, False)
 
     if not os.path.isfile("data/.env"):
         shutil.copy("data/.env.example", "data/.env")
