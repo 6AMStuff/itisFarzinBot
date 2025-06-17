@@ -1,3 +1,17 @@
+## v0.12.3 (2025-06-17)
+
+### Feat
+
+- **bot**: add `is_bot` and `__bot_only__` for plugins
+
+### Fix
+
+- **setup**: disable verbose for optional requirements
+
+### Refactor
+
+- **main**: improve uvloop and initialization setup
+
 ## v0.12.2 (2025-06-14)
 
 ## v0.12.1 (2025-06-12)
