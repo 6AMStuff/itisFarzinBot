@@ -22,6 +22,7 @@ class Bot(Client, metaclass=BotMeta):
     def _post_init(self):
         self.builtin_plugin = "bot/builtin_plugins"
         self.uptime = time.time()
+        self.is_bot = bool(self.bot_token)
         DataBase.metadata.create_all(Config.engine)
         self.load_plugins(folder=self.builtin_plugin)
         DataBase.metadata.create_all(Config.engine)
@@ -63,8 +64,13 @@ class Bot(Client, metaclass=BotMeta):
         for path in self.modules_list(folders):
             module_path = ".".join(path.with_suffix("").parts)
             module = importlib.import_module(module_path)
-            if getattr(module, "__plugin__", False):
-                plugins.append(path.stem)
+
+            if not getattr(module, "__plugin__", True):
+                continue
+            if getattr(module, "__bot_only__", True) and not self.is_bot:
+                continue
+
+            plugins.append(path.stem)
 
         return sorted(plugins)
 
