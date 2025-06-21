@@ -35,7 +35,7 @@ def setup_environment(requirement="requirements.txt", verbose=True):
     ]
 
     if os.path.exists("/IS_CONTAINER"):
-        if verbose:
+        if verbose and not optional:
             print("Running in a container")
         pip_command += [
             "--no-cache-dir",
@@ -45,7 +45,7 @@ def setup_environment(requirement="requirements.txt", verbose=True):
             "ignore",
         ]
     else:
-        if verbose:
+        if verbose and not optional:
             print("Running in a normal environment")
             print("Setting virtual environment up")
         os.system("python -m venv venv")
@@ -68,7 +68,7 @@ def setup_environment(requirement="requirements.txt", verbose=True):
 
 if __name__ == "__main__":
     setup_environment(args.requirement, args.verbose)
-    setup_environment(args.optional_requirement, False)
+    setup_environment(args.optional_requirement, args.verbose)
 
     if not os.path.isfile("data/.env"):
         shutil.copy("data/.env.example", "data/.env")
