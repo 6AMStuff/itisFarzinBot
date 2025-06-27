@@ -1,3 +1,13 @@
+## v0.13.0 (2025-06-27)
+
+### Fix
+
+- **setup**: don't report environments on optional requirements
+
+### Refactor
+
+- **core**: move plugin related methods to its own class
+
 ## v0.12.3 (2025-06-17)
 
 ### Feat
