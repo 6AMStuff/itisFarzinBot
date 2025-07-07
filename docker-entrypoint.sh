@@ -10,8 +10,4 @@ fi
 
 chown -R abc:abc /app
 
-find -L /plugins -name requirements.txt -print0 | while IFS= read -r -d $'\0' req_file; do
-    pip install --upgrade --disable-pip-version-check -r $req_file
-done
-
 exec su-exec abc "$@"
