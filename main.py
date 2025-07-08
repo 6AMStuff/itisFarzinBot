@@ -1,8 +1,9 @@
 import os
+import sys
 import uvloop
 import asyncio
+import subprocess
 from bot import Bot
-from setup import setup_environment
 from pyrogram.methods.utilities.idle import idle
 
 from config import Config
@@ -24,16 +25,29 @@ async def main():
     await app.stop()
 
 
-def setup_plugins_environment():
-    if Config.getenv("test_mode", "").lower() not in ("true", "1"):
-        for root, _, files in os.walk(plugins_folder, followlinks=True):
-            if "requirements.txt" in files:
-                setup_environment(
-                    os.path.join(root, "requirements.txt"), False
-                )
+def requirements():
+    for dirpath, __, filenames in os.walk(
+        plugins_folder,
+        followlinks=True
+    ):
+        if "requirements.txt" in filenames:
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--upgrade",
+                    "--disable-pip-version-check",
+                    "-r",
+                    os.path.join(dirpath, "requirements.txt"),
+                ],
+            )
 
 
 if __name__ == "__main__":
+    if Config.getenv("test_mode") not in {"true", "1"}:
+        requirements()
+
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-    setup_plugins_environment()
     asyncio.run(main())

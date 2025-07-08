@@ -1,6 +1,7 @@
 __pycache__/
 downloads/
 plugins/
+.venv/
 data/
 venv/
 !data/.env.example
