@@ -1,3 +1,13 @@
+## v0.13.1 (2025-07-08)
+
+### Feat
+
+- **main**: add requirements installer
+
+### Refactor
+
+- improve docker structure and remove setup.py
+
 ## v0.13.0 (2025-06-27)
 
 ### Fix
