@@ -8,6 +8,6 @@ if ! getent passwd abc > /dev/null; then
     adduser -u $PUID -g $PGID -D abc
 fi
 
-chown -R abc:abc /app
+chown -R abc:abc /app /opt/venv
 
 exec su-exec abc "$@"
