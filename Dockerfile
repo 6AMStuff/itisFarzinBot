@@ -29,7 +29,7 @@ COPY . .
 
 RUN chmod +x docker-entrypoint.sh
 
-RUN mkdir -p data plugins \
+RUN mkdir data plugins \
     && ln -s /app/data /data \
     && ln -s /app/plugins /plugins
 

@@ -1,9 +1,9 @@
 example_plugins
 __pycache__
 downloads
-plugins/
+plugins
 .venv
-data/
+data
 venv
 .git
 
@@ -11,5 +11,3 @@ venv
 pyproject.toml
 .gitignore
 Dockerfile
-
-!data/.env.example
