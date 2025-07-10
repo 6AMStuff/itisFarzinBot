@@ -7,6 +7,7 @@ import logging.handlers
 from pyrogram import filters
 from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
+from typing import Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
 from sqlalchemy import create_engine, String, Boolean, JSON
@@ -17,8 +18,11 @@ load_dotenv("data/.env")
 
 logger = logging.getLogger(os.getenv("log_name", "bot"))
 log_dir = os.getenv("log_dir", "data")
-log_level = str(os.getenv("log_level"))
-log_level = int(log_level) if log_level.isdigit() else logging.INFO
+log_level = (
+    int(os.getenv("log_level"))
+    if str(os.getenv("log_level")).isdigit()
+    else logging.INFO
+)
 log_max_size_mb = float(os.getenv("log_max_size_mb", 1)) * 1024 * 1024
 log_backup_count = int(os.getenv("log_backup_count", 2))
 file_handler = logging.handlers.RotatingFileHandler(
@@ -77,7 +81,7 @@ class Settings:
         }
 
     @staticmethod
-    def getenv(key: str, default=None):
+    def getenv(key: str, default: Any = None):
         return os.environ.get(key, default)
 
     @staticmethod
@@ -87,7 +91,7 @@ class Settings:
             session.commit()
 
     @staticmethod
-    def setdata(key: str, value, plugin_name: str = None) -> bool:
+    def setdata(key: str, value, plugin_name: Optional[str] = None) -> bool:
         if not plugin_name:
             caller_frame = inspect.currentframe().f_back
             plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
@@ -112,7 +116,10 @@ class Settings:
 
     @staticmethod
     def getdata(
-        key: str, default=None, use_env: bool = False, plugin_name: str = None
+        key: str,
+        default=None,
+        use_env: bool = False,
+        plugin_name: Optional[str] = None,
     ):
         if not plugin_name:
             caller_frame = inspect.currentframe().f_back
@@ -132,7 +139,7 @@ class Settings:
             )
 
     @staticmethod
-    def deldata(key: str, plugin_name: str = None) -> bool:
+    def deldata(key: str, plugin_name: Optional[str] = None) -> bool:
         if not plugin_name:
             caller_frame = inspect.currentframe().f_back
             plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
