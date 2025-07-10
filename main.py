@@ -26,10 +26,7 @@ async def main():
 
 
 def requirements():
-    for dirpath, __, filenames in os.walk(
-        plugins_folder,
-        followlinks=True
-    ):
+    for dirpath, __, filenames in os.walk(plugins_folder, followlinks=True):
         if "requirements.txt" in filenames:
             subprocess.run(
                 [
