@@ -25,6 +25,7 @@ ARG BUILD_DATE
 LABEL \
   maintainer="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
   org.opencontainers.image.authors="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
+  org.opencontainers.image.source="https://github.com/6AMStuff/itisFarzinBot" \
   org.opencontainers.image.title="itisFarzinBot" \
   org.opencontainers.image.description="My personal Telegram bot with Kurigram" \
   org.opencontainers.image.created=$BUILD_DATE
