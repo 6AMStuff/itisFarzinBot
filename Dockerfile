@@ -20,6 +20,15 @@ RUN pip install --disable-pip-version-check --break-system-packages --root-user-
 
 FROM base AS runtime
 
+ARG BUILD_DATE
+
+LABEL \
+  maintainer="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
+  org.opencontainers.image.authors="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
+  org.opencontainers.image.title="itisFarzinBot" \
+  org.opencontainers.image.description="My personal Telegram bot with Kurigram" \
+  org.opencontainers.image.created=$BUILD_DATE
+
 COPY --from=dependencies /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
