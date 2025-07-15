@@ -87,6 +87,6 @@ async def deldata(app: Bot, message: Message):
     await message.reply("Done." if result else "Failed.")
 
 
-__all__ = ["setdata", "getdata", "deldata"]
+__all__ = ("setdata", "getdata", "deldata")
 __plugin__ = True
 __bot_only__ = False

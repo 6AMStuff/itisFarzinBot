@@ -111,6 +111,6 @@ async def load_unload(app: Bot, message: Message):
     await message.reply(responce)
 
 
-__all__ = ["plugins", "plugins_callback", "handlers", "load_unload"]
+__all__ = ("plugins", "plugins_callback", "handlers", "load_unload")
 __plugin__ = True
 __bot_only__ = False

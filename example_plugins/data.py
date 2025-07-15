@@ -38,5 +38,5 @@ async def deldata(_, message: Message):
     await message.reply("Done." if result else "Failed.")
 
 
-__all__ = ["setdata", "getdata", "deldata"]
+__all__ = ("setdata", "getdata", "deldata")
 __plugin__ = True

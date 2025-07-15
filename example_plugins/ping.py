@@ -11,5 +11,5 @@ async def pong(_, message: Message):
     await message.reply("Pong!")
 
 
-__all__ = ["pong"]
+__all__ = ("pong",)
 __plugin__ = True
