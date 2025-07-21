@@ -84,9 +84,13 @@ class PluginManager(Client):
             # TODO: reload the module after import
 
             for name in vars(module).keys():
-                target_attr = getattr(module, name)
-                if hasattr(target_attr, "handlers"):
-                    for handler, group in target_attr.handlers:
+                if handlers := getattr(
+                    getattr(module, name), "handlers", None
+                ):
+                    if not isinstance(handlers, list):
+                        continue
+
+                    for handler, group in handlers:
                         if isinstance(handler, Handler) and isinstance(
                             group, int
                         ):
