@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Lowercase Repository
         run: echo "REPO=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
