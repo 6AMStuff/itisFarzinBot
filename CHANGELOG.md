@@ -1,3 +1,21 @@
+## v0.13.2 (2025-07-23)
+
+### Feat
+
+- **manager**: support cli
+
+### Fix
+
+- **plugin-manager**: handle non-pyrogram handlers
+
+### Refactor
+
+- **drop-example-plugins**: the built-in plugins are good examples by themselves
+- change `__all__` from list to tuple
+- **.env.example**: update example values and improve clarity
+- **settings**: use any and optional types
+- **data**: mark as not bot only
+
 ## v0.13.1 (2025-07-08)
 
 ### Feat
