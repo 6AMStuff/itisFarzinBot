@@ -8,9 +8,6 @@ from pyrogram.types import Message
 from config import Config
 
 
-original___name__ = __name__
-
-
 async def notify_module_data_change(app: Bot, name: str) -> bool:
     name = name.rsplit(".py", 1)[0]
 
@@ -25,6 +22,7 @@ async def notify_module_data_change(app: Bot, name: str) -> bool:
                     await on_data_change()
                 else:
                     on_data_change()
+
                 return True
             break
     return False
@@ -39,10 +37,12 @@ async def setdata(app: Bot, message: Message):
             f"{Config.CMD_PREFIXES[0]}setdata [plugin name] [key] [value]"
         )
         return
+
     _, plugin_name, key, value = message.command
     if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
+
     result = Config.setdata(key, value, plugin_name=plugin_name)
     await notify_module_data_change(app, plugin_name)
     await message.reply("Done." if result else "Failed.")
@@ -57,10 +57,12 @@ async def getdata(app: Bot, message: Message):
             f"{Config.CMD_PREFIXES[0]}getdata [plugin name] [key]"
         )
         return
+
     _, plugin_name, key = message.command
     if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
+
     result = Config.getdata(key, plugin_name=plugin_name)
     await message.reply(f"Value: `{result}`")
 
@@ -74,14 +76,17 @@ async def deldata(app: Bot, message: Message):
             f"{Config.CMD_PREFIXES[0]}deldata [plugin name] [key]"
         )
         return
+
     _, plugin_name, key = message.command
     if plugin_name not in app.get_plugins():
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
+
     result = Config.deldata(key, plugin_name=plugin_name)
     await notify_module_data_change(app, plugin_name)
     await message.reply("Done." if result else "Failed.")
 
 
-__all__ = ["setdata", "getdata", "deldata"]
+__all__ = ("setdata", "getdata", "deldata")
 __plugin__ = True
+__bot_only__ = False

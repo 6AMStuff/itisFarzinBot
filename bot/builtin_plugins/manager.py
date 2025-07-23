@@ -10,33 +10,56 @@ from pyrogram.types import (
 from config import Config
 
 
-def plugins_keyboard(app: Bot):
-    plugins = app.get_plugins()
-    keyboard = [
-        [
-            InlineKeyboardButton(
-                plugin.replace("-", " ").replace("_", " "), f"plugins {plugin}"
-            ),
-            InlineKeyboardButton(
-                {True: "✅", False: "❌"}[app.get_plugin_status(plugin)],
-                f"plugins {plugin}",
-            ),
+async def plugins_status(client: Bot, update: Message | CallbackQuery):
+    plugins = client.get_plugins()
+    text = "**Plugins**:"
+    reply_markup = None
+
+    if client.is_bot:
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    plugin.replace("-", " ").replace("_", " "),
+                    f"plugins {plugin}",
+                ),
+                InlineKeyboardButton(
+                    {True: "✅", False: "❌"}[
+                        client.get_plugin_status(plugin)
+                    ],
+                    f"plugins {plugin}",
+                ),
+            ]
+            for plugin in plugins
         ]
-        for plugin in plugins
-    ]
-    return keyboard or [
-        [InlineKeyboardButton("No were plugin found.", "None")]
-    ]
+        reply_markup = InlineKeyboardMarkup(
+            keyboard
+            or [[InlineKeyboardButton("No were plugin found.", "None")]]
+        )
+
+    else:
+        text += "\n" + "\n".join(
+            [
+                plugin.replace("-", " ").replace("_", " ")
+                + ": "
+                + {True: "✅", False: "❌"}[client.get_plugin_status(plugin)]
+                for plugin in plugins
+            ]
+        )
+
+    if isinstance(update, Message):
+        await update.reply(
+            text,
+            reply_markup=reply_markup,
+        )
+    elif isinstance(update, CallbackQuery):
+        await update.edit_message_text(text, reply_markup=reply_markup)
 
 
 @Bot.on_message(
     Config.IS_ADMIN & filters.command("plugins", Config.CMD_PREFIXES)
 )
 async def plugins(app: Bot, message: Message):
-    await message.reply(
-        "**Plugins**:",
-        reply_markup=InlineKeyboardMarkup(plugins_keyboard(app)),
-    )
+    await plugins_status(app, message)
 
 
 @Bot.on_callback_query(
@@ -48,10 +71,8 @@ async def plugins_callback(app: Bot, query: CallbackQuery):
         app.unload_plugins(plugin)
     else:
         app.load_plugins(plugin, force_load=True)
-    await query.edit_message_text(
-        "**Plugins**:",
-        reply_markup=InlineKeyboardMarkup(plugins_keyboard(app)),
-    )
+
+    await plugins_status(app, query)
 
 
 @Bot.on_message(
@@ -83,11 +104,13 @@ async def load_unload(app: Bot, message: Message):
         result = app.load_plugins(plugins, force_load=True)
     else:
         result = app.unload_plugins(plugins)
+
     responce = "\n".join(
         [f"**{plugin}**: {result[plugin]}" for plugin in result]
     )
     await message.reply(responce)
 
 
-__all__ = ["plugins", "plugins_callback", "handlers", "load_unload"]
+__all__ = ("plugins", "plugins_callback", "handlers", "load_unload")
 __plugin__ = True
+__bot_only__ = False
