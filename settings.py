@@ -185,6 +185,7 @@ class Settings:
     CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
     TIMEZONE = ZoneInfo(_tz())
+    TEST_MODE = getenv("test_mode") in {"true", "1"}
 
 
 class DataBase(DeclarativeBase):
