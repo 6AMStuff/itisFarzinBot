@@ -38,8 +38,8 @@ formatter = logging.Formatter(
 file_handler.setFormatter(formatter)
 logging.basicConfig(
     level=log_level,
-    format="[%(asctime)s] %(levelname)s: %(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p",
+    format=formatter._fmt,
+    datefmt=formatter.datefmt,
     handlers=[file_handler],
 )
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
