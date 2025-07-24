@@ -31,7 +31,7 @@ async def main():
 def requirements():
     for dirpath, __, filenames in os.walk(plugins_folder, followlinks=True):
         if "requirements.txt" in filenames:
-            subprocess.run(
+            result = subprocess.run(
                 [
                     sys.executable,
                     "-m",
@@ -42,7 +42,16 @@ def requirements():
                     "-r",
                     os.path.join(dirpath, "requirements.txt"),
                 ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
             )
+
+            if result.stdout:
+                logging.debug(result.stdout.strip())
+
+            if result.stderr:
+                logging.warning(result.stderr.strip())
 
 
 def setup_plugins():
