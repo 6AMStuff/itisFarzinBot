@@ -97,6 +97,7 @@ class Settings:
             if not data:
                 Settings._createdata(plugin_name)
                 data = {}
+
             data[key] = value
             result = session.execute(
                 update(PluginDatabase)
@@ -126,6 +127,7 @@ class Settings:
             if not data:
                 Settings._createdata(plugin_name)
                 data = {}
+
             return data.get(
                 key, Settings.getenv(key, default) if use_env else default
             )
@@ -145,10 +147,12 @@ class Settings:
             if not data:
                 Settings._createdata(plugin_name)
                 return 1
+
             if key in data:
                 del data[key]
             else:
                 return False
+
             result = session.execute(
                 update(PluginDatabase)
                 .where(PluginDatabase.name == plugin_name)
@@ -176,8 +180,10 @@ class Settings:
     PROXY = getenv(
         "proxy",
         (
-            getenv("http_proxy") or getenv("HTTP_PROXY")
-            or getenv("https_proxy") or getenv("HTTPS_PROXY")
+            getenv("http_proxy")
+            or getenv("HTTP_PROXY")
+            or getenv("https_proxy")
+            or getenv("HTTPS_PROXY")
             if str(getenv("use_system_proxy", "yes")).lower() == "yes"
             else None
         ),
