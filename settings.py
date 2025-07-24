@@ -44,14 +44,6 @@ logging.basicConfig(
 )
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
-tz = os.getenv("TZ", "Europe/London")
-try:
-    ZoneInfo(tz)
-except Exception:
-    tz = "Europe/London"
-os.environ["TZ"] = tz
-time.tzset()
-
 
 class Settings:
     @staticmethod
@@ -165,6 +157,18 @@ class Settings:
             session.commit()
             return result.rowcount > 0
 
+    @staticmethod
+    def _tz():
+        tz = Settings.getenv("TZ", "Europe/London")
+        try:
+            ZoneInfo(tz)
+        except Exception:
+            tz = "Europe/London"
+
+        os.environ["TZ"] = tz
+        time.tzset()
+        return tz
+
     engine = create_engine(
         getenv("db_uri", "sqlite:///data/database.db"), pool_pre_ping=True
     )
@@ -180,7 +184,7 @@ class Settings:
     IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(","))
     CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
-    TIMEZONE = ZoneInfo(tz)
+    TIMEZONE = ZoneInfo(_tz())
 
 
 class DataBase(DeclarativeBase):
