@@ -177,6 +177,7 @@ class Settings:
         "proxy",
         (
             getenv("http_proxy") or getenv("HTTP_PROXY")
+            or getenv("https_proxy") or getenv("HTTPS_PROXY")
             if str(getenv("use_system_proxy", "yes")).lower() == "yes"
             else None
         ),
