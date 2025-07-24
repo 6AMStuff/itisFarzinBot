@@ -9,18 +9,18 @@ from bot import Bot
 from git import Repo
 from pyrogram.methods.utilities.idle import idle
 
-from config import Config
+from settings import Settings
 
-plugins_folder = Config.getenv("plugins_folder", "plugins")
+plugins_folder = Settings.getenv("plugins_folder", "plugins")
 
 
 async def main():
     app = Bot(
-        "data/" + str(Config.getenv("client_name", "itisFarzin")),
-        api_id=Config.getenv("api_id"),
-        api_hash=Config.getenv("api_hash"),
-        bot_token=Config.getenv("bot_token"),
-        proxy=Config.url_parser(Config.PROXY, is_a_proxy=True),
+        "data/" + str(Settings.getenv("client_name", "itisFarzin")),
+        api_id=Settings.getenv("api_id"),
+        api_hash=Settings.getenv("api_hash"),
+        bot_token=Settings.getenv("bot_token"),
+        proxy=Settings.url_parser(Settings.PROXY, is_a_proxy=True),
         plugins=dict(root=plugins_folder),
     )
     await app.start()
@@ -55,7 +55,7 @@ def requirements():
 
 
 def setup_plugins():
-    plugins_repo = Config.getenv(
+    plugins_repo = Settings.getenv(
         "plugins_repo", "https://github.com/6AMStuff/itisFarzinBotPlugins"
     )
     if not plugins_repo:
@@ -87,7 +87,7 @@ def setup_plugins():
 if __name__ == "__main__":
     setup_plugins()
 
-    if not Config.TEST_MODE:
+    if not Settings.TEST_MODE:
         requirements()
 
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
