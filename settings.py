@@ -159,7 +159,7 @@ class Settings:
 
     @staticmethod
     def _tz():
-        tz = Settings.getenv("TZ", "Europe/London")
+        tz = Settings.getenv("tz", "Europe/London")
         try:
             ZoneInfo(tz)
         except Exception:
