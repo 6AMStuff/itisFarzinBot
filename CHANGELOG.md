@@ -1,3 +1,28 @@
+## v0.13.3 (2025-07-28)
+
+### BREAKING CHANGE
+
+- TZ got replaced with tz in the config file
+
+### Feat
+
+- **settings**: check for https proxy in proxy variable
+- **settings**: add test mode variable
+- **main**: auto set up plugins
+
+### Fix
+
+- **settings**: use os instead of settings for `_tz`'s getenv
+
+### Refactor
+
+- **plugin-manager**: `config` to `settings`
+- **settings**: deduplicate logging text and date format
+- **settings**: use lowercase tz variable value for timezone
+- **main**: `config` to `settings`
+- **settings**: timezone clean up
+- **main**: log requirements installations to log file
+
 ## v0.13.2 (2025-07-23)
 
 ### Feat
