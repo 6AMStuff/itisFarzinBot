@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from typing import Generator, Optional
 from pyrogram.handlers.handler import Handler
-from config import Config, DataBase, PluginDatabase
+from settings import Settings, DataBase, PluginDatabase
 
 
 class PluginManager(Client):
@@ -105,12 +105,12 @@ class PluginManager(Client):
         return handler in self.dispatcher.groups[group]
 
     def set_plugin_status(self, plugin: str, enabled: bool = True):
-        with Session(Config.engine) as session:
+        with Session(Settings.engine) as session:
             session.merge(PluginDatabase(name=plugin, enabled=enabled))
             session.commit()
 
     def get_plugin_status(self, plugin: str) -> bool:
-        with Session(Config.engine) as session:
+        with Session(Settings.engine) as session:
             enabled = session.execute(
                 select(PluginDatabase.enabled).where(
                     PluginDatabase.name == plugin
@@ -133,7 +133,7 @@ class PluginManager(Client):
 
         for plugin in plugins:
             if plugin in _plugins:
-                with Session(Config.engine) as session:
+                with Session(Settings.engine) as session:
                     if (
                         session.execute(
                             select(PluginDatabase.enabled).where(
@@ -163,7 +163,7 @@ class PluginManager(Client):
                         f"Failed to load {callback_name} handler, "
                         "because it is already loaded"
                     )
-        DataBase.metadata.create_all(Config.engine)
+        DataBase.metadata.create_all(Settings.engine)
         return result
 
     def unload_plugins(

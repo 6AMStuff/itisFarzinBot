@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Lowercase Repository
         run: echo "REPO=${GITHUB_REPOSITORY@L}" >> $GITHUB_ENV
@@ -23,13 +25,19 @@ jobs:
       - name: Get Current Date
         run: echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
 
+      - name: Get Latest Tag
+        run: |
+          echo "LATEST_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
       - name: Set Docker Tag
         run: |
-          DOCKER_TAG="ghcr.io/${{ env.REPO }}:${{ github.ref_name }}"
+          DOCKER_TAG="ghcr.io/${{ env.REPO }}:${{ env.LATEST_TAG }}"
+
           if [ "${GITHUB_REF##*/}" == "dev" ]; then
-            COMMIT_SHORT=${GITHUB_SHA:0:6}
+            COMMIT_SHORT="${GITHUB_SHA:0:6}"
             DOCKER_TAG="${DOCKER_TAG}-${COMMIT_SHORT}"
           fi
+
           echo "DOCKER_TAG=${DOCKER_TAG}" >> $GITHUB_ENV
 
       - name: Log in to GitHub Container Registry

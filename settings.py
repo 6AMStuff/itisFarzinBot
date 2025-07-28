@@ -38,19 +38,11 @@ formatter = logging.Formatter(
 file_handler.setFormatter(formatter)
 logging.basicConfig(
     level=log_level,
-    format="[%(asctime)s] %(levelname)s: %(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p",
+    format=formatter._fmt,
+    datefmt=formatter.datefmt,
     handlers=[file_handler],
 )
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
-
-tz = os.getenv("TZ", "Europe/London")
-try:
-    ZoneInfo(tz)
-except Exception:
-    tz = "Europe/London"
-os.environ["TZ"] = tz
-time.tzset()
 
 
 class Settings:
@@ -105,6 +97,7 @@ class Settings:
             if not data:
                 Settings._createdata(plugin_name)
                 data = {}
+
             data[key] = value
             result = session.execute(
                 update(PluginDatabase)
@@ -134,6 +127,7 @@ class Settings:
             if not data:
                 Settings._createdata(plugin_name)
                 data = {}
+
             return data.get(
                 key, Settings.getenv(key, default) if use_env else default
             )
@@ -153,10 +147,12 @@ class Settings:
             if not data:
                 Settings._createdata(plugin_name)
                 return 1
+
             if key in data:
                 del data[key]
             else:
                 return False
+
             result = session.execute(
                 update(PluginDatabase)
                 .where(PluginDatabase.name == plugin_name)
@@ -165,6 +161,18 @@ class Settings:
             session.commit()
             return result.rowcount > 0
 
+    @staticmethod
+    def _tz():
+        tz = os.getenv("tz", "Europe/London")
+        try:
+            ZoneInfo(tz)
+        except Exception:
+            tz = "Europe/London"
+
+        os.environ["TZ"] = tz
+        time.tzset()
+        return tz
+
     engine = create_engine(
         getenv("db_uri", "sqlite:///data/database.db"), pool_pre_ping=True
     )
@@ -172,7 +180,10 @@ class Settings:
     PROXY = getenv(
         "proxy",
         (
-            getenv("http_proxy") or getenv("HTTP_PROXY")
+            getenv("http_proxy")
+            or getenv("HTTP_PROXY")
+            or getenv("https_proxy")
+            or getenv("HTTPS_PROXY")
             if str(getenv("use_system_proxy", "yes")).lower() == "yes"
             else None
         ),
@@ -180,7 +191,8 @@ class Settings:
     IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(","))
     CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
-    TIMEZONE = ZoneInfo(tz)
+    TIMEZONE = ZoneInfo(_tz())
+    TEST_MODE = getenv("test_mode") in {"true", "1"}
 
 
 class DataBase(DeclarativeBase):
