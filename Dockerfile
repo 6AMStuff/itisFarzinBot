@@ -20,7 +20,9 @@ RUN pip install --disable-pip-version-check --break-system-packages --root-user-
 
 FROM base AS runtime
 
-ARG BUILD_DATE
+ARG BUILDTIME
+ARG VERSION
+ARG REVISION
 
 LABEL \
   maintainer="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
@@ -28,7 +30,9 @@ LABEL \
   org.opencontainers.image.source="https://github.com/6AMStuff/itisFarzinBot" \
   org.opencontainers.image.title="itisFarzinBot" \
   org.opencontainers.image.description="My personal Telegram bot with Kurigram" \
-  org.opencontainers.image.created=$BUILD_DATE
+  org.opencontainers.image.created=$BUILDTIME \
+  org.opencontainers.image.version=$VERSION \
+  org.opencontainers.image.revision=$REVISION
 
 COPY --from=dependencies /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
