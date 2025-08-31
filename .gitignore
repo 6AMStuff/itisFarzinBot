@@ -1,10 +1,10 @@
 __pycache__/
 downloads/
 plugins/
+config/
 .venv/
-data/
 venv/
-!data/config.sample.yaml
+!config/config.sample.yaml
 *.session*
 *.log
 *.db

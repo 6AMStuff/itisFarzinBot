@@ -16,7 +16,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 config: dict[str, str | int | list] = yaml.safe_load(
-    Path("data/config.yaml").read_text()
+    Path("config/config.yaml").read_text()
 )
 
 
@@ -157,7 +157,7 @@ class Settings:
         return tz
 
     engine = create_engine(
-        getenv("db_uri", "sqlite:///data/database.db"), pool_pre_ping=True
+        getenv("db_uri", "sqlite:///config/database.db"), pool_pre_ping=True
     )
 
     PROXY = getenv(
@@ -195,7 +195,7 @@ log_level = (
     else logging.INFO
 )
 file_handler = logging.handlers.RotatingFileHandler(
-    filename=f"{Settings.getenv("log_dir", "data")}/{logger.name}.log",
+    filename=f"{Settings.getenv("log_dir", "config")}/{logger.name}.log",
     maxBytes=float(Settings.getenv("log_max_size_mb", 1)) * 1024 * 1024,
     backupCount=int(Settings.getenv("log_backup_count", 2)),
 )

@@ -2,8 +2,8 @@ example_plugins
 __pycache__
 downloads
 plugins
+config
 .venv
-data
 venv
 .git
 

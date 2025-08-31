@@ -16,7 +16,7 @@ plugins_folder = Settings.getenv("plugins_folder", "plugins")
 
 async def main():
     app = Bot(
-        "data/" + str(Settings.getenv("client_name", "itisFarzin")),
+        "config/" + str(Settings.getenv("client_name", "itisFarzin")),
         api_id=Settings.getenv("api_id"),
         api_hash=Settings.getenv("api_hash"),
         bot_token=Settings.getenv("bot_token"),
