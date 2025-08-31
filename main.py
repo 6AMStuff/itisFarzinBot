@@ -20,6 +20,7 @@ async def main():
         api_id=Settings.getenv("api_id"),
         api_hash=Settings.getenv("api_hash"),
         bot_token=Settings.getenv("bot_token"),
+        in_memory=(str(Settings.getenv("in_memory")).lower() in {"true", "1"}),
         proxy=Settings.url_parser(Settings.PROXY, is_a_proxy=True),
         plugins=dict(root=plugins_folder),
     )
