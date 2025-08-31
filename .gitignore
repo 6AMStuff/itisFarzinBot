@@ -4,8 +4,7 @@ plugins/
 .venv/
 data/
 venv/
-!data/.env.example
+!data/config.sample.yaml
 *.session*
 *.log
 *.db
-.env
