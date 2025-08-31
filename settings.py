@@ -169,7 +169,7 @@ class Settings:
             else None
         ),
     )
-    IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(","))
+    IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(" "))
     CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
     TIMEZONE = ZoneInfo(_tz())
