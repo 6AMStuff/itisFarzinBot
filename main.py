@@ -16,11 +16,11 @@ plugins_folder = Settings.getenv("plugins_folder", "plugins")
 
 async def main():
     app = Bot(
-        "config/" + str(Settings.getenv("client_name", "itisFarzin")),
+        "config/" + Settings.getenv("client_name", "itisFarzin"),
         api_id=Settings.getenv("api_id"),
         api_hash=Settings.getenv("api_hash"),
         bot_token=Settings.getenv("bot_token"),
-        in_memory=(str(Settings.getenv("in_memory")).lower() in {"true", "1"}),
+        in_memory=Settings.getenv("in_memory").is_enabled,
         proxy=Settings.url_parser(Settings.PROXY, is_a_proxy=True),
         plugins=dict(root=plugins_folder),
     )
