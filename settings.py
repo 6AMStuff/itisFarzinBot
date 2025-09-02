@@ -20,6 +20,34 @@ config: dict[str, str | int | list] = yaml.safe_load(
 )
 
 
+class Value(str):
+    def __init__(self, value: str | int | bool):
+        self._value = str(value)
+
+    @property
+    def is_enabled(self) -> bool:
+        return self._value.lower() in {"true", "1"}
+
+    @property
+    def is_digit(self) -> bool:
+        return self._value.isdigit()
+
+    @property
+    def to_int(self) -> int:
+        return int(self._value)
+
+    @property
+    def to_float(self) -> float:
+        return float(self._value)
+
+    @property
+    def to_str(self) -> str:
+        return self._value
+
+    def __repr__(self) -> str:
+        return self._value
+
+
 class Settings:
     @staticmethod
     def url_parser(url: str, is_a_proxy: bool = False):
@@ -50,13 +78,18 @@ class Settings:
 
     @staticmethod
     def getenv(key: str, default: Any = None):
-        return next(
-            (
-                value
-                for value in (os.getenv(key.upper()), config.get(key.lower()))
-                if value is not None
-            ),
-            default,
+        return Value(
+            next(
+                (
+                    value
+                    for value in (
+                        os.getenv(key.upper()),
+                        config.get(key.lower()),
+                    )
+                    if value is not None
+                ),
+                default,
+            )
         )
 
     @staticmethod
@@ -111,8 +144,10 @@ class Settings:
                 Settings._createdata(plugin_name)
                 data = {}
 
-            return data.get(
-                key, Settings.getenv(key, default) if use_env else default
+            return Value(
+                data.get(
+                    key, Settings.getenv(key, default) if use_env else default
+                )
             )
 
     @staticmethod
@@ -163,17 +198,16 @@ class Settings:
     PROXY = getenv(
         "proxy",
         (
-            getenv("http_proxy")
-            or getenv("https_proxy")
-            if str(getenv("use_system_proxy")).lower() in {"true", "1"}
+            getenv("http_proxy") or getenv("https_proxy")
+            if getenv("use_system_proxy").is_enabled
             else None
         ),
     )
-    IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(" "))
-    CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
+    IS_ADMIN = filters.user(getenv("admins", "@itisFarzin").split(" "))
+    CMD_PREFIXES = getenv("cmd_prefixes", "/").split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
     TIMEZONE = ZoneInfo(_tz())
-    TEST_MODE = str(getenv("test_mode")).lower() in {"true", "1"}
+    TEST_MODE = getenv("test_mode").is_enabled
 
 
 class DataBase(DeclarativeBase):
@@ -190,18 +224,18 @@ class PluginDatabase(DataBase):
 
 logger = logging.getLogger(Settings.getenv("log_name", "bot"))
 log_level = (
-    int(Settings.getenv("log_level"))
-    if str(Settings.getenv("log_level")).isdigit()
+    Settings.getenv("log_level").to_int
+    if Settings.getenv("log_level").is_digit
     else logging.INFO
 )
 file_handler = logging.handlers.RotatingFileHandler(
     filename=f"{Settings.getenv("log_dir", "config")}/{logger.name}.log",
-    maxBytes=float(Settings.getenv("log_max_size_mb", 1)) * 1024 * 1024,
-    backupCount=int(Settings.getenv("log_backup_count", 2)),
+    maxBytes=Settings.getenv("log_max_size_mb", 1).to_float * 1024 * 1024,
+    backupCount=Settings.getenv("log_backup_count", 2).to_int,
 )
 file_handler.setLevel(
-    int(Settings.getenv("log_level"))
-    if str(Settings.getenv("log_level")).isdigit()
+    Settings.getenv("log_level").to_int
+    if Settings.getenv("log_level").is_digit
     else logging.INFO
 )
 formatter = logging.Formatter(
