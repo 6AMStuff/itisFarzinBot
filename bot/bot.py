@@ -1,7 +1,7 @@
 import time
 from .core import Core
 from pyrogram import Client
-from config import Config, DataBase
+from config import Settings, DataBase
 
 
 class BotMeta(type):
@@ -16,7 +16,7 @@ class Bot(Core, Client, metaclass=BotMeta):
         self.builtin_plugin = "bot/builtin_plugins"
         self.uptime = time.time()
         self.is_bot = bool(self.bot_token)
-        DataBase.metadata.create_all(Config.engine)
+        DataBase.metadata.create_all(Settings.engine)
 
         for base_class in reversed(self.__class__.__bases__[0].__bases__):
             if base_class is self.__class__ or base_class is object:

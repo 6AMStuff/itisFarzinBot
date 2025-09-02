@@ -5,7 +5,7 @@ from typing import Callable
 from pyrogram import filters
 from pyrogram.types import Message
 
-from config import Config
+from settings import Settings
 
 
 async def notify_module_data_change(app: Bot, name: str) -> bool:
@@ -29,12 +29,12 @@ async def notify_module_data_change(app: Bot, name: str) -> bool:
 
 
 @Bot.on_message(
-    Config.IS_ADMIN & filters.command("setdata", Config.CMD_PREFIXES)
+    Settings.IS_ADMIN & filters.command("setdata", Settings.CMD_PREFIXES)
 )
 async def setdata(app: Bot, message: Message):
     if len(message.command) != 4:
         await message.reply(
-            f"{Config.CMD_PREFIXES[0]}setdata [plugin name] [key] [value]"
+            f"{Settings.CMD_PREFIXES[0]}setdata [plugin name] [key] [value]"
         )
         return
 
@@ -43,18 +43,18 @@ async def setdata(app: Bot, message: Message):
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
 
-    result = Config.setdata(key, value, plugin_name=plugin_name)
+    result = Settings.setdata(key, value, plugin_name=plugin_name)
     await notify_module_data_change(app, plugin_name)
     await message.reply("Done." if result else "Failed.")
 
 
 @Bot.on_message(
-    Config.IS_ADMIN & filters.command("getdata", Config.CMD_PREFIXES)
+    Settings.IS_ADMIN & filters.command("getdata", Settings.CMD_PREFIXES)
 )
 async def getdata(app: Bot, message: Message):
     if len(message.command) != 3:
         await message.reply(
-            f"{Config.CMD_PREFIXES[0]}getdata [plugin name] [key]"
+            f"{Settings.CMD_PREFIXES[0]}getdata [plugin name] [key]"
         )
         return
 
@@ -63,17 +63,17 @@ async def getdata(app: Bot, message: Message):
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
 
-    result = Config.getdata(key, plugin_name=plugin_name)
+    result = Settings.getdata(key, plugin_name=plugin_name)
     await message.reply(f"Value: `{result}`")
 
 
 @Bot.on_message(
-    Config.IS_ADMIN & filters.command("deldata", Config.CMD_PREFIXES)
+    Settings.IS_ADMIN & filters.command("deldata", Settings.CMD_PREFIXES)
 )
 async def deldata(app: Bot, message: Message):
     if len(message.command) != 3:
         await message.reply(
-            f"{Config.CMD_PREFIXES[0]}deldata [plugin name] [key]"
+            f"{Settings.CMD_PREFIXES[0]}deldata [plugin name] [key]"
         )
         return
 
@@ -82,7 +82,7 @@ async def deldata(app: Bot, message: Message):
         await message.reply(f"Plugin {plugin_name} doesn't exist.")
         return
 
-    result = Config.deldata(key, plugin_name=plugin_name)
+    result = Settings.deldata(key, plugin_name=plugin_name)
     await notify_module_data_change(app, plugin_name)
     await message.reply("Done." if result else "Failed.")
 
