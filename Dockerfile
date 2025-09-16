@@ -36,6 +36,7 @@ LABEL \
 
 COPY --from=dependencies /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+ENV VERSION=$VERSION
 
 WORKDIR /app
 
