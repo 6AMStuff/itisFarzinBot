@@ -94,7 +94,8 @@ async def handlers(app: Bot, message: Message):
 
 
 @Bot.on_message(
-    Settings.IS_ADMIN & filters.command(["load", "unload"], Settings.CMD_PREFIXES)
+    Settings.IS_ADMIN
+    & filters.command(["load", "unload"], Settings.CMD_PREFIXES)
 )
 async def load_unload(app: Bot, message: Message):
     plugins = (
