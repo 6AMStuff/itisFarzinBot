@@ -1,3 +1,26 @@
+## v0.14.0 (2025-09-18)
+
+### BREAKING CHANGE
+
+- duh
+- Rename the folder
+- Migrate to yaml from .env
+
+### Feat
+
+- **main**: clone the plugins repository based on the current branch
+- **settings**: add value class
+- **settings**: switch to yaml for the config file
+- **main**: add in_memory support
+
+### Refactor
+
+- **config**: drop it
+- **core**: switch to settings from config
+- **main**: adapt to the new getenv
+- rename data folder to config
+- **settings**: change admins delimiter to a space
+
 ## v0.13.3 (2025-07-28)
 
 ### BREAKING CHANGE
