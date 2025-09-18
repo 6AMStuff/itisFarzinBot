@@ -16,10 +16,11 @@ plugins_folder = Settings.getenv("plugins_folder", "plugins")
 
 async def main():
     app = Bot(
-        "data/" + str(Settings.getenv("client_name", "itisFarzin")),
+        "config/" + Settings.getenv("client_name", "itisFarzin"),
         api_id=Settings.getenv("api_id"),
         api_hash=Settings.getenv("api_hash"),
         bot_token=Settings.getenv("bot_token"),
+        in_memory=Settings.getenv("in_memory").is_enabled,
         proxy=Settings.url_parser(Settings.PROXY, is_a_proxy=True),
         plugins=dict(root=plugins_folder),
     )
@@ -64,6 +65,13 @@ def setup_plugins():
 
     repo_name = os.path.basename(plugins_repo).replace(".git", "")
     repo_path = os.path.join(plugins_folder, repo_name)
+
+    try:
+        _repo = Repo(".")
+        branch = "dev" if _repo.active_branch.name == "dev" else "main"
+    except Exception:
+        branch = "dev" if os.getenv("VERSION") == "dev" else "main"
+
     if os.path.exists(repo_path):
         repo = Repo(repo_path)
         if plugins_repo not in [remote.url for remote in repo.remotes]:
@@ -73,14 +81,14 @@ def setup_plugins():
             )
             logging.info(f"Removing {repo_name}'s folder.")
             shutil.rmtree(repo_path)
-            Repo.clone_from(plugins_repo, repo_path)
+            Repo.clone_from(plugins_repo, repo_path, branch=branch)
             logging.info(f"Cloned {repo_name}.")
 
         repo.remote().fetch()
         repo.git.pull()
         logging.info(f"Updated {repo_name}.")
     else:
-        Repo.clone_from(plugins_repo, repo_path)
+        Repo.clone_from(plugins_repo, repo_path, branch=branch)
         logging.info(f"Cloned {repo_name}.")
 
 

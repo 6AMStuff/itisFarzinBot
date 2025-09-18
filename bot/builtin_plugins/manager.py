@@ -7,7 +7,7 @@ from pyrogram.types import (
     CallbackQuery,
 )
 
-from config import Config
+from settings import Settings
 
 
 async def plugins_status(client: Bot, update: Message | CallbackQuery):
@@ -56,14 +56,14 @@ async def plugins_status(client: Bot, update: Message | CallbackQuery):
 
 
 @Bot.on_message(
-    Config.IS_ADMIN & filters.command("plugins", Config.CMD_PREFIXES)
+    Settings.IS_ADMIN & filters.command("plugins", Settings.CMD_PREFIXES)
 )
 async def plugins(app: Bot, message: Message):
     await plugins_status(app, message)
 
 
 @Bot.on_callback_query(
-    Config.IS_ADMIN & filters.regex(r"^plugins (?P<plugin>[\w\-]+)$")
+    Settings.IS_ADMIN & filters.regex(r"^plugins (?P<plugin>[\w\-]+)$")
 )
 async def plugins_callback(app: Bot, query: CallbackQuery):
     plugin: str = query.matches[0].group("plugin")
@@ -76,7 +76,7 @@ async def plugins_callback(app: Bot, query: CallbackQuery):
 
 
 @Bot.on_message(
-    Config.IS_ADMIN & filters.command("handlers", Config.CMD_PREFIXES)
+    Settings.IS_ADMIN & filters.command("handlers", Settings.CMD_PREFIXES)
 )
 async def handlers(app: Bot, message: Message):
     responce = "**Handlers**:\n" + "\n".join(
@@ -94,7 +94,8 @@ async def handlers(app: Bot, message: Message):
 
 
 @Bot.on_message(
-    Config.IS_ADMIN & filters.command(["load", "unload"], Config.CMD_PREFIXES)
+    Settings.IS_ADMIN
+    & filters.command(["load", "unload"], Settings.CMD_PREFIXES)
 )
 async def load_unload(app: Bot, message: Message):
     plugins = (

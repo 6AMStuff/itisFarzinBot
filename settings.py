@@ -1,12 +1,13 @@
 import os
 import re
 import time
+import yaml
 import inspect
 import logging
 import logging.handlers
+from pathlib import Path
 from pyrogram import filters
 from zoneinfo import ZoneInfo
-from dotenv import load_dotenv
 from typing import Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
@@ -14,35 +15,37 @@ from sqlalchemy import create_engine, String, Boolean, JSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
-load_dotenv("data/.env")
+config: dict[str, str | int | list] = yaml.safe_load(
+    Path("config/config.yaml").read_text()
+)
 
-logger = logging.getLogger(os.getenv("log_name", "bot"))
-log_dir = os.getenv("log_dir", "data")
-log_level = (
-    int(os.getenv("log_level"))
-    if str(os.getenv("log_level")).isdigit()
-    else logging.INFO
-)
-log_max_size_mb = float(os.getenv("log_max_size_mb", 1)) * 1024 * 1024
-log_backup_count = int(os.getenv("log_backup_count", 2))
-file_handler = logging.handlers.RotatingFileHandler(
-    filename=f"{log_dir}/{logger.name}.log",
-    maxBytes=log_max_size_mb,
-    backupCount=log_backup_count,
-)
-file_handler.setLevel(log_level)
-formatter = logging.Formatter(
-    fmt="[%(asctime)s] %(levelname)s: %(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p",
-)
-file_handler.setFormatter(formatter)
-logging.basicConfig(
-    level=log_level,
-    format=formatter._fmt,
-    datefmt=formatter.datefmt,
-    handlers=[file_handler],
-)
-logging.getLogger("pyrogram").setLevel(logging.ERROR)
+
+class Value(str):
+    def __init__(self, value: str | int | bool):
+        self._value = str(value)
+
+    @property
+    def is_enabled(self) -> bool:
+        return self._value.lower() in {"true", "1"}
+
+    @property
+    def is_digit(self) -> bool:
+        return self._value.isdigit()
+
+    @property
+    def to_int(self) -> int:
+        return int(self._value)
+
+    @property
+    def to_float(self) -> float:
+        return float(self._value)
+
+    @property
+    def to_str(self) -> str:
+        return self._value
+
+    def __repr__(self) -> str:
+        return self._value
 
 
 class Settings:
@@ -55,10 +58,11 @@ class Settings:
             r"(?P<hostname>[^:]+)"  # Hostname
             r":(?P<port>\d+)$"  # Port
         )
+
         if not url:
             return None
-        result = pattern.match(str(url))
 
+        result = pattern.match(str(url))
         if not result:
             return None
 
@@ -74,7 +78,19 @@ class Settings:
 
     @staticmethod
     def getenv(key: str, default: Any = None):
-        return os.environ.get(key, default)
+        return Value(
+            next(
+                (
+                    value
+                    for value in (
+                        os.getenv(key.upper()),
+                        config.get(key.lower()),
+                    )
+                    if value is not None
+                ),
+                default,
+            )
+        )
 
     @staticmethod
     def _createdata(plugin_name: str):
@@ -128,8 +144,10 @@ class Settings:
                 Settings._createdata(plugin_name)
                 data = {}
 
-            return data.get(
-                key, Settings.getenv(key, default) if use_env else default
+            return Value(
+                data.get(
+                    key, Settings.getenv(key, default) if use_env else default
+                )
             )
 
     @staticmethod
@@ -163,7 +181,7 @@ class Settings:
 
     @staticmethod
     def _tz():
-        tz = os.getenv("tz", "Europe/London")
+        tz = os.getenv("TZ") or config.get("tz") or "Europe/London"
         try:
             ZoneInfo(tz)
         except Exception:
@@ -174,25 +192,22 @@ class Settings:
         return tz
 
     engine = create_engine(
-        getenv("db_uri", "sqlite:///data/database.db"), pool_pre_ping=True
+        getenv("db_uri", "sqlite:///config/database.db"), pool_pre_ping=True
     )
 
     PROXY = getenv(
         "proxy",
         (
-            getenv("http_proxy")
-            or getenv("HTTP_PROXY")
-            or getenv("https_proxy")
-            or getenv("HTTPS_PROXY")
-            if str(getenv("use_system_proxy", "yes")).lower() == "yes"
+            getenv("http_proxy") or getenv("https_proxy")
+            if getenv("use_system_proxy").is_enabled
             else None
         ),
     )
-    IS_ADMIN = filters.user(str(getenv("admins", "@itisFarzin")).split(","))
-    CMD_PREFIXES = str(getenv("cmd_prefixes", "/")).split(" ")
+    IS_ADMIN = filters.user(getenv("admins", "@itisFarzin").split(" "))
+    CMD_PREFIXES = getenv("cmd_prefixes", "/").split(" ")
     REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
     TIMEZONE = ZoneInfo(_tz())
-    TEST_MODE = getenv("test_mode") in {"true", "1"}
+    TEST_MODE = getenv("test_mode").is_enabled
 
 
 class DataBase(DeclarativeBase):
@@ -205,3 +220,33 @@ class PluginDatabase(DataBase):
     name: Mapped[str] = mapped_column(String(40), primary_key=True)
     enabled: Mapped[bool] = mapped_column(Boolean())
     custom_data: Mapped[JSON] = mapped_column(JSON(), default=dict())
+
+
+logger = logging.getLogger(Settings.getenv("log_name", "bot"))
+log_level = (
+    Settings.getenv("log_level").to_int
+    if Settings.getenv("log_level").is_digit
+    else logging.INFO
+)
+file_handler = logging.handlers.RotatingFileHandler(
+    filename=f"{Settings.getenv("log_dir", "config")}/{logger.name}.log",
+    maxBytes=Settings.getenv("log_max_size_mb", 1).to_float * 1024 * 1024,
+    backupCount=Settings.getenv("log_backup_count", 2).to_int,
+)
+file_handler.setLevel(
+    Settings.getenv("log_level").to_int
+    if Settings.getenv("log_level").is_digit
+    else logging.INFO
+)
+formatter = logging.Formatter(
+    fmt="[%(asctime)s] %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+)
+file_handler.setFormatter(formatter)
+logging.basicConfig(
+    level=file_handler.level,
+    format=formatter._fmt,
+    datefmt=formatter.datefmt,
+    handlers=[file_handler],
+)
+logging.getLogger("pyrogram").setLevel(logging.ERROR)
