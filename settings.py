@@ -22,7 +22,7 @@ config: dict[str, str | int | list] = yaml.safe_load(
 
 class Value(str):
     def __init__(self, value: str | int | bool):
-        self._value = str(value)
+        self._value = str(value or "")
 
     @property
     def is_enabled(self) -> bool:
