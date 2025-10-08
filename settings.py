@@ -146,7 +146,12 @@ class Settings:
 
             return Value(
                 data.get(
-                    key, Settings.getenv(key, default) if use_env else default
+                    key,
+                    (
+                        Settings.getenv(key, default).to_str
+                        if use_env
+                        else default
+                    ),
                 )
             )
 
