@@ -1,3 +1,10 @@
+## v0.14.1 (2025-10-09)
+
+### Fix
+
+- **settings**: use the environment's value in getdata
+- **settings**: treat nones as empty strings
+
 ## v0.14.0 (2025-09-18)
 
 ### BREAKING CHANGE
