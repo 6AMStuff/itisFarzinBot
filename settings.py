@@ -22,7 +22,7 @@ config: dict[str, str | int | list] = yaml.safe_load(
 
 class Value(str):
     def __init__(self, value: str | int | bool):
-        self._value = str(value)
+        self._value = str(value or "")
 
     @property
     def is_enabled(self) -> bool:
@@ -146,7 +146,12 @@ class Settings:
 
             return Value(
                 data.get(
-                    key, Settings.getenv(key, default) if use_env else default
+                    key,
+                    (
+                        Settings.getenv(key, default).to_str
+                        if use_env
+                        else default
+                    ),
                 )
             )
 
