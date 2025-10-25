@@ -95,7 +95,10 @@ def setup_plugins():
 if __name__ == "__main__":
     setup_plugins()
 
-    if not Settings.TEST_MODE:
+    if (
+        not Settings.TEST_MODE
+        or not Settings.getenv("disable_requirements").is_enabled
+    ):
         requirements()
 
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
