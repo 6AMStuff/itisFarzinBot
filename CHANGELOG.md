@@ -1,3 +1,9 @@
+## v0.14.2 (2025-10-26)
+
+### Feat
+
+- **main**: add disable requirements setup config
+
 ## v0.14.1 (2025-10-09)
 
 ### Fix
