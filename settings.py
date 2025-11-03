@@ -15,9 +15,28 @@ from sqlalchemy import create_engine, String, Boolean, JSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
-config: dict[str, str | int | list] = yaml.safe_load(
-    Path("config/config.yaml").read_text()
-)
+config = {
+    "client_name": "itisFarzin",
+    "api_id": None,
+    "api_hash": None,
+    "bot_token": None,
+    "in_memory": False,
+    "plugins_folder": "plugins",
+    "log_name": "bot",
+    "log_level": 20,
+    "log_dir": "config",
+    "log_max_size_mb": 1,
+    "log_backup_count": 2,
+    "admins": ["@FarzinKazemzadeh", "@itisFarzin"],
+    "tz": "Europe/London",
+    "proxy": None,
+    "use_system_proxy": True,
+    "cmd_prefixes": [".", "/"],
+    "db_uri": "sqlite:///config/database.db",
+    "plugins_repo": "https://github.com/6AMStuff/itisFarzinBotPlugins"
+}
+
+config.update(yaml.safe_load(Path("config/config.yaml").read_text()))
 
 
 class Value(str):
