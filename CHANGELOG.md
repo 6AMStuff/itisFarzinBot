@@ -1,3 +1,9 @@
+## v0.14.3 (2025-11-03)
+
+### Refactor
+
+- **deps**: add the default configurations
+
 ## v0.14.2 (2025-10-26)
 
 ### Feat
