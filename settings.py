@@ -33,7 +33,7 @@ config = {
     "use_system_proxy": True,
     "cmd_prefixes": [".", "/"],
     "db_uri": "sqlite:///config/database.db",
-    "plugins_repo": "https://github.com/6AMStuff/itisFarzinBotPlugins"
+    "plugins_repo": "https://github.com/6AMStuff/itisFarzinBotPlugins",
 }
 
 config.update(yaml.safe_load(Path("config/config.yaml").read_text()))
