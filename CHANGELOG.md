@@ -1,3 +1,13 @@
+## v0.14.4 (2025-11-10)
+
+### Fix
+
+- **settings**: update the default configurations
+
+### Refactor
+
+- **settings**: improve the value class
+
 ## v0.14.3 (2025-11-03)
 
 ### Refactor
