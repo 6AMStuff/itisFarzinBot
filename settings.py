@@ -27,11 +27,11 @@ config = {
     "log_dir": "config",
     "log_max_size_mb": 1,
     "log_backup_count": 2,
-    "admins": ["@FarzinKazemzadeh", "@itisFarzin"],
+    "admins": "@FarzinKazemzadeh @itisFarzin",
     "tz": "Europe/London",
     "proxy": None,
     "use_system_proxy": True,
-    "cmd_prefixes": [".", "/"],
+    "cmd_prefixes": ". /",
     "db_uri": "sqlite:///config/database.db",
     "plugins_repo": "https://github.com/6AMStuff/itisFarzinBotPlugins",
 }
