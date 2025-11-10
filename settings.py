@@ -27,44 +27,42 @@ config = {
     "log_dir": "config",
     "log_max_size_mb": 1,
     "log_backup_count": 2,
-    "admins": ["@FarzinKazemzadeh", "@itisFarzin"],
+    "admins": "@FarzinKazemzadeh @itisFarzin",
     "tz": "Europe/London",
     "proxy": None,
     "use_system_proxy": True,
-    "cmd_prefixes": [".", "/"],
+    "cmd_prefixes": ". /",
     "db_uri": "sqlite:///config/database.db",
-    "plugins_repo": "https://github.com/6AMStuff/itisFarzinBotPlugins"
+    "plugins_repo": "https://github.com/6AMStuff/itisFarzinBotPlugins",
 }
 
 config.update(yaml.safe_load(Path("config/config.yaml").read_text()))
 
 
 class Value(str):
-    def __init__(self, value: str | int | bool):
-        self._value = str(value or "")
+    def __new__(cls, value: str | int | bool):
+        s = str(value or "")
+        return str.__new__(cls, s)
 
     @property
     def is_enabled(self) -> bool:
-        return self._value.lower() in {"true", "1"}
+        return self.lower() in {"true", "1"}
 
     @property
     def is_digit(self) -> bool:
-        return self._value.isdigit()
+        return self.isdigit()
 
     @property
     def to_int(self) -> int:
-        return int(self._value)
+        return int(self)
 
     @property
     def to_float(self) -> float:
-        return float(self._value)
+        return float(self)
 
     @property
     def to_str(self) -> str:
-        return self._value
-
-    def __repr__(self) -> str:
-        return self._value
+        return str(self)
 
 
 class Settings:
