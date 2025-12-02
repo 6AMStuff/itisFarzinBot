@@ -152,9 +152,6 @@ class PluginManager(Client):
         folder: Optional[str | list[str]] = None,
     ):
         result = {}
-        if isinstance(plugins, str):
-            plugins = plugins.split(",")
-
         plugins: set[str] = set(
             plugins.split(",") if isinstance(plugins, str) else plugins or ""
         ).intersection(self.get_plugins(folder=folder))
