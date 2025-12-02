@@ -131,7 +131,7 @@ class PluginManager(Client):
             with Session(Settings.engine) as session:
                 stmt = select(PluginDatabase.name).where(
                     PluginDatabase.name.in_(plugins),
-                    PluginDatabase.enabled.is_(False)
+                    PluginDatabase.enabled.is_(False),
                 )
                 disabled_plugins = set(session.execute(stmt).scalars().all())
 
@@ -170,12 +170,12 @@ class PluginManager(Client):
         if isinstance(plugins, str):
             plugins = plugins.split(",")
 
-        _plugins = self.get_plugins(folder=folder)
-        plugins = plugins or _plugins
+        plugins: set[str] = set(
+            plugins.split(",") if isinstance(plugins, str) else plugins or ""
+        ).intersection(self.get_plugins(folder=folder))
 
         for plugin in plugins:
-            if plugin in _plugins:
-                self.set_plugin_status(plugin, False)
+            self.set_plugin_status(plugin, False)
 
         for handler in self.get_handlers(plugins, folder=folder):
             if isinstance(handler[0], str):
