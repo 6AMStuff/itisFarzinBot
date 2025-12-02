@@ -4,9 +4,9 @@ import inspect
 import importlib
 from pathlib import Path
 from pyrogram import Client
+from typing import Iterator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from typing import Optional, Iterator
 from pyrogram.handlers.handler import Handler
 from settings import Settings, DataBase, PluginDatabase
 
@@ -19,7 +19,7 @@ class PluginManager(Client):
         self.load_plugins(folder=self.builtin_plugin)
 
     def modules_list(
-        self, folder: Optional[str | list[str]] = None
+        self, folder: str | list[str] | None = None
     ) -> Iterator[Path]:
         targets = (
             folder
@@ -36,7 +36,7 @@ class PluginManager(Client):
                         yield Path(root) / file
 
     def get_plugins(
-        self, folder: Optional[str | list[str]] = None
+        self, folder: str | list[str] | None = None
     ) -> Iterator[str]:
         folders = (
             folder
@@ -52,8 +52,8 @@ class PluginManager(Client):
 
     def get_handlers(
         self,
-        plugins: Optional[str | list[str]] = None,
-        folder: Optional[str | list[str]] = None,
+        plugins: str | list[str] | None = None,
+        folder: str | list[str] | None = None,
     ) -> Iterator[tuple[str, str] | tuple[Handler, int]]:
         group_offset = 0 if folder == self.builtin_plugin else 1
         plugins: set[str] = set(
@@ -103,8 +103,8 @@ class PluginManager(Client):
 
     def load_plugins(
         self,
-        plugins: Optional[str | list[str]] = None,
-        folder: Optional[str | list[str]] = None,
+        plugins: str | list[str] | None = None,
+        folder: str | list[str] | None = None,
         force_load: bool = False,
     ) -> dict[str, str]:
         result = {}
@@ -148,8 +148,8 @@ class PluginManager(Client):
 
     def unload_plugins(
         self,
-        plugins: Optional[str | list[str]] = None,
-        folder: Optional[str | list[str]] = None,
+        plugins: str | list[str] | None = None,
+        folder: str | list[str] | None = None,
     ):
         result = {}
         plugins: set[str] = set(
