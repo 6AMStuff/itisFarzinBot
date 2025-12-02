@@ -1,12 +1,13 @@
 import os
 import logging
+import inspect
 import importlib
 from pathlib import Path
 from pyrogram import Client
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from typing import Optional, Iterator
 from pyrogram.handlers.handler import Handler
-from typing import Generator, Optional, Iterator
 from settings import Settings, DataBase, PluginDatabase
 
 
@@ -57,41 +58,33 @@ class PluginManager(Client):
         self,
         plugins: Optional[str | list[str]] = None,
         folder: Optional[str | list[str]] = None,
-    ) -> Generator[tuple[str, str] | tuple[Handler, int], None, None]:
-        if isinstance(plugins, str):
-            plugins = plugins.split(",")
-
+    ) -> Iterator[tuple[str, str] | tuple[Handler, int]]:
         group_offset = 0 if folder == self.builtin_plugin else 1
-        _plugins = self.get_plugins(folder=folder)
-
-        if plugins:
-            for plugin in plugins:
-                if plugin not in _plugins:
-                    yield (plugin, "Plugin not found")
+        plugins: set[str] = set(
+            plugins.split(",") if isinstance(plugins, str) else plugins or ""
+        ) or set(self.get_plugins(folder=folder))
 
         for path in self.modules_list(folder=folder):
-            if plugins and path.stem not in plugins:
+            if path.stem not in plugins:
                 continue
 
-            module_path = ".".join(path.parent.parts + (path.stem,))
+            module_path = ".".join(path.with_suffix("").parts)
             module = importlib.import_module(module_path)
             # TODO: reload the module after import
 
-            for name in vars(module).keys():
-                if handlers := getattr(
-                    getattr(module, name), "handlers", None
-                ):
-                    if not isinstance(handlers, list):
-                        continue
+            for _, obj in inspect.getmembers(module):
+                handlers = getattr(obj, "handlers", None)
+                if not isinstance(handlers, list):
+                    continue
 
-                    for handler, group in handlers:
-                        if isinstance(handler, Handler) and isinstance(
-                            group, int
-                        ):
-                            if group < 0 and group_offset != 0:
-                                yield (handler, 0)
-                            else:
-                                yield (handler, group + group_offset)
+                for handler, group in handlers:
+                    if isinstance(handler, Handler) and isinstance(group, int):
+                        group = (
+                            0
+                            if (group < 0 and group_offset != 0)
+                            else (group + group_offset)
+                        )
+                        yield (handler, group)
 
     def handler_is_loaded(self, handler: Handler, group: int = 0) -> bool:
         if group not in self.dispatcher.groups:
