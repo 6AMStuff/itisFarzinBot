@@ -131,21 +131,17 @@ class PluginManager(Client):
                 self.set_plugin_status(plugin, True)
 
         for handler in self.get_handlers(plugins, folder=folder):
-            if isinstance(handler[0], str):
-                result[handler[0]] = handler[1]
-                logging.warning(handler[1])
+            callback_name = handler[0].callback.__name__
+            if not self.handler_is_loaded(*handler):
+                self.add_handler(*handler)
+                result[callback_name] = "Handler loaded"
+                logging.info(f"{callback_name} handler has been loaded")
             else:
-                callback_name = handler[0].callback.__name__
-                if not self.handler_is_loaded(*handler):
-                    self.add_handler(*handler)
-                    result[callback_name] = "Handler loaded"
-                    logging.info(f"{callback_name} handler has been loaded")
-                else:
-                    result[callback_name] = "Failed to load handler"
-                    logging.warning(
-                        f"Failed to load {callback_name} handler, "
-                        "because it is already loaded"
-                    )
+                result[callback_name] = "Failed to load handler"
+                logging.warning(
+                    f"Failed to load {callback_name} handler, "
+                    "because it is already loaded"
+                )
 
         DataBase.metadata.create_all(Settings.engine)
         return result
