@@ -37,9 +37,7 @@ class PluginManager(Client):
 
     def get_plugins(
         self, folder: Optional[str | list[str]] = None
-    ) -> list[str] | list[Path]:
-        plugins = []
-
+    ) -> Iterator[str]:
         folders = (
             folder
             if isinstance(folder, list)
@@ -50,9 +48,7 @@ class PluginManager(Client):
             module_path = ".".join(path.with_suffix("").parts)
             module = importlib.import_module(module_path)
             if getattr(module, "__plugin__", False):
-                plugins.append(path.stem)
-
-        return sorted(plugins)
+                yield path.stem
 
     def get_handlers(
         self,
