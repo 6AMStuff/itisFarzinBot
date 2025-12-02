@@ -5,8 +5,8 @@ from pathlib import Path
 from pyrogram import Client
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from typing import Generator, Optional
 from pyrogram.handlers.handler import Handler
+from typing import Generator, Optional, Iterator
 from settings import Settings, DataBase, PluginDatabase
 
 
@@ -19,26 +19,20 @@ class PluginManager(Client):
 
     def modules_list(
         self, folder: Optional[str | list[str]] = None
-    ) -> list[Path]:
-        modules = []
-
-        folders = (
+    ) -> Iterator[Path]:
+        targets = (
             folder
             if isinstance(folder, list)
             else [folder or self.plugins["root"]]
         )
 
-        for f in folders:
+        for path_str in targets:
             for root, _, files in os.walk(
-                f.replace(".", "/"), followlinks=True
+                path_str.replace(".", os.sep), followlinks=True
             ):
                 for file in files:
-                    if not file.endswith(".py"):
-                        continue
-                    path = Path(root) / file
-                    modules.append(path)
-
-        return sorted(modules)
+                    if file.endswith(".py"):
+                        yield Path(root) / file
 
     def get_plugins(
         self, folder: Optional[str | list[str]] = None
