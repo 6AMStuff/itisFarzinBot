@@ -116,7 +116,7 @@ class Settings:
             session.commit()
 
     @staticmethod
-    def setdata(key: str, value, plugin_name: str | None = None) -> bool:
+    def setdata(key: str, value: Any, plugin_name: str | None = None) -> bool:
         if not plugin_name:
             caller_frame = inspect.currentframe().f_back
             plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
@@ -143,7 +143,7 @@ class Settings:
     @staticmethod
     def getdata(
         key: str,
-        default=None,
+        default: Any = None,
         use_env: bool = False,
         plugin_name: str | None = None,
     ):
