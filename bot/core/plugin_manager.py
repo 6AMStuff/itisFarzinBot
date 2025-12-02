@@ -160,19 +160,16 @@ class PluginManager(Client):
             self.set_plugin_status(plugin, False)
 
         for handler in self.get_handlers(plugins, folder=folder):
-            if isinstance(handler[0], str):
-                result[handler[0]] = handler[1]
-                logging.warning(handler[1])
+            callback_name = handler[0].callback.__name__
+            if self.handler_is_loaded(*handler):
+                self.remove_handler(*handler)
+                result[callback_name] = "Handler unloaded"
+                logging.info(f"{callback_name} handler has been unloaded")
             else:
-                callback_name = handler[0].callback.__name__
-                if self.handler_is_loaded(*handler):
-                    self.remove_handler(*handler)
-                    result[callback_name] = "Handler unloaded"
-                    logging.info(f"{callback_name} handler has been unloaded")
-                else:
-                    result[callback_name] = "Failed to unload handler"
-                    logging.warning(
-                        f"Failed to unload {callback_name} handler, "
-                        "it is not loaded already."
-                    )
+                result[callback_name] = "Failed to unload handler"
+                logging.warning(
+                    f"Failed to unload {callback_name} handler, "
+                    "it is not loaded already."
+                )
+
         return result
