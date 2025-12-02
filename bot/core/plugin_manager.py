@@ -57,7 +57,7 @@ class PluginManager(Client):
     ) -> Iterator[tuple[str, str] | tuple[Handler, int]]:
         group_offset = 0 if folder == self.builtin_plugin else 1
         plugins: set[str] = set(
-            plugins.split(",") if isinstance(plugins, str) else plugins or ""
+            plugins.split(",") if isinstance(plugins, str) else plugins or []
         ) or set(self.get_plugins(folder=folder))
 
         for path in self.modules_list(folder=folder):
@@ -109,7 +109,7 @@ class PluginManager(Client):
     ) -> dict[str, str]:
         result = {}
         plugins: set[str] = set(
-            plugins.split(",") if isinstance(plugins, str) else plugins or ""
+            plugins.split(",") if isinstance(plugins, str) else plugins or []
         )
         all_plugins = set(self.get_plugins(folder=folder))
         plugins = plugins or all_plugins
@@ -153,7 +153,7 @@ class PluginManager(Client):
     ):
         result = {}
         plugins: set[str] = set(
-            plugins.split(",") if isinstance(plugins, str) else plugins or ""
+            plugins.split(",") if isinstance(plugins, str) else plugins or []
         ).intersection(self.get_plugins(folder=folder))
 
         for plugin in plugins:
