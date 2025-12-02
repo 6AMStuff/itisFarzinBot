@@ -119,27 +119,27 @@ class PluginManager(Client):
         force_load: bool = False,
     ) -> dict[str, str]:
         result = {}
-        if isinstance(plugins, str):
-            plugins = plugins.split(",")
+        plugins: set[str] = set(
+            plugins.split(",") if isinstance(plugins, str) else plugins or ""
+        )
+        all_plugins = set(self.get_plugins(folder=folder))
+        plugins = plugins or all_plugins
+        valid_plugins = plugins.intersection(all_plugins)
+        disabled_plugins = set()
 
-        _plugins = self.get_plugins(folder=folder)
-        plugins = plugins or _plugins
+        if not force_load:
+            with Session(Settings.engine) as session:
+                stmt = select(PluginDatabase.name).where(
+                    PluginDatabase.name.in_(plugins),
+                    PluginDatabase.enabled.is_(False)
+                )
+                disabled_plugins = set(session.execute(stmt).scalars().all())
 
-        for plugin in plugins:
-            if plugin in _plugins:
-                with Session(Settings.engine) as session:
-                    if (
-                        session.execute(
-                            select(PluginDatabase.enabled).where(
-                                PluginDatabase.name == plugin
-                            )
-                        ).scalar()
-                        is False
-                        and not force_load
-                    ):
-                        plugins.remove(plugin)
-                    else:
-                        self.set_plugin_status(plugin, True)
+        for plugin in valid_plugins:
+            if plugin in disabled_plugins:
+                plugins.discard(plugin)
+            else:
+                self.set_plugin_status(plugin, True)
 
         for handler in self.get_handlers(plugins, folder=folder):
             if isinstance(handler[0], str):
@@ -157,6 +157,7 @@ class PluginManager(Client):
                         f"Failed to load {callback_name} handler, "
                         "because it is already loaded"
                     )
+
         DataBase.metadata.create_all(Settings.engine)
         return result
 
