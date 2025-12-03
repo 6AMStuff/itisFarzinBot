@@ -86,9 +86,17 @@ class PluginManager(Client):
         result = self.dispatcher.groups.get(group)
         return result is not None and handler in result
 
-    def set_plugin_status(self, plugin: str, enabled: bool = True):
+    def set_plugins_status(
+        self, plugins: list[str] | str, enabled: bool = True
+    ):
+        plugins: set[str] = set(
+            plugins.split(",") if isinstance(plugins, str) else plugins
+        )
+
         with Session(Settings.engine) as session:
-            session.merge(PluginDatabase(name=plugin, enabled=enabled))
+            for plugin in plugins:
+                session.merge(PluginDatabase(name=plugin, enabled=enabled))
+
             session.commit()
 
     def get_plugin_status(self, plugin: str) -> bool:
@@ -123,11 +131,8 @@ class PluginManager(Client):
                 )
                 disabled_plugins = set(session.execute(stmt).scalars().all())
 
-        for plugin in valid_plugins:
-            if plugin in disabled_plugins:
-                plugins.discard(plugin)
-            else:
-                self.set_plugin_status(plugin, True)
+        plugins.difference_update(disabled_plugins.intersection(valid_plugins))
+        self.set_plugins_status(plugins, True)
 
         for handler in self.get_handlers(plugins, folder=folder):
             callback_name = handler[0].callback.__name__
@@ -155,8 +160,7 @@ class PluginManager(Client):
             plugins.split(",") if isinstance(plugins, str) else plugins or []
         ).intersection(self.get_plugins(folder=folder))
 
-        for plugin in plugins:
-            self.set_plugin_status(plugin, False)
+        self.set_plugins_status(plugins, False)
 
         for handler in self.get_handlers(plugins, folder=folder):
             callback_name = handler[0].callback.__name__
