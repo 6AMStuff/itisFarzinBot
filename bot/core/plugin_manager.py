@@ -38,13 +38,13 @@ class PluginManager(Client):
     def get_plugins(
         self, folder: str | list[str] | None = None
     ) -> Iterator[str]:
-        folders = (
+        targets = (
             folder
             if isinstance(folder, list)
             else [folder or self.plugins["root"]]
         )
 
-        for path in self.modules_list(folders):
+        for path in self.modules_list(targets):
             module_path = ".".join(path.with_suffix("").parts)
             module = importlib.import_module(module_path)
             if getattr(module, "__plugin__", False):
@@ -83,9 +83,8 @@ class PluginManager(Client):
                         yield (handler, group)
 
     def handler_is_loaded(self, handler: Handler, group: int = 0) -> bool:
-        if group not in self.dispatcher.groups:
-            return False
-        return handler in self.dispatcher.groups[group]
+        result = self.dispatcher.groups.get(group)
+        return result is not None and handler in result
 
     def set_plugin_status(self, plugin: str, enabled: bool = True):
         with Session(Settings.engine) as session:
@@ -96,10 +95,10 @@ class PluginManager(Client):
         with Session(Settings.engine) as session:
             enabled = session.execute(
                 select(PluginDatabase.enabled).where(
-                    PluginDatabase.name == plugin
+                    PluginDatabase.name.is_(plugin)
                 )
             ).scalar()
-            return enabled or False
+            return bool(enabled)
 
     def load_plugins(
         self,
