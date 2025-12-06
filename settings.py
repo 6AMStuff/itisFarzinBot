@@ -4,11 +4,11 @@ import time
 import yaml
 import inspect
 import logging
+from typing import Any
 import logging.handlers
 from pathlib import Path
 from pyrogram import filters
 from zoneinfo import ZoneInfo
-from typing import Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import select, update
 from sqlalchemy import create_engine, String, Boolean, JSON
@@ -116,7 +116,7 @@ class Settings:
             session.commit()
 
     @staticmethod
-    def setdata(key: str, value, plugin_name: Optional[str] = None) -> bool:
+    def setdata(key: str, value: Any, plugin_name: str | None = None) -> bool:
         if not plugin_name:
             caller_frame = inspect.currentframe().f_back
             plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
@@ -143,9 +143,9 @@ class Settings:
     @staticmethod
     def getdata(
         key: str,
-        default=None,
+        default: Any = None,
         use_env: bool = False,
-        plugin_name: Optional[str] = None,
+        plugin_name: str | None = None,
     ):
         if not plugin_name:
             caller_frame = inspect.currentframe().f_back
@@ -164,16 +164,12 @@ class Settings:
             return Value(
                 data.get(
                     key,
-                    (
-                        Settings.getenv(key, default).to_str
-                        if use_env
-                        else default
-                    ),
+                    Settings.getenv(key, default) if use_env else default,
                 )
             )
 
     @staticmethod
-    def deldata(key: str, plugin_name: Optional[str] = None) -> bool:
+    def deldata(key: str, plugin_name: str | None = None) -> bool:
         if not plugin_name:
             caller_frame = inspect.currentframe().f_back
             plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
