@@ -1,3 +1,24 @@
+## v0.15.0 (2025-12-06)
+
+### Refactor
+
+- **plugin-manager**: rename set_plugin_status to set_plugins_status
+- **plugin-manager**: minor code cleanups and improvements
+- **plugin-manager**: enhance handling of empty plugins variables
+- **plugin-manager**: remove the unreachable code from unload_plugins
+- **settings**: use any for unspecified variable types
+- **settings**: remove the unnecessary .to_str
+- **settings**: replace optionals with nones
+- **plugin-manager**: replace optionals with nones
+- **plugin-manager**: drop the useless code in unload_plugins
+- **plugin-manager**: remove the unreachable code from load_plugins
+- **plugin-manager**: improve get_plugins
+- **plugin-manager**: improve get_handlers
+- **plugin-manager**: improve unload_plugins
+- **plugin-manager**: improve load_plugins
+- **plugin-manager**: improve modules_list
+- **plugins/data**: little improvements for notify_module
+
 ## v0.14.4 (2025-11-10)
 
 ### Fix
