@@ -31,7 +31,7 @@ jobs:
         with:
           driver: docker-container
 
-      - name: Docker meta
+      - name: Docker meta (Standard)
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -42,10 +42,11 @@ jobs:
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
 
-      - name: Build and Push Docker Image
+      - name: Build and Push (Standard)
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -54,5 +55,32 @@ jobs:
             BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=standard
+          cache-to: type=gha,mode=max,scope=standard
+
+      - name: Docker meta (Minimal)
+        id: meta-min
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=minimal,enable={{is_default_branch}}
+            type=semver,pattern=minimal-v{{version}}
+            type=semver,pattern=minimal-v{{major}}.{{minor}}
+
+      - name: Build and Push (Minimal)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.minimal
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-min.outputs.tags }}
+          labels: ${{ steps.meta-min.outputs.labels }}
+          build-args: |
+            BUILDTIME=${{ fromJSON(steps.meta-min.outputs.json).labels['org.opencontainers.image.created'] }}
+            VERSION=${{ fromJSON(steps.meta-min.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.meta-min.outputs.json).labels['org.opencontainers.image.revision'] }}
+          cache-from: type=gha,scope=minimal
+          cache-to: type=gha,mode=max,scope=minimal
