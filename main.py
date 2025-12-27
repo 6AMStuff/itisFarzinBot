@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     if (
         not Settings.TEST_MODE
-        or not Settings.getenv("disable_requirements").is_enabled
+        and not Settings.getenv("disable_requirements").is_enabled
     ):
         requirements()
 
