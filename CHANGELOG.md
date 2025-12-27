@@ -1,3 +1,9 @@
+## v0.15.3 (2025-12-27)
+
+### Fix
+
+- **main**: correct the requirements setup logic
+
 ## v0.15.2 (2025-12-07)
 
 ## v0.15.1 (2025-12-06)
