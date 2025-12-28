@@ -1,10 +1,13 @@
 FROM python:3.13-alpine3.21 AS base
 
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=off \
-    PYTHONDONTWRITEBYTECODE=1
+ENV \
+  PYTHONUNBUFFERED=1 \
+  PYTHONDONTWRITEBYTECODE=1 \
+  PIP_DISABLE_PIP_VERSION_CHECK=1 \
+  PIP_NO_CACHE_DIR=1 \
+  PIP_ROOT_USER_ACTION=ignore
 
-RUN apk add --no-cache  git su-exec
+RUN apk add --no-cache git su-exec
 
 RUN touch /IS_CONTAINER
 
@@ -15,7 +18,7 @@ COPY requirements-minimal.txt /tmp/
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN pip install --disable-pip-version-check --break-system-packages --root-user-action ignore -r /tmp/requirements-minimal.txt
+RUN pip install --break-system-packages -r /tmp/requirements-minimal.txt
 
 FROM base AS runtime
 
@@ -24,11 +27,10 @@ ARG VERSION
 ARG REVISION
 
 LABEL \
-  maintainer="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
-  org.opencontainers.image.authors="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
+  org.opencontainers.image.authors="Farzin Kazemzadeh <itisFarzin@proton.me>" \
   org.opencontainers.image.source="https://github.com/6AMStuff/itisFarzinBot" \
   org.opencontainers.image.title="itisFarzinBot" \
-  org.opencontainers.image.description="My personal Telegram bot with Kurigram" \
+  org.opencontainers.image.description="A base for Telegram (user)bots" \
   org.opencontainers.image.created=$BUILDTIME \
   org.opencontainers.image.version=$VERSION \
   org.opencontainers.image.revision=$REVISION
@@ -46,10 +48,9 @@ COPY . .
 
 RUN chmod +x docker-entrypoint.sh
 
-RUN mkdir config plugins \
-    && ln -s /app/config /config
+RUN mkdir -p config plugins
 
-VOLUME ["/config"]
+VOLUME ["/app/config"]
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
