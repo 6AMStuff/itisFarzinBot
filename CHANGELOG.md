@@ -1,3 +1,9 @@
+## v0.16.0 (2025-12-28)
+
+### BREAKING CHANGE
+
+- Removed directories /config and /plugins; use /app/config and /app/plugins instead.
+
 ## v0.15.3 (2025-12-27)
 
 ### Fix
