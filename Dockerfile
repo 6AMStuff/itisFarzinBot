@@ -25,11 +25,10 @@ ARG VERSION
 ARG REVISION
 
 LABEL \
-  maintainer="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
-  org.opencontainers.image.authors="Farzin Kazemzadeh <itisFarzin@gmail.com>" \
+  org.opencontainers.image.authors="Farzin Kazemzadeh <itisFarzin@proton.me>" \
   org.opencontainers.image.source="https://github.com/6AMStuff/itisFarzinBot" \
   org.opencontainers.image.title="itisFarzinBot" \
-  org.opencontainers.image.description="My personal Telegram bot with Kurigram" \
+  org.opencontainers.image.description="A base for Telegram (user)bots" \
   org.opencontainers.image.created=$BUILDTIME \
   org.opencontainers.image.version=$VERSION \
   org.opencontainers.image.revision=$REVISION
