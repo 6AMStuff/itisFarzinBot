@@ -1,11 +1,14 @@
 FROM python:3.13-alpine3.21 AS base
 
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=off \
-    PYTHONDONTWRITEBYTECODE=1
+ENV \
+  PYTHONUNBUFFERED=1 \
+  PYTHONDONTWRITEBYTECODE=1 \
+  PIP_DISABLE_PIP_VERSION_CHECK=1 \
+  PIP_NO_CACHE_DIR=1 \
+  PIP_ROOT_USER_ACTION=ignore
 
 RUN apk add --no-cache \
-    build-base python3-dev libffi-dev openssl-dev git su-exec
+  build-base python3-dev libffi-dev openssl-dev git su-exec
 
 RUN touch /IS_CONTAINER
 
@@ -16,7 +19,7 @@ COPY requirements.txt /tmp/
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN pip install --disable-pip-version-check --break-system-packages --root-user-action ignore -r /tmp/requirements.txt
+RUN pip install --break-system-packages -r /tmp/requirements.txt
 
 FROM base AS runtime
 
