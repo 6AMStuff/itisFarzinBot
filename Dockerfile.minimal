@@ -46,10 +46,9 @@ COPY . .
 
 RUN chmod +x docker-entrypoint.sh
 
-RUN mkdir config plugins \
-    && ln -s /app/config /config
+RUN mkdir config plugins
 
-VOLUME ["/config"]
+VOLUME ["/app/config"]
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
