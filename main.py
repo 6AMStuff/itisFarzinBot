@@ -11,12 +11,12 @@ from pyrogram.methods.utilities.idle import idle
 
 from settings import Settings
 
-plugins_folder = Settings.getenv("plugins_folder", "plugins")
+plugins_folder = Settings.getenv("plugins_folder")
 
 
 async def main():
     app = Bot(
-        "config/" + Settings.getenv("client_name", "itisFarzin"),
+        "config/" + Settings.getenv("client_name"),
         api_id=Settings.getenv("api_id"),
         api_hash=Settings.getenv("api_hash"),
         bot_token=Settings.getenv("bot_token"),
@@ -56,9 +56,7 @@ def requirements():
 
 
 def setup_plugins():
-    plugins_repo = Settings.getenv(
-        "plugins_repo", "https://github.com/6AMStuff/itisFarzinBotPlugins"
-    )
+    plugins_repo = Settings.getenv("plugins_repo")
     if not plugins_repo:
         logging.warning("Skipping setting up plugins.")
         return
