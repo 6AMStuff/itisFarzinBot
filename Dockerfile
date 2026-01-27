@@ -36,13 +36,13 @@ LABEL \
   org.opencontainers.image.version=$VERSION \
   org.opencontainers.image.revision=$REVISION
 
-COPY --from=dependencies /opt/venv /opt/venv
+COPY --from=dependencies --chown=1000:1000 /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 ENV VERSION=$VERSION
 
 WORKDIR /app
 
-COPY . .
+COPY --chown=1000:1000 . .
 
 RUN chmod +x docker-entrypoint.sh
 

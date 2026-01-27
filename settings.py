@@ -199,7 +199,7 @@ class Settings:
 
     @staticmethod
     def _tz():
-        tz = os.getenv("TZ") or config.get("tz") or "Europe/London"
+        tz = os.getenv("TZ") or config.get("tz")
         try:
             ZoneInfo(tz)
         except Exception:
@@ -209,9 +209,7 @@ class Settings:
         time.tzset()
         return tz
 
-    engine = create_engine(
-        getenv("db_uri", "sqlite:///config/database.db"), pool_pre_ping=True
-    )
+    engine = create_engine(getenv("db_uri"), pool_pre_ping=True)
 
     PROXY = getenv(
         "proxy",
@@ -221,9 +219,9 @@ class Settings:
             else None
         ),
     )
-    IS_ADMIN = filters.user(getenv("admins", "@itisFarzin").split(" "))
-    CMD_PREFIXES = getenv("cmd_prefixes", "/").split(" ")
-    REGEX_CMD_PREFIXES = "|".join(re.escape(prefix) for prefix in CMD_PREFIXES)
+    IS_ADMIN = filters.user(getenv("admins").split(" "))
+    CMD_PREFIXES = getenv("cmd_prefixes").split(" ")
+    REGEX_CMD_PREFIXES = "|".join(map(re.escape, CMD_PREFIXES))
     TIMEZONE = ZoneInfo(_tz())
     TEST_MODE = getenv("test_mode").is_enabled
 
@@ -240,16 +238,16 @@ class PluginDatabase(DataBase):
     custom_data: Mapped[JSON] = mapped_column(JSON(), default=dict())
 
 
-logger = logging.getLogger(Settings.getenv("log_name", "bot"))
+logger = logging.getLogger(Settings.getenv("log_name"))
 log_level = (
     Settings.getenv("log_level").to_int
     if Settings.getenv("log_level").is_digit
     else logging.INFO
 )
 file_handler = logging.handlers.RotatingFileHandler(
-    filename=f"{Settings.getenv("log_dir", "config")}/{logger.name}.log",
-    maxBytes=Settings.getenv("log_max_size_mb", 1).to_float * 1024 * 1024,
-    backupCount=Settings.getenv("log_backup_count", 2).to_int,
+    filename=f"{Settings.getenv("log_dir")}/{logger.name}.log",
+    maxBytes=Settings.getenv("log_max_size_mb").to_float * 1024 * 1024,
+    backupCount=Settings.getenv("log_backup_count").to_int,
 )
 file_handler.setLevel(
     Settings.getenv("log_level").to_int
