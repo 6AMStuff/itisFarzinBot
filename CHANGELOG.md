@@ -1,3 +1,10 @@
+## v0.16.1 (2026-01-27)
+
+### Refactor
+
+- **main**: drop default values when calling getenv
+- **settings**: drop default values when calling getenv
+
 ## v0.16.0 (2025-12-28)
 
 ### BREAKING CHANGE
