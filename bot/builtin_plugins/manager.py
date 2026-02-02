@@ -70,7 +70,7 @@ async def plugins_callback(app: Bot, query: CallbackQuery):
     if app.get_plugin_status(plugin):
         app.unload_plugins(plugin)
     else:
-        app.load_plugins(plugin, force_load=True)
+        app.custom_load_plugins(plugin, force_load=True)
 
     await plugins_status(app, query)
 
@@ -102,7 +102,7 @@ async def load_unload(app: Bot, message: Message):
         ",".join(message.command[-1:]) if len(message.command) > 1 else None
     )
     if message.command[0] == "load":
-        result = app.load_plugins(plugins, force_load=True)
+        result = app.custom_load_plugins(plugins, force_load=True)
     else:
         result = app.unload_plugins(plugins)
 
