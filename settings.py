@@ -14,7 +14,6 @@ from sqlalchemy import select, update
 from sqlalchemy import create_engine, String, Boolean, JSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-
 config = {
     "client_name": "itisFarzin",
     "api_id": None,
@@ -110,6 +109,21 @@ class Settings:
         )
 
     @staticmethod
+    def infer_plugin_name() -> str | None:
+        frame = inspect.currentframe()
+        try:
+            if not frame or not frame.f_back or not frame.f_back.f_back:
+                return None
+
+            module = frame.f_back.f_back.f_globals.get("__name__")
+            if not isinstance(module, str):
+                return None
+
+            return module.rsplit(".", 1)[-1]
+        finally:
+            del frame
+
+    @staticmethod
     def _createdata(plugin_name: str):
         with Session(Settings.engine) as session:
             session.merge(PluginDatabase(name=plugin_name, enabled=True))
@@ -117,12 +131,12 @@ class Settings:
 
     @staticmethod
     def setdata(key: str, value: Any, plugin_name: str | None = None) -> bool:
+        plugin_name = plugin_name or Settings.infer_plugin_name()
         if not plugin_name:
-            caller_frame = inspect.currentframe().f_back
-            plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+            return False
 
         with Session(Settings.engine) as session:
-            data: dict = session.execute(
+            data = session.execute(
                 select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
@@ -147,12 +161,12 @@ class Settings:
         use_env: bool = False,
         plugin_name: str | None = None,
     ):
+        plugin_name = plugin_name or Settings.infer_plugin_name()
         if not plugin_name:
-            caller_frame = inspect.currentframe().f_back
-            plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+            return False
 
         with Session(Settings.engine) as session:
-            data: dict = session.execute(
+            data = session.execute(
                 select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
@@ -170,19 +184,19 @@ class Settings:
 
     @staticmethod
     def deldata(key: str, plugin_name: str | None = None) -> bool:
+        plugin_name = plugin_name or Settings.infer_plugin_name()
         if not plugin_name:
-            caller_frame = inspect.currentframe().f_back
-            plugin_name = caller_frame.f_globals["__name__"].split(".")[-1]
+            return False
 
         with Session(Settings.engine) as session:
-            data: dict = session.execute(
+            data = session.execute(
                 select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
             if not data:
                 Settings._createdata(plugin_name)
-                return 1
+                return True
 
             if key in data:
                 del data[key]
@@ -198,15 +212,19 @@ class Settings:
             return result.rowcount > 0
 
     @staticmethod
-    def _tz():
+    def apply_timezone():
         tz = os.getenv("TZ") or config.get("tz")
-        try:
-            ZoneInfo(tz)
-        except Exception:
-            tz = "Europe/London"
+        if tz:
+            try:
+                ZoneInfo(tz)
+            except Exception:
+                tz = None
+
+        tz = tz or "Europe/London"
 
         os.environ["TZ"] = tz
         time.tzset()
+
         return tz
 
     engine = create_engine(getenv("db_uri"), pool_pre_ping=True)
@@ -219,10 +237,11 @@ class Settings:
             else None
         ),
     )
-    IS_ADMIN = filters.user(getenv("admins").split(" "))
+    ADMINS = getenv("admins").split(" ")
+    IS_ADMIN = filters.user(list(ADMINS))
     CMD_PREFIXES = getenv("cmd_prefixes").split(" ")
     REGEX_CMD_PREFIXES = "|".join(map(re.escape, CMD_PREFIXES))
-    TIMEZONE = ZoneInfo(_tz())
+    TIMEZONE = ZoneInfo(apply_timezone())
     TEST_MODE = getenv("test_mode").is_enabled
 
 
@@ -235,7 +254,7 @@ class PluginDatabase(DataBase):
 
     name: Mapped[str] = mapped_column(String(40), primary_key=True)
     enabled: Mapped[bool] = mapped_column(Boolean())
-    custom_data: Mapped[JSON] = mapped_column(JSON(), default=dict())
+    custom_data: Mapped[dict[str, Any]] = mapped_column(JSON(), default=dict())
 
 
 logger = logging.getLogger(Settings.getenv("log_name"))
@@ -246,7 +265,7 @@ log_level = (
 )
 file_handler = logging.handlers.RotatingFileHandler(
     filename=f"{Settings.getenv("log_dir")}/{logger.name}.log",
-    maxBytes=Settings.getenv("log_max_size_mb").to_float * 1024 * 1024,
+    maxBytes=Settings.getenv("log_max_size_mb").to_int * 1024 * 1024,
     backupCount=Settings.getenv("log_backup_count").to_int,
 )
 file_handler.setLevel(
@@ -261,7 +280,7 @@ formatter = logging.Formatter(
 file_handler.setFormatter(formatter)
 logging.basicConfig(
     level=file_handler.level,
-    format=formatter._fmt,
+    format=formatter._fmt or "",
     datefmt=formatter.datefmt,
     handlers=[file_handler],
 )
