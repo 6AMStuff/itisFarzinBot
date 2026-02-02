@@ -52,7 +52,16 @@ async def plugins_status(client: Bot, update: Message | CallbackQuery):
             reply_markup=reply_markup,
         )
     elif isinstance(update, CallbackQuery):
-        await update.edit_message_text(text, reply_markup=reply_markup)
+        # Thanks for the great type annotations, kurigram!
+        if reply_markup is not None:
+            await update.edit_message_text(
+                text=text,
+                reply_markup=reply_markup,
+            )
+        else:
+            await update.edit_message_text(
+                text=text,
+            )
 
 
 @Bot.on_message(
@@ -79,7 +88,7 @@ async def plugins_callback(app: Bot, query: CallbackQuery):
     Settings.IS_ADMIN & filters.command("handlers", Settings.CMD_PREFIXES)
 )
 async def handlers(app: Bot, message: Message):
-    responce = "**Handlers**:\n" + "\n".join(
+    response = "**Handlers**:\n" + "\n".join(
         [
             f"{handler.callback.__name__}: "
             + (
@@ -87,10 +96,10 @@ async def handlers(app: Bot, message: Message):
                 if app.handler_is_loaded(handler, group)
                 else "Not loaded"
             )
-            for handler, group in app.get_handlers(app.get_plugins())
+            for handler, group in app.get_handlers(list(app.get_plugins()))
         ]
     )
-    await message.reply(responce)
+    await message.reply(response)
 
 
 @Bot.on_message(
@@ -98,6 +107,9 @@ async def handlers(app: Bot, message: Message):
     & filters.command(["load", "unload"], Settings.CMD_PREFIXES)
 )
 async def load_unload(app: Bot, message: Message):
+    if not message.command:
+        return
+
     plugins = (
         ",".join(message.command[-1:]) if len(message.command) > 1 else None
     )
