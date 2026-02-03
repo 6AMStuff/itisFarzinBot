@@ -5,7 +5,7 @@ from typing import Callable
 from pyrogram import filters
 from pyrogram.types import Message
 
-from settings import Settings
+from bot.settings import Settings
 
 
 async def notify_module(app: Bot, name: str) -> bool:

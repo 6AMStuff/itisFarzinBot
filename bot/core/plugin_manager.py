@@ -8,7 +8,7 @@ from sqlalchemy import select
 from pyrogram.client import Client
 from sqlalchemy.orm import Session
 from pyrogram.handlers.handler import Handler
-from settings import Settings, DataBase, PluginDatabase
+from bot.settings import Settings, DataBase, PluginDatabase
 
 
 class PluginManager(Client):
@@ -110,7 +110,6 @@ class PluginManager(Client):
                 )
             ).scalar()
             return bool(enabled)
-
 
     def load_plugins(self) -> None:
         self.custom_load_plugins()

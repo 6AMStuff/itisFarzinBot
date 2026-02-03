@@ -7,7 +7,7 @@ from pyrogram.types import (
     CallbackQuery,
 )
 
-from settings import Settings
+from bot.settings import Settings
 
 
 async def plugins_status(client: Bot, update: Message | CallbackQuery):

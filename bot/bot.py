@@ -1,7 +1,7 @@
 import time
 from .core import Core
 from pyrogram import Client
-from settings import Settings, DataBase
+from bot.settings import Settings, DataBase
 
 
 class BotMeta(type):

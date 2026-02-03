@@ -9,7 +9,7 @@ from bot import Bot
 from git import Repo
 from pyrogram.methods.utilities.idle import idle
 
-from settings import Settings
+from bot.settings import Settings
 
 plugins_folder = Settings.getenv("plugins_folder")
 
