@@ -28,9 +28,11 @@ class PluginManager(Client):
         )
 
         for path_str in targets:
-            for root, _, files in os.walk(
+            for root, dirs, files in os.walk(
                 path_str.replace(".", os.sep), followlinks=True
             ):
+                # Skip dot-prefixed directories
+                dirs[:] = [d for d in dirs if not d.startswith(".")]
                 for file in files:
                     if file.endswith(".py"):
                         yield Path(root) / file
