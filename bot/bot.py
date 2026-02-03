@@ -1,6 +1,6 @@
 import time
 from .core import Core
-from pyrogram import Client
+from pyrogram.client import Client
 from bot.settings import Settings, DataBase
 
 
