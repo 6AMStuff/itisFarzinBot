@@ -39,7 +39,7 @@ config.update(yaml.safe_load(Path("config/config.yaml").read_text()))
 
 
 class Value(str):
-    def __new__(cls, value: str | int | bool):
+    def __new__(cls, value: str | int | bool | None = None):
         s = str(value or "")
         return str.__new__(cls, s)
 
@@ -163,7 +163,7 @@ class Settings:
     ):
         plugin_name = plugin_name or Settings.infer_plugin_name()
         if not plugin_name:
-            return False
+            return Value()
 
         with Session(Settings.engine) as session:
             data = session.execute(
