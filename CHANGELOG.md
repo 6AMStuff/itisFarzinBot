@@ -1,3 +1,23 @@
+## v0.16.2 (2026-02-04)
+
+### BREAKING CHANGE
+
+- Every instance of settings should be changed to bot.settings
+
+### Fix
+
+- **plugin-manager**: skip dot-prefixed directories in plugins
+
+### Refactor
+
+- **settings**: correct an invalid return value
+- **bot**: make pyright happy
+- **settings**: move it under project
+- **plugins/data**: make pyright happy
+- **plugins/manager**: make pyright happy
+- **plugin-manager**: make pyright happy
+- **settings**: make pyright happy
+
 ## v0.16.1 (2026-01-27)
 
 ### Refactor
