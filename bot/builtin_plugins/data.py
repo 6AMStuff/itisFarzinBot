@@ -5,7 +5,7 @@ from typing import Callable
 from pyrogram import filters
 from pyrogram.types import Message
 
-from settings import Settings
+from bot.settings import Settings
 
 
 async def notify_module(app: Bot, name: str) -> bool:
@@ -30,6 +30,9 @@ async def notify_module(app: Bot, name: str) -> bool:
     Settings.IS_ADMIN & filters.command("setdata", Settings.CMD_PREFIXES)
 )
 async def setdata(app: Bot, message: Message):
+    if not message.command:
+        return
+
     if len(message.command) != 4:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}setdata [plugin name] [key] [value]"
@@ -50,6 +53,9 @@ async def setdata(app: Bot, message: Message):
     Settings.IS_ADMIN & filters.command("getdata", Settings.CMD_PREFIXES)
 )
 async def getdata(app: Bot, message: Message):
+    if not message.command:
+        return
+
     if len(message.command) != 3:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}getdata [plugin name] [key]"
@@ -69,6 +75,9 @@ async def getdata(app: Bot, message: Message):
     Settings.IS_ADMIN & filters.command("deldata", Settings.CMD_PREFIXES)
 )
 async def deldata(app: Bot, message: Message):
+    if not message.command:
+        return
+
     if len(message.command) != 3:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}deldata [plugin name] [key]"
