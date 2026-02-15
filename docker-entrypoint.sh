@@ -15,7 +15,7 @@ else
 fi
 
 echo "Setting up ownership"
-dirs="/app /opt/venv"
+dirs="/app"
 
 for dir in $dirs; do
     echo "- $dir"
