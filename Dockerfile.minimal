@@ -10,6 +10,10 @@ RUN apk add --no-cache git su-exec
 RUN wget -qO- https://astral.sh/uv/install.sh | sh
 ENV PATH="$UV_INSTALL_DIR:$PATH"
 
+RUN rm -f /usr/local/bin/pip /usr/local/bin/pip3 && \
+  printf '#!/bin/sh\nexec uv pip "$@"\n' > /usr/local/bin/pip && \
+  chmod +x /usr/local/bin/pip
+
 FROM base AS dependencies
 
 WORKDIR /app

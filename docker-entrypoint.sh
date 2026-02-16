@@ -29,9 +29,4 @@ for dir in $dirs; do
     fi
 done
 
-rm -f /usr/local/bin/pip
-echo '#!/bin/sh
-exec uv pip "$@"' > /usr/local/bin/pip
-chmod +x /usr/local/bin/pip
-
 exec su-exec abc "$@"
