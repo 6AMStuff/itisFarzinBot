@@ -9,6 +9,5 @@ venv
 
 !config/config.sample.yaml
 .pre-commit-config.yaml
-pyproject.toml
 .gitignore
 Dockerfile

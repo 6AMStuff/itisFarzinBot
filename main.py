@@ -1,5 +1,4 @@
 import os
-import sys
 import uvloop
 import shutil
 import asyncio
@@ -34,12 +33,9 @@ def requirements():
         if "requirements.txt" in filenames:
             result = subprocess.run(
                 [
-                    sys.executable,
-                    "-m",
+                    "uv",
                     "pip",
                     "install",
-                    "--upgrade",
-                    "--disable-pip-version-check",
                     "-r",
                     os.path.join(dirpath, "requirements.txt"),
                 ],
