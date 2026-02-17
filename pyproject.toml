@@ -23,11 +23,25 @@ full = [
     "tgcrypto==1.2.5",
 ]
 
-[tool.black]
+[tool.ruff]
 line-length = 79
+src = ["src", "tests"]
 
-[tool.flake8]
-max-line-length = 79
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "W",
+  "C90",
+  "SIM",
+  "RUF",
+  "B",
+  "S",
+  "TCH",
+]
+
+[tool.ruff.format]
+quote-style = "double"
 
 [tool.commitizen]
 name = "cz_customize"
@@ -103,3 +117,8 @@ default = false
 type = "input"
 name = "footer"
 message = "Footer. Information about Breaking Changes and reference issues that this commit closes: (press [enter] to skip)"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.1",
+]
