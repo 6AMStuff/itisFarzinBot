@@ -1,5 +1,5 @@
 import time
-from .core import Core
+from .core import Core, Dispatcher
 from pyrogram.client import Client
 from bot.settings import Settings, DataBase
 
@@ -16,6 +16,7 @@ class Bot(Core, Client, metaclass=BotMeta):
         self.builtin_plugin = "bot/builtin_plugins"
         self.uptime = time.time()
         self.is_bot = bool(self.bot_token)
+        self.dispatcher = Dispatcher(self)
         DataBase.metadata.create_all(Settings.engine)
 
         for base_class in reversed(self.__class__.__bases__[0].__bases__):
