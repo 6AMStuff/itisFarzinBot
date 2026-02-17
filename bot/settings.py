@@ -264,7 +264,7 @@ log_level = (
     else logging.INFO
 )
 file_handler = logging.handlers.RotatingFileHandler(
-    filename=f"{Settings.getenv("log_dir")}/{logger.name}.log",
+    filename=f"{Settings.getenv('log_dir')}/{logger.name}.log",
     maxBytes=Settings.getenv("log_max_size_mb").to_int * 1024 * 1024,
     backupCount=Settings.getenv("log_backup_count").to_int,
 )

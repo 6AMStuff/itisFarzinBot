@@ -23,6 +23,6 @@ class Bot(Core, Client, metaclass=BotMeta):
                 continue
 
             if hasattr(base_class, "_post_init"):
-                _post_init = getattr(base_class, "_post_init")
+                _post_init = base_class._post_init
                 if callable(_post_init):
                     _post_init(self)
