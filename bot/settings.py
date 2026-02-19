@@ -39,7 +39,7 @@ config.update(yaml.safe_load(Path("config/config.yaml").read_text()))
 
 
 class Value(str):
-    def __new__(cls, value: str | int | bool | None = None):
+    def __new__(cls, value: str | int | bool | None = None) -> "Value":
         s = str(value or "")
         return str.__new__(cls, s)
 
@@ -66,7 +66,9 @@ class Value(str):
 
 class Settings:
     @staticmethod
-    def url_parser(url: str, is_a_proxy: bool = False):
+    def url_parser(
+        url: str, is_a_proxy: bool = False
+    ) -> dict[str, int | str | Any] | None:
         pattern = re.compile(
             r"^(?:(?P<scheme>[a-zA-Z0-9]+)://)?"  # Optional scheme
             r"(?:(?P<username>[^:]+)"  # Optional username
@@ -88,12 +90,12 @@ class Settings:
             return None
 
         return {
-            key: int(value) if str(value).isdigit() else value
+            key: int(value) if str(value).isdigit() else str(value)
             for key, value in result.groupdict().items()
         }
 
     @staticmethod
-    def getenv(key: str, default: Any = None):
+    def getenv(key: str, default: Any = None) -> Value:
         return Value(
             next(
                 (
@@ -124,7 +126,7 @@ class Settings:
             del frame
 
     @staticmethod
-    def _createdata(plugin_name: str):
+    def _createdata(plugin_name: str) -> None:
         with Session(Settings.engine) as session:
             session.merge(PluginDatabase(name=plugin_name, enabled=True))
             session.commit()
@@ -160,7 +162,7 @@ class Settings:
         default: Any = None,
         use_env: bool = False,
         plugin_name: str | None = None,
-    ):
+    ) -> Value:
         plugin_name = plugin_name or Settings.infer_plugin_name()
         if not plugin_name:
             return Value()
@@ -212,15 +214,16 @@ class Settings:
             return result.rowcount > 0
 
     @staticmethod
-    def apply_timezone():
+    def apply_timezone() -> str:
         tz = os.getenv("TZ") or config.get("tz")
-        if tz:
-            try:
-                ZoneInfo(tz)
-            except Exception:
-                tz = None
 
-        tz = tz or "Europe/London"
+        if not isinstance(tz, str) or not tz:
+            tz = "Europe/London"
+
+        try:
+            ZoneInfo(tz)
+        except Exception:
+            tz = "Europe/London"
 
         os.environ["TZ"] = tz
         time.tzset()
