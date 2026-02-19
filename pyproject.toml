@@ -22,6 +22,11 @@ dependencies = [
 full = [
     "tgcrypto==1.2.5",
 ]
+dev = [
+    "mypy>=1.19.1",
+    "ruff>=0.15.1",
+    "types-pyyaml>=6.0.12",
+]
 
 [tool.ruff]
 line-length = 79
@@ -42,6 +47,9 @@ select = [
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.mypy]
+files = ["bot"]
 
 [tool.commitizen]
 name = "cz_customize"
@@ -117,8 +125,3 @@ default = false
 type = "input"
 name = "footer"
 message = "Footer. Information about Breaking Changes and reference issues that this commit closes: (press [enter] to skip)"
-
-[dependency-groups]
-dev = [
-    "ruff>=0.15.1",
-]
