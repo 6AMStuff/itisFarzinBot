@@ -18,7 +18,7 @@ async def notify_module(app: Bot, name: str) -> bool:
             if on_data_change := getattr(module, "on_data_change", None):
                 if inspect.iscoroutinefunction(on_data_change):
                     await on_data_change()
-                elif isinstance(on_data_change, Callable):
+                elif callable(on_data_change):
                     on_data_change()
 
                 return True
@@ -29,7 +29,7 @@ async def notify_module(app: Bot, name: str) -> bool:
 @Bot.on_message(
     Settings.IS_ADMIN & filters.command("setdata", Settings.CMD_PREFIXES)
 )
-async def setdata(app: Bot, message: Message):
+async def setdata(app: Bot, message: Message) -> None:
     if not message.command:
         return
 
@@ -52,7 +52,7 @@ async def setdata(app: Bot, message: Message):
 @Bot.on_message(
     Settings.IS_ADMIN & filters.command("getdata", Settings.CMD_PREFIXES)
 )
-async def getdata(app: Bot, message: Message):
+async def getdata(app: Bot, message: Message) -> None:
     if not message.command:
         return
 
@@ -74,7 +74,7 @@ async def getdata(app: Bot, message: Message):
 @Bot.on_message(
     Settings.IS_ADMIN & filters.command("deldata", Settings.CMD_PREFIXES)
 )
-async def deldata(app: Bot, message: Message):
+async def deldata(app: Bot, message: Message) -> None:
     if not message.command:
         return
 

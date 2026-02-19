@@ -10,7 +10,7 @@ from pyrogram.types import (
 from bot.settings import Settings
 
 
-async def plugins_status(client: Bot, update: Message | CallbackQuery):
+async def plugins_status(client: Bot, update: Message | CallbackQuery) -> None:
     plugins = client.get_plugins()
     text = "**Plugins**:"
     reply_markup = None
@@ -67,14 +67,14 @@ async def plugins_status(client: Bot, update: Message | CallbackQuery):
 @Bot.on_message(
     Settings.IS_ADMIN & filters.command("plugins", Settings.CMD_PREFIXES)
 )
-async def plugins(app: Bot, message: Message):
+async def plugins(app: Bot, message: Message) -> None:
     await plugins_status(app, message)
 
 
 @Bot.on_callback_query(
     Settings.IS_ADMIN & filters.regex(r"^plugins (?P<plugin>[\w\-]+)$")
 )
-async def plugins_callback(app: Bot, query: CallbackQuery):
+async def plugins_callback(app: Bot, query: CallbackQuery) -> None:
     plugin: str = query.matches[0].group("plugin")
     if app.get_plugin_status(plugin):
         app.unload_plugins(plugin)
@@ -87,7 +87,7 @@ async def plugins_callback(app: Bot, query: CallbackQuery):
 @Bot.on_message(
     Settings.IS_ADMIN & filters.command("handlers", Settings.CMD_PREFIXES)
 )
-async def handlers(app: Bot, message: Message):
+async def handlers(app: Bot, message: Message) -> None:
     response = "**Handlers**:\n" + "\n".join(
         [
             f"{handler.callback.__name__}: "
@@ -106,7 +106,7 @@ async def handlers(app: Bot, message: Message):
     Settings.IS_ADMIN
     & filters.command(["load", "unload"], Settings.CMD_PREFIXES)
 )
-async def load_unload(app: Bot, message: Message):
+async def load_unload(app: Bot, message: Message) -> None:
     if not message.command:
         return
 
