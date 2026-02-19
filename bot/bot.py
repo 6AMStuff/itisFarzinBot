@@ -1,18 +1,19 @@
 import time
+from typing import Any
 from .core import Core, Dispatcher
 from pyrogram.client import Client
 from bot.settings import Settings, DataBase
 
 
 class BotMeta(type):
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args: Any, **kwargs: Any) -> "Bot":
         instance: Bot = super().__call__(*args, **kwargs)
         instance._post_init()
         return instance
 
 
-class Bot(Core, Client, metaclass=BotMeta):
-    def _post_init(self):
+class Bot(Core, Client, metaclass=BotMeta):  # type: ignore[misc]
+    def _post_init(self) -> None:
         self.builtin_plugin = "bot/builtin_plugins"
         self.uptime = time.time()
         self.is_bot = bool(self.bot_token)
