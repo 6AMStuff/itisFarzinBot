@@ -1,12 +1,9 @@
+import bot
 import inspect
 import logging
+import bot.types
 import pyrogram.handlers
 import pyrogram.dispatcher
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import bot
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
@@ -59,6 +56,11 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
 
         if not args:
             return False
+
+        if isinstance(args[0], pyrogram.types.Message):
+            args[0].__class__ = bot.types.Message
+            if args[0].reply_to_message:
+                args[0].reply_to_message.__class__ = bot.types.Message
 
         return await self.invoke_handler(handler, args)
 

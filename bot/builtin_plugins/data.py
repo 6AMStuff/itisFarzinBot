@@ -3,7 +3,7 @@ import inspect
 from bot import Bot
 from typing import Callable
 from pyrogram import filters
-from pyrogram.types import Message
+from bot.types import Message
 
 from bot.settings import Settings
 
