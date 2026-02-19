@@ -40,47 +40,39 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         async with lock:
             for group in self.groups.values():
                 for handler in group:
-                    await self.process_handler(
+                    if await self.process_handler(
                         handler,
                         parsed_update,
                         update,
                         users,
                         chats,
                         handler_type,
-                    )
-                    break
+                    ):
+                        break
 
     async def process_handler(
         self, handler, parsed_update, update, users, chats, handler_type
     ):
-        if isinstance(handler, handler_type):
-            args = await self.get_args_for_parsed_update(
-                handler, parsed_update
-            )
-        elif isinstance(
-            handler, pyrogram.handlers.raw_update_handler.RawUpdateHandler
-        ):
-            args = await self.get_args_for_raw_update(
-                handler, update, users, chats
-            )
-        else:
-            return
+        args = await self.get_handler_args(
+            handler, parsed_update, update, users, chats, handler_type
+        )
 
-        if args is not None:
-            await self.invoke_handler(handler, args)
+        if not args:
+            return False
 
-    async def get_args_for_parsed_update(self, handler, parsed_update):
+        return await self.invoke_handler(handler, args)
+
+    async def get_handler_args(
+        self, handler, parsed_update, update, users, chats, handler_type
+    ):
         try:
-            if await handler.check(self.client, parsed_update):
+            if isinstance(handler, handler_type) and await handler.check(
+                self.client, parsed_update
+            ):
                 return (parsed_update,)
-        except Exception as e:
-            logging.exception(e)
-
-        return None
-
-    async def get_args_for_raw_update(self, handler, update, users, chats):
-        try:
-            if await handler.check(self.client, update):
+            elif isinstance(
+                handler, pyrogram.handlers.raw_update_handler.RawUpdateHandler
+            ) and await handler.check(self.client, update):
                 return (update, users, chats)
         except Exception as e:
             logging.exception(e)
@@ -101,6 +93,8 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         except pyrogram.StopPropagation:
             raise
         except pyrogram.ContinuePropagation:
-            return
+            return False
         except Exception as e:
             logging.exception(e)
+
+        return True
