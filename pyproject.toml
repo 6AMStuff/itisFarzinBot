@@ -50,6 +50,7 @@ quote-style = "double"
 
 [tool.mypy]
 files = ["bot"]
+strict = true
 
 [tool.commitizen]
 name = "cz_customize"
