@@ -1,20 +1,27 @@
 import bot
 import inspect
 import logging
+import asyncio
 import bot.types
+import pyrogram.types
+from typing import Any
 import pyrogram.handlers
 import pyrogram.dispatcher
+# from typing import Any, TYPE_CHECKING
+
+# if TYPE_CHECKING:
+#     import pyrogram.types
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
     def __init__(self, client: "bot.Bot"):
         super().__init__(client)
 
-    async def handler_worker(self, lock):
+    async def handler_worker(self, lock: asyncio.locks.Lock) -> None:
         while True:
             packet = await self.updates_queue.get()
 
-            if packet is None:
+            if not isinstance(packet, tuple):
                 break
 
             try:
@@ -24,15 +31,24 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
             except Exception as e:
                 logging.exception(e)
 
-    async def process_packet(self, packet, lock):
+    async def process_packet(
+        self,
+        packet: tuple[Any, dict[int, Any], dict[Any, Any]],
+        lock: asyncio.locks.Lock,
+    ) -> None:
         update, users, chats = packet
-        parser = self.update_parsers.get(type(update), None)
+        parser = self.update_parsers.get(type(update), None)  # type: ignore[call-overload]
 
         parsed_update, handler_type = (
             await parser(update, users, chats)
             if parser is not None
             else (None, type(None))
         )
+
+        if not parsed_update or not isinstance(
+            handler_type, type(pyrogram.handlers.handler.Handler)
+        ):
+            return
 
         async with lock:
             for group in self.groups.values():
@@ -48,8 +64,14 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
                         break
 
     async def process_handler(
-        self, handler, parsed_update, update, users, chats, handler_type
-    ):
+        self,
+        handler: pyrogram.handlers.handler.Handler,
+        parsed_update: pyrogram.types.Update,
+        update: Any,
+        users: dict[int, pyrogram.raw.types.user.User],
+        chats: dict[int, pyrogram.raw.types.chat.Chat],
+        handler_type: type[pyrogram.handlers.handler.Handler],
+    ) -> bool:
         args = await self.get_handler_args(
             handler, parsed_update, update, users, chats, handler_type
         )
@@ -65,8 +87,14 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         return await self.invoke_handler(handler, args)
 
     async def get_handler_args(
-        self, handler, parsed_update, update, users, chats, handler_type
-    ):
+        self,
+        handler: pyrogram.handlers.handler.Handler,
+        parsed_update: pyrogram.types.Update,
+        update: Any,
+        users: dict[int, pyrogram.raw.types.user.User],
+        chats: dict[int, pyrogram.raw.types.chat.Chat],
+        handler_type: type[pyrogram.handlers.handler.Handler],
+    ) -> tuple[Any] | tuple[Any, Any, Any] | None:
         try:
             if isinstance(handler, handler_type) and await handler.check(
                 self.client, parsed_update
@@ -81,7 +109,11 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
 
         return None
 
-    async def invoke_handler(self, handler, args):
+    async def invoke_handler(
+        self,
+        handler: pyrogram.handlers.handler.Handler,
+        args: tuple[Any] | tuple[Any, Any, Any],
+    ) -> bool:
         try:
             if inspect.iscoroutinefunction(handler.callback):
                 await handler.callback(self.client, *args)

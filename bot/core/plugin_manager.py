@@ -12,10 +12,12 @@ from bot.settings import Settings, DataBase, PluginDatabase
 
 
 class PluginManager(Client):
-    plugins: dict
+    plugins: dict[str, str | list[str]]
+    plugins_path: str
     builtin_plugin: str
 
-    def _post_init(self):
+    def _post_init(self) -> None:
+        self.plugins_path = str(self.plugins["root"])
         self.custom_load_plugins(folder=self.builtin_plugin)
 
     def modules_list(
@@ -24,7 +26,7 @@ class PluginManager(Client):
         targets = (
             folder
             if isinstance(folder, (list, set))
-            else [folder or self.plugins["root"]]
+            else [folder or self.plugins_path]
         )
 
         for path_str in targets:
@@ -43,7 +45,7 @@ class PluginManager(Client):
         targets = (
             folder
             if isinstance(folder, (list, set))
-            else [folder or self.plugins["root"]]
+            else [folder or self.plugins_path]
         )
 
         for path in self.modules_list(targets):
@@ -90,7 +92,7 @@ class PluginManager(Client):
 
     def set_plugins_status(
         self, plugins: list[str] | set[str] | str | None, enabled: bool = True
-    ):
+    ) -> None:
         if not plugins:
             return
 
@@ -164,7 +166,7 @@ class PluginManager(Client):
         self,
         plugins: str | list[str] | None = None,
         folder: str | list[str] | None = None,
-    ):
+    ) -> dict[str, str]:
         result = {}
         plugins_set: set[str] = set(
             plugins.split(",") if isinstance(plugins, str) else plugins or []
