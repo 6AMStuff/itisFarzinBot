@@ -7,10 +7,6 @@ import pyrogram.types
 from typing import Any
 import pyrogram.handlers
 import pyrogram.dispatcher
-# from typing import Any, TYPE_CHECKING
-
-# if TYPE_CHECKING:
-#     import pyrogram.types
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
