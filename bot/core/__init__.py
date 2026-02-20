@@ -1,3 +1,4 @@
+from .dispatcher import Dispatcher
 from .plugin_manager import PluginManager
 
 
@@ -5,4 +6,4 @@ class Core(PluginManager):
     pass
 
 
-__all__ = ("Core",)
+__all__ = ("Core", "Dispatcher")

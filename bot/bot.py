@@ -1,21 +1,23 @@
 import time
-from .core import Core
+from typing import Any
+from .core import Core, Dispatcher
 from pyrogram.client import Client
 from bot.settings import Settings, DataBase
 
 
 class BotMeta(type):
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args: Any, **kwargs: Any) -> "Bot":
         instance: Bot = super().__call__(*args, **kwargs)
         instance._post_init()
         return instance
 
 
-class Bot(Core, Client, metaclass=BotMeta):
-    def _post_init(self):
+class Bot(Core, Client, metaclass=BotMeta):  # type: ignore[misc]
+    def _post_init(self) -> None:
         self.builtin_plugin = "bot/builtin_plugins"
         self.uptime = time.time()
         self.is_bot = bool(self.bot_token)
+        self.dispatcher = Dispatcher(self)
         DataBase.metadata.create_all(Settings.engine)
 
         for base_class in reversed(self.__class__.__bases__[0].__bases__):
@@ -23,6 +25,6 @@ class Bot(Core, Client, metaclass=BotMeta):
                 continue
 
             if hasattr(base_class, "_post_init"):
-                _post_init = getattr(base_class, "_post_init")
+                _post_init = base_class._post_init
                 if callable(_post_init):
                     _post_init(self)

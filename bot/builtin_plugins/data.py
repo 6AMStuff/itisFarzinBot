@@ -1,35 +1,14 @@
-import sys
-import inspect
 from bot import Bot
-from typing import Callable
 from pyrogram import filters
-from pyrogram.types import Message
+from bot.types import Message
 
 from bot.settings import Settings
-
-
-async def notify_module(app: Bot, name: str) -> bool:
-    name = name.rsplit(".py", 1)[0]
-
-    for path in app.modules_list():
-        if path.stem == name:
-            module_path = ".".join(path.with_suffix("").parts)
-            module = sys.modules.get(module_path)
-            if on_data_change := getattr(module, "on_data_change", None):
-                if inspect.iscoroutinefunction(on_data_change):
-                    await on_data_change()
-                elif isinstance(on_data_change, Callable):
-                    on_data_change()
-
-                return True
-            break
-    return False
 
 
 @Bot.on_message(
     Settings.IS_ADMIN & filters.command("setdata", Settings.CMD_PREFIXES)
 )
-async def setdata(app: Bot, message: Message):
+async def setdata(app: Bot, message: Message) -> None:
     if not message.command:
         return
 
@@ -45,14 +24,14 @@ async def setdata(app: Bot, message: Message):
         return
 
     result = Settings.setdata(key, value, plugin_name=plugin_name)
-    await notify_module(app, plugin_name)
+    await app.call_data_change(plugin_name)
     await message.reply("Done." if result else "Failed.")
 
 
 @Bot.on_message(
     Settings.IS_ADMIN & filters.command("getdata", Settings.CMD_PREFIXES)
 )
-async def getdata(app: Bot, message: Message):
+async def getdata(app: Bot, message: Message) -> None:
     if not message.command:
         return
 
@@ -74,7 +53,7 @@ async def getdata(app: Bot, message: Message):
 @Bot.on_message(
     Settings.IS_ADMIN & filters.command("deldata", Settings.CMD_PREFIXES)
 )
-async def deldata(app: Bot, message: Message):
+async def deldata(app: Bot, message: Message) -> None:
     if not message.command:
         return
 
@@ -90,10 +69,10 @@ async def deldata(app: Bot, message: Message):
         return
 
     result = Settings.deldata(key, plugin_name=plugin_name)
-    await notify_module(app, plugin_name)
+    await app.call_data_change(plugin_name)
     await message.reply("Done." if result else "Failed.")
 
 
-__all__ = ("setdata", "getdata", "deldata")
+__all__ = ("deldata", "getdata", "setdata")
 __plugin__ = True
 __bot_only__ = False

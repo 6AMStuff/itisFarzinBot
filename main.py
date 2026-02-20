@@ -1,4 +1,5 @@
 import os
+import shlex
 import uvloop
 import shutil
 import asyncio
@@ -28,17 +29,14 @@ async def main():
     await app.stop()
 
 
-def requirements():
+def requirements(plugins_folder):
     for dirpath, __, filenames in os.walk(plugins_folder, followlinks=True):
         if "requirements.txt" in filenames:
-            result = subprocess.run(
-                [
-                    "uv",
-                    "pip",
-                    "install",
-                    "-r",
-                    os.path.join(dirpath, "requirements.txt"),
-                ],
+            requirements_file = os.path.join(dirpath, "requirements.txt")
+            result = subprocess.run(  # noqa: S603
+                shlex.split(
+                    f"uv pip install -r {shlex.quote(requirements_file)}"
+                ),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -93,7 +91,7 @@ if __name__ == "__main__":
         not Settings.TEST_MODE
         and not Settings.getenv("disable_requirements").is_enabled
     ):
-        requirements()
+        requirements(plugins_folder)
 
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     asyncio.run(main())
