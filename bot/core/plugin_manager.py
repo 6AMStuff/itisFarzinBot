@@ -188,3 +188,29 @@ class PluginManager(Client):
                 )
 
         return result
+
+    async def call_data_change(self, name: str) -> bool:
+        name = Path(name).stem
+
+        for path in self.modules_list():
+            if path.stem != name:
+                continue
+
+            module_path = ".".join(path.with_suffix("").parts)
+            module = importlib.import_module(module_path)
+            if on_data_change := getattr(module, "on_data_change", None):
+                try:
+                    if inspect.iscoroutinefunction(on_data_change):
+                        await on_data_change()
+                    else:
+                        on_data_change()
+                except Exception as e:
+                    logging.error(
+                        "Error executing 'on_data_change' in"
+                        f" {module_path}: {e}"
+                    )
+                    return False
+
+                return True
+
+        return False

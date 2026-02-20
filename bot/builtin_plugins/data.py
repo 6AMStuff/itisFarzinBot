@@ -1,29 +1,8 @@
-import sys
-import inspect
 from bot import Bot
-from typing import Callable
 from pyrogram import filters
 from bot.types import Message
 
 from bot.settings import Settings
-
-
-async def notify_module(app: Bot, name: str) -> bool:
-    name = name.rsplit(".py", 1)[0]
-
-    for path in app.modules_list():
-        if path.stem == name:
-            module_path = ".".join(path.with_suffix("").parts)
-            module = sys.modules.get(module_path)
-            if on_data_change := getattr(module, "on_data_change", None):
-                if inspect.iscoroutinefunction(on_data_change):
-                    await on_data_change()
-                elif callable(on_data_change):
-                    on_data_change()
-
-                return True
-            break
-    return False
 
 
 @Bot.on_message(
@@ -45,7 +24,7 @@ async def setdata(app: Bot, message: Message) -> None:
         return
 
     result = Settings.setdata(key, value, plugin_name=plugin_name)
-    await notify_module(app, plugin_name)
+    await app.call_data_change(plugin_name)
     await message.reply("Done." if result else "Failed.")
 
 
@@ -90,7 +69,7 @@ async def deldata(app: Bot, message: Message) -> None:
         return
 
     result = Settings.deldata(key, plugin_name=plugin_name)
-    await notify_module(app, plugin_name)
+    await app.call_data_change(plugin_name)
     await message.reply("Done." if result else "Failed.")
 
 
