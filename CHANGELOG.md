@@ -32,17 +32,36 @@
 
 ## v0.17.0 (2026-02-16)
 
+### Features
+
+- **itisfarzinbot**: switch to uv
+
+### Maintenance
+
+- **docker**: bind pip to uv pip
+- **pyproject**: define project
+- **commitizen**: remove the old config
+- **pyproject**: set up commitizen
+
+### Documentation
+
+- **readme**: update prerequisites, add installation and running sections
+
+### Build System
+
+- **docker**: move uv pip wrapper into images
+
 ## v0.16.2 (2026-02-04)
 
 ### BREAKING CHANGE
 
 - Every instance of settings should be changed to bot.settings
 
-### Fix
+### Bug Fixes
 
 - **plugin-manager**: skip dot-prefixed directories in plugins
 
-### Refactor
+### Code Refactoring
 
 - **settings**: correct an invalid return value
 - **bot**: make pyright happy
@@ -54,10 +73,15 @@
 
 ## v0.16.1 (2026-01-27)
 
-### Refactor
+### Code Refactoring
 
 - **main**: drop default values when calling getenv
 - **settings**: drop default values when calling getenv
+
+### Build System
+
+- **deps**: update kurigram to 2.2.17
+- **docker**: chown to 1000:1000 in copies
 
 ## v0.16.0 (2025-12-28)
 
@@ -65,19 +89,41 @@
 
 - Removed directories /config and /plugins; use /app/config and /app/plugins instead.
 
+### Build System
+
+- **docker**: correct mkdir command
+- **docker**: update python environments
+- **docker**: update labels
+- **docker**: update volumes
+- **docker**: include the config.sample.yaml file
+
+### Continuous Integration
+
+- **docker**: parallelize docker builds
+
 ## v0.15.3 (2025-12-27)
 
-### Fix
+### Bug Fixes
 
 - **main**: correct the requirements setup logic
 
 ## v0.15.2 (2025-12-07)
 
+### Continuous Integration
+
+- **github**: change the minimal tag to {branch}-minimal
+- **github**: add workflow support for the minimal variant
+- **docker**: add minimal variant
+
 ## v0.15.1 (2025-12-06)
+
+### Build System
+
+- **docker**: use python:3.13-alpine3.21 as the base image
 
 ## v0.15.0 (2025-12-06)
 
-### Refactor
+### Code Refactoring
 
 - **plugin-manager**: rename set_plugin_status to set_plugins_status
 - **plugin-manager**: minor code cleanups and improvements
@@ -96,34 +142,52 @@
 - **plugin-manager**: improve modules_list
 - **plugins/data**: little improvements for notify_module
 
+### Build System
+
+- **deps**: update `kurigram` to 2.2.15
+
 ## v0.14.4 (2025-11-10)
 
-### Fix
+### Bug Fixes
 
 - **settings**: update the default configurations
 
-### Refactor
+### Code Refactoring
 
 - **settings**: improve the value class
 
+### Styling
+
+- **settings**: reformat code with black
+
 ## v0.14.3 (2025-11-03)
 
-### Refactor
+### Code Refactoring
 
 - **deps**: add the default configurations
 
+### Build System
+
+- **docker**: cleaner user and ownership setup
+
 ## v0.14.2 (2025-10-26)
 
-### Feat
+### Features
 
 - **main**: add disable requirements setup config
 
 ## v0.14.1 (2025-10-09)
 
-### Fix
+### Bug Fixes
 
 - **settings**: use the environment's value in getdata
 - **settings**: treat nones as empty strings
+
+### Build System
+
+- **deps**: update `GitPython` to 3.1.45
+- **deps**: update `SQLAlchemy` to 2.0.43
+- **deps**: update `kurigram` to 2.2.12
 
 ## v0.14.0 (2025-09-18)
 
@@ -133,14 +197,14 @@
 - Rename the folder
 - Migrate to yaml from .env
 
-### Feat
+### Features
 
 - **main**: clone the plugins repository based on the current branch
 - **settings**: add value class
 - **settings**: switch to yaml for the config file
 - **main**: add in_memory support
 
-### Refactor
+### Code Refactoring
 
 - **config**: drop it
 - **core**: switch to settings from config
@@ -148,23 +212,40 @@
 - rename data folder to config
 - **settings**: change admins delimiter to a space
 
+### Styling
+
+- **manager**: reformat code with black
+
+### Build System
+
+- **docker**: add version environment
+- **deps**: update `kurigram` to 2.2.10
+- **docker**: set in_memory to true
+- **docker**: update labels
+
+### Continuous Integration
+
+- **github**: update docker tags
+- **github**: add caching to docker workflow
+- **github**: overhaul the docker workflow
+
 ## v0.13.3 (2025-07-28)
 
 ### BREAKING CHANGE
 
 - TZ got replaced with tz in the config file
 
-### Feat
+### Features
 
 - **settings**: check for https proxy in proxy variable
 - **settings**: add test mode variable
 - **main**: auto set up plugins
 
-### Fix
+### Bug Fixes
 
 - **settings**: use os instead of settings for `_tz`'s getenv
 
-### Refactor
+### Code Refactoring
 
 - **plugin-manager**: `config` to `settings`
 - **settings**: deduplicate logging text and date format
@@ -173,17 +254,26 @@
 - **settings**: timezone clean up
 - **main**: log requirements installations to log file
 
+### Styling
+
+- **settings**: manual and black reformat
+
+### Continuous Integration
+
+- **github**: fetch all commits
+- **github**: update docker tag naming convention
+
 ## v0.13.2 (2025-07-23)
 
-### Feat
+### Features
 
 - **manager**: support cli
 
-### Fix
+### Bug Fixes
 
 - **plugin-manager**: handle non-pyrogram handlers
 
-### Refactor
+### Code Refactoring
 
 - **drop-example-plugins**: the built-in plugins are good examples by themselves
 - change `__all__` from list to tuple
@@ -191,165 +281,243 @@
 - **settings**: use any and optional types
 - **data**: mark as not bot only
 
+### Styling
+
+- **main**: reformat with black
+- **pre-commit**: exclude .venv from linting
+
+### Documentation
+
+- **readme**: completely overhaul the content
+
+### Build System
+
+- **deps**: update `python-dotenv` to 1.1.1
+- **deps**: update `sqlalchemy` to 2.0.41
+- **deps**: update `kurigram` to 2.2.7
+- **docker**: add the source label
+- **docker**: add labels
+- **docker**: exclude data and plugin directories
+- **docker**: chown `/opt/venv` to user and group `abc`
+
+### Continuous Integration
+
+- **github**: add 6-letter commit SHA to dev branch builds
+- **github**: set `BUILD_DATE` in build system
+- **github**: improve repository name handling
+- **github**: add docker build and push
+
 ## v0.13.1 (2025-07-08)
 
-### Feat
+### Features
 
 - **main**: add requirements installer
 
-### Refactor
+### Code Refactoring
 
 - improve docker structure and remove setup.py
 
 ## v0.13.0 (2025-06-27)
 
-### Fix
+### Bug Fixes
 
 - **setup**: don't report environments on optional requirements
 
-### Refactor
+### Code Refactoring
 
 - **core**: move plugin related methods to its own class
 
+### Build System
+
+- **docker**: add git package
+
 ## v0.12.3 (2025-06-17)
 
-### Feat
+### Features
 
 - **bot**: add `is_bot` and `__bot_only__` for plugins
 
-### Fix
+### Bug Fixes
 
 - **setup**: disable verbose for optional requirements
 
-### Refactor
+### Code Refactoring
 
 - **main**: improve uvloop and initialization setup
 
+### Build System
+
+- **deps**: update `kurigram` to 2.2.6
+
 ## v0.12.2 (2025-06-14)
+
+### Build System
+
+- **docker**: install gcc and required dependencies
+- **docker**: switch back to alpine
+- **setup**: add support for optional packages
 
 ## v0.12.1 (2025-06-12)
 
-### Feat
+### Features
 
 - **bot**: use uvloop instead of built-in asyncio
 - **bot**: add uptime variable
 
+### Build System
+
+- **deps**: update `kurigram` to 2.2.5
+
 ## v0.12.0 (2025-06-08)
 
-### Feat
+### Features
 
 - **deps**: [TMP] update `kurigram` to `4db3f39`
 
+### Build System
+
+- **docker**: switch to python 3.13-slim
+- **deps**: update `kurigram` to 2.2.4
+
 ## v0.11.10 (2025-05-28)
 
-### Feat
+### Features
 
 - **settings**: add support for timezones
 
 ## v0.11.9 (2025-05-25)
 
-### Feat
+### Features
 
 - **settings**: improve logging
 
-### Fix
+### Bug Fixes
 
 - **settings**: correct proxy variable type for None
 
-### Refactor
+### Code Refactoring
 
 - **settings**: config.py -> settings.py
 
+### Build System
+
+- **deps**: add socksio package
+
 ## v0.11.8 (2025-05-21)
 
-### Feat
+### Features
 
 - **bot**: Clamp plugin handler groups at 0
 - **settings**: enable pool_pre_ping
 
+### Build System
+
+- **deps**: add PyMySQL package
+
 ## v0.11.7 (2025-05-17)
 
-### Fix
+### Bug Fixes
 
 - **manager**: add admin filter to plugins callback
 
 ## v0.11.6 (2025-05-16)
 
-### Fix
+### Bug Fixes
 
 - **settings**: correct a nested double quotes
 - **manager**: support - (dash) in plugins callback regex
 
+### Build System
+
+- **docker**: rewrite the build system
+
 ## v0.11.5 (2025-05-15)
+
+### Build System
+
+- **docker**: improved structure
 
 ## v0.11.4 (2025-05-15)
 
-### Fix
+### Bug Fixes
 
 - **manager**: handle when there is no plugin in `plugins` command
 
-### Refactor
+### Code Refactoring
 
 - **settings**: Allow passing plugin name to data methods
 
 ## v0.11.3 (2025-05-15)
 
+### Build System
+
+- **dependencies**: update `kurigram` to 2.2.3
+
 ## v0.11.2 (2025-05-15)
 
-### Fix
+### Bug Fixes
 
 - **config**: exclude venv folder from flake8 in pre commit
 
 ## v0.11.1 (2025-05-15)
 
-### Feat
+### Features
 
 - **config**: add pyproject.toml support for flake8
 
+### Styling
+
+- reformat code with black
+
 ## v0.11.0 (2025-05-15)
 
-### Feat
+### Features
 
 - **config**: configure pre commit
 - **config**: configure black and flake8
 
+### Styling
+
+- **commitizen**: update changelog on bump
+- **commitizen**: set up Commitizen
+
 ## v0.10.2 (2025-05-15)
 
-### Refactor
+### Code Refactoring
 
 - **manager**: replace plugin's name '-' and '_' with spaces when displaying
 
 ## v0.10.1 (2025-05-15)
 
-### Fix
+### Bug Fixes
 
 - **plugins**: create databse tables before loading plugins
 - **manager**: force plugin loading in plugins command
 
 ## v0.10.0 (2025-05-15)
 
-### Feat
+### Features
 
 - create SQL tables after loading plugins
 - add test mode
 
-### Fix
+### Bug Fixes
 
 - **manager**: improve plugins command UI
 
-### Refactor
+### Code Refactoring
 
 - **manager**: merge `load` and `unload` commands into a single function
 
 ## v0.9.1 (2025-05-15)
 
-### Feat
+### Features
 
 - ignore the data's content folder except for `.env.example`
 
 ## v0.9.0 (2025-05-15)
 
-### Feat
+### Features
 
 - **plugins**: implement `on_data_change` hook
 - create database for missing plugin data
@@ -359,7 +527,7 @@
 - **setup.py**: do not check for a new version of pip
 - **setup.py**: Add verbose
 
-### Refactor
+### Code Refactoring
 
 - **plugins**: update `notify_module_data_change` to use `modules_list`
 - **plugins**: decompose `plugin_list` into focused functions
@@ -368,7 +536,7 @@
 
 ## v0.8.0 (2025-05-15)
 
-### Feat
+### Features
 
 - **Docker**: include `data` folder and `requirements.txt` file in image
 - **Docker**: include `data/.env.example` in image
@@ -382,17 +550,25 @@
 - **treewide**: update dependencies
 - **Docker**: switch to python's container as the base
 
+### Maintenance
+
+- Flake8
+
 ## v0.7.0 (2025-05-15)
 
-### Feat
+### Features
 
 - only list plugins in plugins command
 - only built-in plugins can have lower groups
 - add `__all__` to all of plugins
 
+### Maintenance
+
+- change copyright owner's name to my real name
+
 ## v0.6.0 (2025-05-15)
 
-### Feat
+### Features
 
 - monospace the value of data
 - update dependencies
@@ -401,64 +577,68 @@
 
 ## v0.5.1 (2025-05-15)
 
-### Feat
+### Features
 
 - ignore `downloads` folder
 
 ## v0.5.0 (2025-05-15)
 
-### Feat
+### Features
 
 - add support for using symlink folders for plugins
 - add regex version of cmd prefixes
 
 ## v0.4.2 (2025-05-15)
 
-### Feat
+### Features
 
 - add data plugin as a builtin plugin
 
-### Fix
+### Bug Fixes
 
 - wrong return type for getdata and deldata
 
 ## v0.4.1 (2025-05-15)
 
-### Feat
+### Features
 
 - add ability to get value from env on `getdata`
 - use a metaclass for our client class
 
 ## v0.4.0 (2025-05-15)
 
-### Feat
+### Features
 
 - add an example plugin for new custom data feature
 - add method to remove plugin's custom data
 - add custom data row for plugins
 
+### Maintenance
+
+- `only_name` to `path_only` in `plugin_list` function
+
 ## v0.3.1 (2025-05-15)
 
-### Feat
+### Features
 
 - add support for disabling load of plugins
 
 ## v0.3.0 (2025-05-15)
 
-### Feat
+### Features
 
 - initial of database
 
 ## v0.2.0 (2025-05-15)
 
-### Feat
+### Features
 
 - rewrite plugin loader
 - rewrite the config file
 
 ## v0.1.0 (2025-05-15)
 
-### Feat
+### Features
 
 - My own implementation of plugin loader
 - add a wrapper for Client
@@ -468,6 +648,6 @@
 - make the plugins folder configurable
 - initialize BaseBot
 
-### Fix
+### Bug Fixes
 
 - symlink volumes correctly
