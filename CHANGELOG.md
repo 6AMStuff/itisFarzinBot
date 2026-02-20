@@ -1,3 +1,35 @@
+## v0.17.1 (2026-02-20)
+
+### Features
+
+- **types**: add custom message type stub
+- **core**: import dispatcher
+
+### Bug Fixes
+
+- **dispatcher**: correct update process
+
+### Code Refactoring
+
+- **core**: remove commented-out code
+- **core**: move notify_module to plugin manager
+- **bot**: prepare for mypy strict
+- **core**: prepare for mypy strict
+- **types**: prepare for mypy strict
+- **plugins**: prepare for mypy strict
+- **settings**: prepare for mypy strict
+
+### Maintenance
+
+- **commitizen**: update configurations
+- **mypy**: enable strict mode
+- **pyproject**: add mypy
+- **pyproject**: add ruff
+
+### Styling
+
+- **itisfarzinbot**: reformat to satisfy ruff
+
 ## v0.17.0 (2026-02-16)
 
 ## v0.16.2 (2026-02-04)
