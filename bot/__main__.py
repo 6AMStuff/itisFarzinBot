@@ -13,7 +13,7 @@ from bot.settings import Settings
 plugins_folder = Settings.getenv("plugins_folder")
 
 
-async def main():
+async def main() -> None:
     app = Bot(
         "config/" + Settings.getenv("client_name"),
         api_id=Settings.getenv("api_id"),
@@ -24,11 +24,11 @@ async def main():
         plugins=dict(root=plugins_folder),
     )
     await app.start()
-    await idle()
+    await idle()  # type: ignore[no-untyped-call]
     await app.stop()
 
 
-def requirements(plugins_folder):
+def requirements(plugins_folder: str) -> None:
     for dirpath, __, filenames in os.walk(plugins_folder, followlinks=True):
         if "requirements.txt" in filenames:
             requirements_file = os.path.join(dirpath, "requirements.txt")
@@ -48,7 +48,7 @@ def requirements(plugins_folder):
                 logging.warning(result.stderr.strip())
 
 
-def setup_plugins():
+def setup_plugins() -> None:
     plugins_repo = Settings.getenv("plugins_repo")
     if not plugins_repo:
         logging.warning("Skipping setting up plugins.")

@@ -4,14 +4,13 @@ import time
 import yaml
 import inspect
 import logging
+import sqlalchemy
 import logging.handlers
 from pyrogram import filters
 from zoneinfo import ZoneInfo
 from typing import Any, ClassVar
-from sqlalchemy.orm import Session
-from sqlalchemy import select, update
-from sqlalchemy import create_engine, String, Boolean, JSON
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import String, Boolean, JSON
+from sqlalchemy.orm import Session, DeclarativeBase, Mapped, mapped_column
 
 
 class Config:
@@ -157,7 +156,7 @@ class Settings:
 
         with Session(Settings.engine) as session:
             data = session.execute(
-                select(PluginDatabase.custom_data).where(
+                sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
@@ -167,12 +166,16 @@ class Settings:
 
             data[key] = value
             result = session.execute(
-                update(PluginDatabase)
+                sqlalchemy.update(PluginDatabase)
                 .where(PluginDatabase.name == plugin_name)
                 .values(custom_data=data)
             )
             session.commit()
-            return result.rowcount > 0
+
+            if isinstance(result, sqlalchemy.engine.cursor.CursorResult):
+                return result.rowcount > 0
+
+            return False
 
     @staticmethod
     def getdata(
@@ -187,7 +190,7 @@ class Settings:
 
         with Session(Settings.engine) as session:
             data = session.execute(
-                select(PluginDatabase.custom_data).where(
+                sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
@@ -210,7 +213,7 @@ class Settings:
 
         with Session(Settings.engine) as session:
             data = session.execute(
-                select(PluginDatabase.custom_data).where(
+                sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
@@ -224,31 +227,35 @@ class Settings:
                 return False
 
             result = session.execute(
-                update(PluginDatabase)
+                sqlalchemy.update(PluginDatabase)
                 .where(PluginDatabase.name == plugin_name)
                 .values(custom_data=data)
             )
             session.commit()
-            return result.rowcount > 0
+
+            if isinstance(result, sqlalchemy.engine.cursor.CursorResult):
+                return result.rowcount > 0
+
+            return False
 
     @staticmethod
-    def apply_timezone() -> str:
+    def apply_timezone() -> Value:
         tz = config.get("tz")
 
-        if not isinstance(tz, str) or not tz:
-            tz = "Europe/London"
+        if not isinstance(tz, Value) or not tz:
+            tz = Value("Europe/London")
 
         try:
             ZoneInfo(tz)
         except Exception:
-            tz = "Europe/London"
+            tz = Value("Europe/London")
 
         os.environ["TZ"] = tz
         time.tzset()
 
         return tz
 
-    engine = create_engine(getenv("db_uri"), pool_pre_ping=True)
+    engine = sqlalchemy.create_engine(getenv("db_uri"), pool_pre_ping=True)
 
     PROXY = getenv(
         "proxy",
