@@ -55,4 +55,4 @@ VOLUME ["/app/config", "/app/plugins"]
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
-CMD ["python3", "main.py"]
+CMD ["uv", "run", "python", "-m", "bot"]

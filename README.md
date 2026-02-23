@@ -43,7 +43,7 @@ docker pull ghcr.io/6amstuff/itisfarzinbot:latest
 
 Run the bot using uv:
 ```bash
-uv run python main.py
+uv run python -m bot
 ```
 
 ### Docker
