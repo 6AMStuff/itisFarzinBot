@@ -2,7 +2,6 @@ import os
 import shlex
 import uvloop
 import shutil
-import asyncio
 import logging
 import subprocess
 from bot import Bot
@@ -93,5 +92,4 @@ if __name__ == "__main__":
     ):
         requirements(plugins_folder)
 
-    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-    asyncio.run(main())
+    uvloop.run(main())
