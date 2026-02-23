@@ -1,6 +1,6 @@
-example_plugins
 __pycache__
 downloads
+.*_cache
 plugins
 config
 .venv
