@@ -1,3 +1,33 @@
+## v0.18.0 (2026-02-24)
+
+### Features
+
+- **settings**: turn config into a class
+
+### Bug Fixes
+
+- **settings**: don't skip null values in config
+
+### Code Refactoring
+
+- **bot**: make mypy happy
+- **main**: move it under project
+- **main**: use uvloop.run instead of asyncio.run
+
+### Maintenance
+
+- **itisfarzinbot**: support python 3.14
+
+### Documentation
+
+- **license**: update year
+- **changelog**: regenrate it
+
+### Build System
+
+- **docker**: update ignore list
+- **docker**: use python:3.14-alpine as base image
+
 ## v0.17.1 (2026-02-20)
 
 ### Features
