@@ -1,6 +1,6 @@
 [project]
 name = "itisFarzinBot"
-version = "0.16.2"
+version = "0.18.0"
 description = "A lightweight, modular Telegram bot framework."
 readme = "README.md"
 license = { text = "MIT" }
@@ -55,7 +55,7 @@ strict = true
 [tool.commitizen]
 name = "cz_customize"
 tag_format = "v$version"
-version_provider = "scm"
+version_provider = "uv"
 version_scheme = "pep440"
 update_changelog_on_bump = true
 
