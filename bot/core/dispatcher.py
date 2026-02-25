@@ -68,9 +68,18 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         chats: dict[int, pyrogram.raw.types.chat.Chat],
         handler_type: type[pyrogram.handlers.handler.Handler],
     ) -> bool:
-        args = await self.get_handler_args(
-            handler, parsed_update, update, users, chats, handler_type
-        )
+        args = ()
+        try:
+            if isinstance(handler, handler_type) and await handler.check(
+                self.client, parsed_update
+            ):
+                args = (parsed_update,)
+            elif isinstance(
+                handler, pyrogram.handlers.raw_update_handler.RawUpdateHandler
+            ) and await handler.check(self.client, update):
+                args = (update, users, chats)
+        except Exception as e:
+            logging.exception(e)
 
         if not args:
             return False
@@ -81,29 +90,6 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
                 args[0].reply_to_message.__class__ = bot.types.Message
 
         return await self.invoke_handler(handler, args)
-
-    async def get_handler_args(
-        self,
-        handler: pyrogram.handlers.handler.Handler,
-        parsed_update: pyrogram.types.Update,
-        update: Any,
-        users: dict[int, pyrogram.raw.types.user.User],
-        chats: dict[int, pyrogram.raw.types.chat.Chat],
-        handler_type: type[pyrogram.handlers.handler.Handler],
-    ) -> tuple[Any] | tuple[Any, Any, Any] | None:
-        try:
-            if isinstance(handler, handler_type) and await handler.check(
-                self.client, parsed_update
-            ):
-                return (parsed_update,)
-            elif isinstance(
-                handler, pyrogram.handlers.raw_update_handler.RawUpdateHandler
-            ) and await handler.check(self.client, update):
-                return (update, users, chats)
-        except Exception as e:
-            logging.exception(e)
-
-        return None
 
     async def invoke_handler(
         self,
