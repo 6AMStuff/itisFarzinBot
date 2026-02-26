@@ -96,15 +96,19 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         handler: pyrogram.handlers.handler.Handler,
         args: tuple[Any] | tuple[Any, Any, Any],
     ) -> bool:
+        sig = inspect.signature(handler.callback)
+        custom_args = (
+            args if len(sig.parameters) == 1 else (self.client, *args)
+        )
+
         try:
             if inspect.iscoroutinefunction(handler.callback):
-                await handler.callback(self.client, *args)
+                await handler.callback(*custom_args)
             else:
                 await self.client.loop.run_in_executor(
                     self.client.executor,
                     handler.callback,
-                    self.client,
-                    *args,
+                    *custom_args,
                 )
         except pyrogram.StopPropagation:
             raise
