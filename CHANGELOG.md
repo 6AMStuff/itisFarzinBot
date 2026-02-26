@@ -1,3 +1,17 @@
+## v0.18.1 (2026-02-26)
+
+### Code Refactoring
+
+- **core**: clean up dispatcher
+
+### Maintenance
+
+- **pyproject**: update version
+
+### Build System
+
+- **docker**: don't set the plugins repo environment
+
 ## v0.18.0 (2026-02-24)
 
 ### Features
