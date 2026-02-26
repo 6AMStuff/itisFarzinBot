@@ -4,38 +4,66 @@ import time
 import yaml
 import inspect
 import logging
-from typing import Any
+import sqlalchemy
 import logging.handlers
-from pathlib import Path
 from pyrogram import filters
 from zoneinfo import ZoneInfo
-from sqlalchemy.orm import Session
-from sqlalchemy import select, update
-from sqlalchemy import create_engine, String, Boolean, JSON
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from typing import Any, ClassVar
+from sqlalchemy import String, Boolean, JSON
+from sqlalchemy.orm import Session, DeclarativeBase, Mapped, mapped_column
 
-config = {
-    "client_name": "itisFarzin",
-    "api_id": None,
-    "api_hash": None,
-    "bot_token": None,
-    "in_memory": False,
-    "plugins_folder": "plugins",
-    "log_name": "bot",
-    "log_level": 20,
-    "log_dir": "config",
-    "log_max_size_mb": 1,
-    "log_backup_count": 2,
-    "admins": "@FarzinKazemzadeh @itisFarzin",
-    "tz": "Europe/London",
-    "proxy": None,
-    "use_system_proxy": True,
-    "cmd_prefixes": ". /",
-    "db_uri": "sqlite:///config/database.db",
-    "plugins_repo": "https://github.com/6AMStuff/itisFarzinBotPlugins",
-}
 
-config.update(yaml.safe_load(Path("config/config.yaml").read_text()))
+class Config:
+    config: dict[str, Any]
+    config_path = "config/config.yaml"
+    default_values: ClassVar[dict[str, str | bool | int | None]] = {
+        "client_name": "itisFarzin",
+        "api_id": None,
+        "api_hash": None,
+        "bot_token": None,
+        "in_memory": False,
+        "plugins_folder": "plugins",
+        "log_name": "bot",
+        "log_level": 20,
+        "log_dir": "config",
+        "log_max_size_mb": 1,
+        "log_backup_count": 2,
+        "admins": "@FarzinKazemzadeh @itisFarzin",
+        "tz": "Europe/London",
+        "proxy": None,
+        "use_system_proxy": True,
+        "cmd_prefixes": ". /",
+        "db_uri": "sqlite:///config/database.db",
+        "plugins_repo": "https://github.com/6AMStuff/itisFarzinBotPlugins",
+    }
+
+    def __init__(self) -> None:
+        self.config = {}
+
+        if os.path.exists(self.config_path):
+            with open(self.config_path, "r") as file:
+                self.config = yaml.safe_load(file)
+
+    def __getitem__(self, key: str) -> "Value":
+        return Value(
+            next(
+                (
+                    value
+                    for value in (
+                        os.getenv(key.upper()),
+                        self.config.get(key.lower()),
+                        self.default_values.get(key),
+                    )
+                    if value is not None
+                ),
+                None,
+            )
+        )
+
+    get = __getitem__
+
+
+config = Config()
 
 
 class Value(str):
@@ -96,19 +124,8 @@ class Settings:
 
     @staticmethod
     def getenv(key: str, default: Any = None) -> Value:
-        return Value(
-            next(
-                (
-                    value
-                    for value in (
-                        os.getenv(key.upper()),
-                        config.get(key.lower()),
-                    )
-                    if value is not None
-                ),
-                default,
-            )
-        )
+        value = config.get(key.lower())
+        return Value(value if value is not None else default)
 
     @staticmethod
     def infer_plugin_name() -> str | None:
@@ -139,7 +156,7 @@ class Settings:
 
         with Session(Settings.engine) as session:
             data = session.execute(
-                select(PluginDatabase.custom_data).where(
+                sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
@@ -149,12 +166,16 @@ class Settings:
 
             data[key] = value
             result = session.execute(
-                update(PluginDatabase)
+                sqlalchemy.update(PluginDatabase)
                 .where(PluginDatabase.name == plugin_name)
                 .values(custom_data=data)
             )
             session.commit()
-            return result.rowcount > 0
+
+            if isinstance(result, sqlalchemy.engine.cursor.CursorResult):
+                return result.rowcount > 0
+
+            return False
 
     @staticmethod
     def getdata(
@@ -169,7 +190,7 @@ class Settings:
 
         with Session(Settings.engine) as session:
             data = session.execute(
-                select(PluginDatabase.custom_data).where(
+                sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
@@ -192,7 +213,7 @@ class Settings:
 
         with Session(Settings.engine) as session:
             data = session.execute(
-                select(PluginDatabase.custom_data).where(
+                sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
@@ -206,31 +227,35 @@ class Settings:
                 return False
 
             result = session.execute(
-                update(PluginDatabase)
+                sqlalchemy.update(PluginDatabase)
                 .where(PluginDatabase.name == plugin_name)
                 .values(custom_data=data)
             )
             session.commit()
-            return result.rowcount > 0
+
+            if isinstance(result, sqlalchemy.engine.cursor.CursorResult):
+                return result.rowcount > 0
+
+            return False
 
     @staticmethod
-    def apply_timezone() -> str:
-        tz = os.getenv("TZ") or config.get("tz")
+    def apply_timezone() -> Value:
+        tz = config.get("tz")
 
-        if not isinstance(tz, str) or not tz:
-            tz = "Europe/London"
+        if not isinstance(tz, Value) or not tz:
+            tz = Value("Europe/London")
 
         try:
             ZoneInfo(tz)
         except Exception:
-            tz = "Europe/London"
+            tz = Value("Europe/London")
 
         os.environ["TZ"] = tz
         time.tzset()
 
         return tz
 
-    engine = create_engine(getenv("db_uri"), pool_pre_ping=True)
+    engine = sqlalchemy.create_engine(getenv("db_uri"), pool_pre_ping=True)
 
     PROXY = getenv(
         "proxy",

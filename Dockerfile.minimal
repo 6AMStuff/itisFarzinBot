@@ -1,4 +1,4 @@
-FROM python:3.13-alpine3.21 AS base
+FROM python:3.14-alpine AS base
 
 ENV \
   PYTHONUNBUFFERED=1 \
@@ -55,4 +55,4 @@ VOLUME ["/app/config"]
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
-CMD ["python3", "main.py"]
+CMD ["uv", "run", "python", "-m", "bot"]

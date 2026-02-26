@@ -1,4 +1,4 @@
-FROM python:3.13-alpine3.21 AS base
+FROM python:3.14-alpine AS base
 
 ENV \
   PYTHONUNBUFFERED=1 \
@@ -44,7 +44,6 @@ COPY --from=dependencies --chown=1000:1000 /app/.venv /app/.venv
 
 ENV PATH="/app/.venv/bin:/opt/uv/bin:$PATH"
 ENV VERSION=$VERSION
-ENV PLUGINS_REPO=""
 
 COPY --chown=1000:1000 . .
 
@@ -55,4 +54,4 @@ VOLUME ["/app/config", "/app/plugins"]
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
-CMD ["python3", "main.py"]
+CMD ["uv", "run", "python", "-m", "bot"]
