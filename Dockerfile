@@ -44,7 +44,6 @@ COPY --from=dependencies --chown=1000:1000 /app/.venv /app/.venv
 
 ENV PATH="/app/.venv/bin:/opt/uv/bin:$PATH"
 ENV VERSION=$VERSION
-ENV PLUGINS_REPO=""
 
 COPY --chown=1000:1000 . .
 
