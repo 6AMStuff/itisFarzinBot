@@ -14,7 +14,7 @@ class BotMeta(type):
 
 class Bot(Core, Client, metaclass=BotMeta):  # type: ignore[misc]
     def _post_init(self) -> None:
-        self.builtin_plugin = "bot/builtin_plugins"
+        self.builtin_plugins = "bot/plugins"
         self.uptime = time.time()
         self.is_bot = bool(self.bot_token)
         self.dispatcher = Dispatcher(self)
