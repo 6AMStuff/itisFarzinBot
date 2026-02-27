@@ -63,12 +63,20 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         self,
         handler: pyrogram.handlers.handler.Handler,
         parsed_update: pyrogram.types.Update,
-        update: Any,
+        update: pyrogram.types.Update,
         users: dict[int, pyrogram.raw.types.user.User],
         chats: dict[int, pyrogram.raw.types.chat.Chat],
         handler_type: type[pyrogram.handlers.handler.Handler],
     ) -> bool:
-        args = ()
+        args: (
+            tuple[pyrogram.types.Update]
+            | tuple[
+                Any,
+                dict[int, pyrogram.raw.types.user.User],
+                dict[int, pyrogram.raw.types.chat.Chat],
+            ]
+            | None
+        ) = None
         try:
             if isinstance(handler, handler_type) and await handler.check(
                 self.client, parsed_update
