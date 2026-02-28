@@ -1,3 +1,24 @@
+## v0.19.0 (2026-02-28)
+
+### Features
+
+- **plugins**: add status plugin
+- **core**: support client-less handler functions
+
+### Code Refactoring
+
+- **dispatcher**: update type annotations
+- **bot**: rename builtin plugins to plugins
+
+### Maintenance
+
+- **commitizen**: drop major from bump map
+- **git**: update ignore list
+
+### Continuous Integration
+
+- **github**: always add dev tags to docker images
+
 ## v0.18.1 (2026-02-26)
 
 ### Code Refactoring
