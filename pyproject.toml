@@ -84,7 +84,6 @@ change_type_order = [
 ]
 
 [tool.commitizen.customize.bump_map]
-"^.!" = "MAJOR"
 "^feat" = "MINOR"
 "^(fix|refactor|chore|style|test|docs|build|ci|revert)" = "PATCH"
 
@@ -134,7 +133,7 @@ message = "Provide additional contextual information about the code changes:"
 [[tool.commitizen.customize.questions]]
 type = "confirm"
 name = "breaking"
-message = "Is this a BREAKING CHANGE? Correlates with MAJOR in SemVer"
+message = "Is this a BREAKING CHANGE?"
 default = false
 
 [[tool.commitizen.customize.questions]]
