@@ -14,11 +14,11 @@ from bot.settings import Settings, DataBase, PluginDatabase
 class PluginManager(Client):
     plugins: dict[str, str | list[str]]
     plugins_path: str
-    builtin_plugin: str
+    builtin_plugins: str
 
     def _post_init(self) -> None:
         self.plugins_path = str(self.plugins["root"])
-        self.custom_load_plugins(folder=self.builtin_plugin)
+        self.custom_load_plugins(folder=self.builtin_plugins)
 
     def modules_list(
         self, folder: str | list[str] | set[str] | None = None
@@ -59,7 +59,7 @@ class PluginManager(Client):
         plugins: str | list[str] | set[str] | None = None,
         folder: str | list[str] | set[str] | None = None,
     ) -> Iterator[tuple[Handler, int]]:
-        group_offset = 0 if folder == self.builtin_plugin else 1
+        group_offset = 0 if folder == self.builtin_plugins else 1
         plugins_set: set[str] = set(
             plugins.split(",") if isinstance(plugins, str) else plugins or []
         ) or set(self.get_plugins(folder=folder))

@@ -63,12 +63,20 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         self,
         handler: pyrogram.handlers.handler.Handler,
         parsed_update: pyrogram.types.Update,
-        update: Any,
+        update: pyrogram.types.Update,
         users: dict[int, pyrogram.raw.types.user.User],
         chats: dict[int, pyrogram.raw.types.chat.Chat],
         handler_type: type[pyrogram.handlers.handler.Handler],
     ) -> bool:
-        args = ()
+        args: (
+            tuple[pyrogram.types.Update]
+            | tuple[
+                Any,
+                dict[int, pyrogram.raw.types.user.User],
+                dict[int, pyrogram.raw.types.chat.Chat],
+            ]
+            | None
+        ) = None
         try:
             if isinstance(handler, handler_type) and await handler.check(
                 self.client, parsed_update
@@ -96,15 +104,19 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         handler: pyrogram.handlers.handler.Handler,
         args: tuple[Any] | tuple[Any, Any, Any],
     ) -> bool:
+        sig = inspect.signature(handler.callback)
+        custom_args = (
+            args if len(sig.parameters) == 1 else (self.client, *args)
+        )
+
         try:
             if inspect.iscoroutinefunction(handler.callback):
-                await handler.callback(self.client, *args)
+                await handler.callback(*custom_args)
             else:
                 await self.client.loop.run_in_executor(
                     self.client.executor,
                     handler.callback,
-                    self.client,
-                    *args,
+                    *custom_args,
                 )
         except pyrogram.StopPropagation:
             raise

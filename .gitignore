@@ -1,9 +1,7 @@
 __pycache__/
 downloads/
-plugins/
+/plugins/
 config/
-.venv/
-venv/
 !config/config.sample.yaml
 *.session*
 *.log
