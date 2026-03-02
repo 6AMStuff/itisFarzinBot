@@ -23,9 +23,7 @@ class Config:
         "bot_token": None,
         "in_memory": False,
         "plugins_folder": "plugins",
-        "log_name": "bot",
         "log_level": 20,
-        "log_dir": "config",
         "log_max_size_mb": 1,
         "log_backup_count": 2,
         "admins": "@FarzinKazemzadeh @itisFarzin",
@@ -285,14 +283,14 @@ class PluginDatabase(DataBase):
     custom_data: Mapped[dict[str, Any]] = mapped_column(JSON(), default=dict())
 
 
-logger = logging.getLogger(Settings.getenv("log_name"))
+logger = logging.getLogger("bot")
 log_level = (
     Settings.getenv("log_level").to_int
     if Settings.getenv("log_level").is_digit
     else logging.INFO
 )
 file_handler = logging.handlers.RotatingFileHandler(
-    filename=f"{Settings.getenv('log_dir')}/{logger.name}.log",
+    filename="config/bot.log",
     maxBytes=Settings.getenv("log_max_size_mb").to_int * 1024 * 1024,
     backupCount=Settings.getenv("log_backup_count").to_int,
 )
