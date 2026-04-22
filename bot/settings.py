@@ -66,7 +66,7 @@ config = Config()
 
 class Value(str):
     def __new__(cls, value: str | int | bool | None = None) -> "Value":
-        s = str(value or "")
+        s = "" if value is None else str(value)
         return str.__new__(cls, s)
 
     @property
@@ -88,6 +88,9 @@ class Value(str):
     @property
     def to_str(self) -> str:
         return str(self)
+
+    def as_optional(self) -> str | None:
+        return str(self) if self else None
 
 
 class Settings:
@@ -262,7 +265,7 @@ class Settings:
             if getenv("use_system_proxy").is_enabled
             else None
         ),
-    )
+    ).as_optional()
     ADMINS = getenv("admins").split(" ")
     IS_ADMIN = filters.user(list(ADMINS))
     CMD_PREFIXES = getenv("cmd_prefixes").split(" ")
