@@ -23,9 +23,7 @@ class Config:
         "bot_token": None,
         "in_memory": False,
         "plugins_folder": "plugins",
-        "log_name": "bot",
         "log_level": 20,
-        "log_dir": "config",
         "log_max_size_mb": 1,
         "log_backup_count": 2,
         "admins": "@FarzinKazemzadeh @itisFarzin",
@@ -68,7 +66,7 @@ config = Config()
 
 class Value(str):
     def __new__(cls, value: str | int | bool | None = None) -> "Value":
-        s = str(value or "")
+        s = "" if value is None else str(value)
         return str.__new__(cls, s)
 
     @property
@@ -90,6 +88,9 @@ class Value(str):
     @property
     def to_str(self) -> str:
         return str(self)
+
+    def as_optional(self) -> str | None:
+        return str(self) if self else None
 
 
 class Settings:
@@ -264,7 +265,7 @@ class Settings:
             if getenv("use_system_proxy").is_enabled
             else None
         ),
-    )
+    ).as_optional()
     ADMINS = getenv("admins").split(" ")
     IS_ADMIN = filters.user(list(ADMINS))
     CMD_PREFIXES = getenv("cmd_prefixes").split(" ")
@@ -285,14 +286,14 @@ class PluginDatabase(DataBase):
     custom_data: Mapped[dict[str, Any]] = mapped_column(JSON(), default=dict())
 
 
-logger = logging.getLogger(Settings.getenv("log_name"))
+logger = logging.getLogger("bot")
 log_level = (
     Settings.getenv("log_level").to_int
     if Settings.getenv("log_level").is_digit
     else logging.INFO
 )
 file_handler = logging.handlers.RotatingFileHandler(
-    filename=f"{Settings.getenv('log_dir')}/{logger.name}.log",
+    filename="config/bot.log",
     maxBytes=Settings.getenv("log_max_size_mb").to_int * 1024 * 1024,
     backupCount=Settings.getenv("log_backup_count").to_int,
 )
