@@ -1,3 +1,9 @@
+## v0.19.2 (2026-04-27)
+
+### Maintenance
+
+- **uv**: update packages
+
 ## v0.19.1 (2026-04-27)
 
 ### Bug Fixes
