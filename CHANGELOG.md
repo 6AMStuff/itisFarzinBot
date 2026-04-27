@@ -1,3 +1,17 @@
+## v0.19.1 (2026-04-27)
+
+### Bug Fixes
+
+- **settings**: improve value handling in value class
+
+### Code Refactoring
+
+- **settings**: hardcode log name and directory
+
+### Maintenance
+
+- **uv**: update packages
+
 ## v0.19.0 (2026-02-28)
 
 ### Features
