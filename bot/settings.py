@@ -96,8 +96,11 @@ class Value(str):
 class Settings:
     @staticmethod
     def url_parser(
-        url: str, is_a_proxy: bool = False
+        url: str | None, is_a_proxy: bool = False
     ) -> dict[str, int | str | Any] | None:
+        if not url:
+            return None
+
         pattern = re.compile(
             r"^(?:(?P<scheme>[a-zA-Z0-9]+)://)?"  # Optional scheme
             r"(?:(?P<username>[^:]+)"  # Optional username
@@ -105,9 +108,6 @@ class Settings:
             r"(?P<hostname>[^:]+)"  # Hostname
             r":(?P<port>\d+)$"  # Port
         )
-
-        if not url:
-            return None
 
         result = pattern.match(str(url))
         if not result:
