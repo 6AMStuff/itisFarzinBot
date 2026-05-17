@@ -6,6 +6,7 @@ import logging
 import subprocess
 from bot import Bot
 from git import Repo
+from pathlib import Path
 from pyrogram.methods.utilities.idle import idle
 
 from bot.settings import Settings
@@ -28,24 +29,34 @@ async def main() -> None:
     await app.stop()
 
 
-def requirements(plugins_folder: str) -> None:
-    for dirpath, __, filenames in os.walk(plugins_folder, followlinks=True):
-        if "requirements.txt" in filenames:
-            requirements_file = os.path.join(dirpath, "requirements.txt")
-            result = subprocess.run(  # noqa: S603
-                shlex.split(
-                    f"uv pip install -r {shlex.quote(requirements_file)}"
-                ),
+def install_requirements(plugins_folder: str) -> None:
+    plugins_path = Path(plugins_folder)
+
+    dependency_files = []
+    patterns = [
+        "*/requirements.txt", "*/*/requirements.txt",
+        "*/pyproject.toml", "*/*/pyproject.toml"
+    ]
+    for pattern in patterns:
+        dependency_files.extend(plugins_path.glob(pattern))
+
+    for dependency_file in dependency_files:
+        logging.info(
+            f"Installing dependencies for {dependency_file.parent.name}."
+        )
+        try:
+            subprocess.run(  # noqa: S603
+                shlex.split(f"uv pip install -r {dependency_file}"),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                check=True,
             )
-
-            if result.stdout:
-                logging.debug(result.stdout.strip())
-
-            if result.stderr:
-                logging.warning(result.stderr.strip())
+        except subprocess.CalledProcessError as e:
+            logging.error(
+                "Failed to install dependencies for"
+                + f" {dependency_file.parent.name}: {e.stderr.strip()}"
+            )
 
 
 def setup_plugins() -> None:
@@ -54,8 +65,11 @@ def setup_plugins() -> None:
         logging.warning("Skipping setting up plugins.")
         return
 
-    repo_name = os.path.basename(plugins_repo).replace(".git", "")
-    repo_path = os.path.join(plugins_folder, repo_name)
+    repo_name = plugins_repo.rstrip("/").split("/")[-1]
+    if repo_name.endswith(".git"):
+        repo_name = repo_name[:-4]
+
+    repo_path = Path(plugins_folder) / repo_name
 
     try:
         _repo = Repo(".")
@@ -63,7 +77,7 @@ def setup_plugins() -> None:
     except Exception:
         branch = "dev" if os.getenv("VERSION") == "dev" else "main"
 
-    if os.path.exists(repo_path):
+    if repo_path.exists():
         repo = Repo(repo_path)
         if plugins_repo not in [remote.url for remote in repo.remotes]:
             logging.warning(
@@ -90,6 +104,6 @@ if __name__ == "__main__":
         not Settings.TEST_MODE
         and not Settings.getenv("disable_requirements").is_enabled
     ):
-        requirements(plugins_folder)
+        install_requirements(plugins_folder)
 
     uvloop.run(main())

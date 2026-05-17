@@ -30,6 +30,9 @@ dev = [
     "types-pyyaml>=6.0.12",
 ]
 
+[tool.uv]
+exclude-newer = "1 week"
+
 [tool.ruff]
 line-length = 79
 src = ["src", "tests"]

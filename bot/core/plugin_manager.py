@@ -62,7 +62,7 @@ class PluginManager(Client):
         group_offset = 0 if folder == self.builtin_plugins else 1
         plugins_set: set[str] = set(
             plugins.split(",") if isinstance(plugins, str) else plugins or []
-        ) or set(self.get_plugins(folder=folder))
+        )
 
         for path in self.modules_list(folder=folder):
             if path.stem not in plugins_set:
@@ -144,9 +144,9 @@ class PluginManager(Client):
         plugins_set.difference_update(
             disabled_plugins.intersection(valid_plugins)
         )
-        self.set_plugins_status(plugins, True)
+        self.set_plugins_status(plugins_set, True)
 
-        for handler in self.get_handlers(plugins, folder=folder):
+        for handler in self.get_handlers(plugins_set, folder=folder):
             callback_name = handler[0].callback.__name__
             if not self.handler_is_loaded(*handler):
                 self.add_handler(*handler)
