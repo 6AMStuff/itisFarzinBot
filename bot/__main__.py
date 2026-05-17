@@ -37,7 +37,9 @@ def install_requirements(plugins_folder: str) -> None:
     )
 
     for requirements_file in requirements_files:
-        logging.info(f"Installing requirements from {requirements_file}")
+        logging.info(
+            f"Installing requirements for {requirements_file.parent.name}."
+        )
         try:
             subprocess.run(  # noqa: S603
                 shlex.split(f"uv pip install -r {requirements_file}"),
@@ -48,8 +50,8 @@ def install_requirements(plugins_folder: str) -> None:
             )
         except subprocess.CalledProcessError as e:
             logging.error(
-                f"Failed to install requirements from {requirements_file}: "
-                + e.stderr.strip()
+                "Failed to install requirements for"
+                + f" {requirements_file.parent.name}: {e.stderr.strip()}"
             )
 
 
