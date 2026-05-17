@@ -32,17 +32,21 @@ async def main() -> None:
 def install_requirements(plugins_folder: str) -> None:
     plugins_path = Path(plugins_folder)
 
-    requirements_files = list(plugins_path.glob("*/requirements.txt")) + list(
-        plugins_path.glob("*/*/requirements.txt")
-    )
+    dependency_files = []
+    patterns = [
+        "*/requirements.txt", "*/*/requirements.txt",
+        "*/pyproject.toml", "*/*/pyproject.toml"
+    ]
+    for pattern in patterns:
+        dependency_files.extend(plugins_path.glob(pattern))
 
-    for requirements_file in requirements_files:
+    for dependency_file in dependency_files:
         logging.info(
-            f"Installing requirements for {requirements_file.parent.name}."
+            f"Installing dependencies for {dependency_file.parent.name}."
         )
         try:
             subprocess.run(  # noqa: S603
-                shlex.split(f"uv pip install -r {requirements_file}"),
+                shlex.split(f"uv pip install -r {dependency_file}"),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -50,8 +54,8 @@ def install_requirements(plugins_folder: str) -> None:
             )
         except subprocess.CalledProcessError as e:
             logging.error(
-                "Failed to install requirements for"
-                + f" {requirements_file.parent.name}: {e.stderr.strip()}"
+                "Failed to install dependencies for"
+                + f" {dependency_file.parent.name}: {e.stderr.strip()}"
             )
 
 
