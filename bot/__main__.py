@@ -6,6 +6,7 @@ import logging
 import subprocess
 from bot import Bot
 from git import Repo
+from pathlib import Path
 from pyrogram.methods.utilities.idle import idle
 
 from bot.settings import Settings
@@ -28,24 +29,28 @@ async def main() -> None:
     await app.stop()
 
 
-def requirements(plugins_folder: str) -> None:
-    for dirpath, __, filenames in os.walk(plugins_folder, followlinks=True):
-        if "requirements.txt" in filenames:
-            requirements_file = os.path.join(dirpath, "requirements.txt")
-            result = subprocess.run(  # noqa: S603
-                shlex.split(
-                    f"uv pip install -r {shlex.quote(requirements_file)}"
-                ),
+def install_requirements(plugins_folder: str) -> None:
+    plugins_path = Path(plugins_folder)
+
+    requirements_files = list(plugins_path.glob("*/requirements.txt")) + list(
+        plugins_path.glob("*/*/requirements.txt")
+    )
+
+    for requirements_file in requirements_files:
+        logging.info(f"Installing requirements from {requirements_file}")
+        try:
+            subprocess.run(  # noqa: S603
+                shlex.split(f"uv pip install -r {requirements_file}"),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                check=True,
             )
-
-            if result.stdout:
-                logging.debug(result.stdout.strip())
-
-            if result.stderr:
-                logging.warning(result.stderr.strip())
+        except subprocess.CalledProcessError as e:
+            logging.error(
+                f"Failed to install requirements from {requirements_file}: "
+                + e.stderr.strip()
+            )
 
 
 def setup_plugins() -> None:
@@ -90,6 +95,6 @@ if __name__ == "__main__":
         not Settings.TEST_MODE
         and not Settings.getenv("disable_requirements").is_enabled
     ):
-        requirements(plugins_folder)
+        install_requirements(plugins_folder)
 
     uvloop.run(main())
