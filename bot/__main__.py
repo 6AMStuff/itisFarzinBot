@@ -59,8 +59,11 @@ def setup_plugins() -> None:
         logging.warning("Skipping setting up plugins.")
         return
 
-    repo_name = os.path.basename(plugins_repo).replace(".git", "")
-    repo_path = os.path.join(plugins_folder, repo_name)
+    repo_name = plugins_repo.rstrip("/").split("/")[-1]
+    if repo_name.endswith(".git"):
+        repo_name = repo_name[:-4]
+
+    repo_path = Path(plugins_folder) / repo_name
 
     try:
         _repo = Repo(".")
@@ -68,7 +71,7 @@ def setup_plugins() -> None:
     except Exception:
         branch = "dev" if os.getenv("VERSION") == "dev" else "main"
 
-    if os.path.exists(repo_path):
+    if repo_path.exists():
         repo = Repo(repo_path)
         if plugins_repo not in [remote.url for remote in repo.remotes]:
             logging.warning(
