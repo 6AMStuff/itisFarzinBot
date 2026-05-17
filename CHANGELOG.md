@@ -1,3 +1,25 @@
+## v0.20.0 (2026-05-17)
+
+### Features
+
+- **bot**: add support for pyproject.toml dependencies
+
+### Bug Fixes
+
+- **plugin-manager**: don't load disabled plugins on startup
+- **settings**: accept none as url parameter in url_parser
+
+### Code Refactoring
+
+- **bot**: update install requirements messages
+- **bot**: replace os.path with pathlib in setup_plugins
+- **bot**: improve requirements installation
+
+### Maintenance
+
+- **uv**: update packages
+- **uv**: configure 7-day release delay
+
 ## v0.19.2 (2026-04-27)
 
 ### Maintenance

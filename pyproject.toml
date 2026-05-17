@@ -1,6 +1,6 @@
 [project]
 name = "itisFarzinBot"
-version = "0.19.2"
+version = "0.20.0"
 description = "A lightweight, modular Telegram bot framework."
 readme = "README.md"
 license = { text = "MIT" }
