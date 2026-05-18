@@ -35,13 +35,14 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         update, users, chats = packet
         parser = self.update_parsers.get(type(update), None)  # type: ignore[call-overload]
 
-        parsed_update, handler_type = (
-            await parser(update, users, chats)
-            if parser is not None
-            else (None, type(None))
-        )
+        if parser is None:
+            return
 
-        if not parsed_update or not isinstance(
+        parsed_update, handler_type = await parser(update, users, chats)
+
+        if not isinstance(
+            parsed_update, pyrogram.types.Update
+        ) or not isinstance(
             handler_type, type(pyrogram.handlers.handler.Handler)
         ):
             return
