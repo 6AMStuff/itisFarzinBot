@@ -32,7 +32,7 @@ async def main() -> None:
 def install_requirements(plugins_folder: str) -> None:
     plugins_path = Path(plugins_folder)
 
-    dependency_files = []
+    dependency_files: list[Path] = []
     patterns = [
         "*/requirements.txt", "*/*/requirements.txt",
         "*/pyproject.toml", "*/*/pyproject.toml"
