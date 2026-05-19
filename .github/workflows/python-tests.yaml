@@ -8,7 +8,7 @@ jobs:
     name: Test with Python ${{ matrix.python-version }}
     if: >
       !(
-        contains(toJson(github.event.commits), '[skip tests]') ||
+        contains(github.event.head_commit.message || '', '[skip tests]') ||
         contains(github.event.pull_request.title || '', '[skip tests]') ||
         contains(github.event.pull_request.body || '', '[skip tests]')
       )
