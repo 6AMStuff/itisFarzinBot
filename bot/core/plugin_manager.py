@@ -141,6 +141,9 @@ class PluginManager(Client):
                 )
                 disabled_plugins = set(session.execute(stmt).scalars().all())
 
+        if isinstance(folder, str) and folder == self.builtin_plugins:
+            disabled_plugins = set()
+
         plugins_set.difference_update(
             disabled_plugins.intersection(valid_plugins)
         )
