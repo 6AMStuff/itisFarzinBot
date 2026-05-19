@@ -24,7 +24,7 @@ full = [
     "tgcrypto>=1.2.5",
 ]
 dev = [
-    "mypy>=1.19.1",
+    "mypy>=2.1.0",
     "ruff>=0.15.1",
     "types-psutil>=7.2.2.20260130",
     "types-pyyaml>=6.0.12",
