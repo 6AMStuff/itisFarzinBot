@@ -97,6 +97,10 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
             args[0].__class__ = bot.types.Message
             if args[0].reply_to_message:
                 args[0].reply_to_message.__class__ = bot.types.Message
+        elif isinstance(args[0], pyrogram.types.CallbackQuery):
+            args[0].__class__ = bot.types.CallbackQuery
+            if args[0].message:
+                args[0].message.__class__ = bot.types.Message
 
         return await self.invoke_handler(handler, args)
 
