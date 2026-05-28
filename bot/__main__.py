@@ -34,8 +34,8 @@ def install_requirements(plugins_folder: str) -> None:
 
     dependency_files: list[Path] = []
     patterns = [
-        "*/requirements.txt", "*/*/requirements.txt",
-        "*/pyproject.toml", "*/*/pyproject.toml"
+        "requirements.txt", "*/requirements.txt",
+        "pyproject.toml", "*/pyproject.toml"
     ]
     for pattern in patterns:
         dependency_files.extend(plugins_path.glob(pattern))
