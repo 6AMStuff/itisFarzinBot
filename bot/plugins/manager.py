@@ -1,10 +1,10 @@
 from bot import Bot
 from pyrogram import filters
-from bot.types import Message
-from pyrogram.types import (
+from bot.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
     CallbackQuery,
+    Message,
 )
 
 from bot.settings import Settings

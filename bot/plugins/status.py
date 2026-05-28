@@ -5,7 +5,7 @@ import shutil
 import platform
 from bot import Bot
 from pyrogram import filters, raw
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from bot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.settings import Settings
 
