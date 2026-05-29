@@ -43,21 +43,20 @@ class Config:
             with open(self.config_path) as file:
                 self.config = yaml.safe_load(file)
 
-    def __getitem__(self, key: str) -> "Value":
-        return Value(
-            next(
-                (
-                    value
-                    for value in (
-                        os.getenv(key.upper()),
-                        self.config.get(key.lower()),
-                        self.default_values.get(key),
-                    )
-                    if value is not None
-                ),
-                None,
-            )
+    def __getitem__(self, key: str) -> "Value | None":
+        value = next(
+            (
+                value
+                for value in (
+                    os.getenv(key.upper()),
+                    self.config.get(key.lower()),
+                    self.default_values.get(key),
+                )
+                if value is not None
+            ),
+            None,
         )
+        return Value(value) if value is not None else None
 
     get = __getitem__
 
