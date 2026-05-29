@@ -49,6 +49,11 @@ select = [
   "B",
   "S",
   "TCH",
+  "I",
+  "UP",
+  "A",
+  "FURB",
+  "ARG",
 ]
 
 [tool.ruff.format]
