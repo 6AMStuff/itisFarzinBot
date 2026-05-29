@@ -1,8 +1,11 @@
 import time
 from typing import Any
-from .core import Core, Dispatcher
+
 from pyrogram.client import Client
-from bot.settings import Settings, DataBase
+
+from bot.settings import DataBase, Settings
+
+from .core import Core, Dispatcher
 
 
 class BotMeta(type):

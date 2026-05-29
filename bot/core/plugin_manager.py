@@ -1,14 +1,16 @@
-import os
-import logging
-import inspect
 import importlib
+import inspect
+import logging
+import os
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
-from sqlalchemy import select
+
 from pyrogram.client import Client
-from sqlalchemy.orm import Session
 from pyrogram.handlers.handler import Handler
-from bot.settings import Settings, DataBase, PluginDatabase
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from bot.settings import DataBase, PluginDatabase, Settings
 
 
 class PluginManager(Client):

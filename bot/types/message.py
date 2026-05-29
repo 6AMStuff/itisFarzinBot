@@ -1,6 +1,7 @@
 import shlex
+from typing import TYPE_CHECKING, Any
+
 import pyrogram.types
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import bot

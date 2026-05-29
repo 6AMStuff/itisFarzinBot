@@ -1,12 +1,14 @@
-import bot
+import asyncio
 import inspect
 import logging
-import asyncio
-import bot.types
-import pyrogram.types
 from typing import Any
-import pyrogram.handlers
+
 import pyrogram.dispatcher
+import pyrogram.handlers
+import pyrogram.types
+
+import bot
+import bot.types
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):

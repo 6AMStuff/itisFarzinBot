@@ -1,8 +1,7 @@
 from bot import Bot
-from pyrogram import filters
-from bot.types import Message
-
 from bot.settings import Settings
+from bot.types import Message
+from pyrogram import filters
 
 
 @Bot.on_message(

@@ -1,6 +1,8 @@
-import bot.types
-import pyrogram.types
 from typing import Any
+
+import pyrogram.types
+
+import bot.types
 
 
 class CallbackQuery(pyrogram.types.CallbackQuery):

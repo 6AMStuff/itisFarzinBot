@@ -1,14 +1,15 @@
+import logging
 import os
 import shlex
-import uvloop
 import shutil
-import logging
 import subprocess
-from bot import Bot
-from git import Repo
 from pathlib import Path
+
+import uvloop
+from git import Repo
 from pyrogram.methods.utilities.idle import idle
 
+from bot import Bot
 from bot.settings import Settings
 
 plugins_folder = Settings.getenv("plugins_folder")
@@ -47,8 +48,7 @@ def install_requirements(plugins_folder: str) -> None:
         try:
             subprocess.run(  # noqa: S603
                 shlex.split(f"uv pip install -r {dependency_file}"),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
                 text=True,
                 check=True,
             )
@@ -66,8 +66,7 @@ def setup_plugins() -> None:
         return
 
     repo_name = plugins_repo.rstrip("/").split("/")[-1]
-    if repo_name.endswith(".git"):
-        repo_name = repo_name[:-4]
+    repo_name = repo_name.removesuffix(".git")
 
     repo_path = Path(plugins_folder) / repo_name
 

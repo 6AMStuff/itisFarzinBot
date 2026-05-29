@@ -1,14 +1,13 @@
 import os
-import time
-import psutil
-import shutil
 import platform
+import shutil
+import time
+
+import psutil
 from bot import Bot
-from pyrogram import filters, raw
-from bot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-
 from bot.settings import Settings
-
+from bot.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram import filters, raw
 
 pid = os.getpid()
 proc = psutil.Process(pid)
