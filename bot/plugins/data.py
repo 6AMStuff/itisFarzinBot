@@ -8,10 +8,7 @@ from pyrogram import filters
     Settings.IS_ADMIN & filters.command("setdata", Settings.CMD_PREFIXES)
 )
 async def setdata(app: Bot, message: Message) -> None:
-    if not message.command:
-        return
-
-    if len(message.command) != 4:
+    if not message.command or len(message.command) != 4:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}setdata [plugin name] [key] [value]"
         )
@@ -31,10 +28,7 @@ async def setdata(app: Bot, message: Message) -> None:
     Settings.IS_ADMIN & filters.command("getdata", Settings.CMD_PREFIXES)
 )
 async def getdata(app: Bot, message: Message) -> None:
-    if not message.command:
-        return
-
-    if len(message.command) != 3:
+    if not message.command or len(message.command) != 3:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}getdata [plugin name] [key]"
         )
@@ -53,10 +47,7 @@ async def getdata(app: Bot, message: Message) -> None:
     Settings.IS_ADMIN & filters.command("deldata", Settings.CMD_PREFIXES)
 )
 async def deldata(app: Bot, message: Message) -> None:
-    if not message.command:
-        return
-
-    if len(message.command) != 3:
+    if not message.command or len(message.command) != 3:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}deldata [plugin name] [key]"
         )
