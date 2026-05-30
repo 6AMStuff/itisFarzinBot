@@ -16,7 +16,7 @@ async def setdata(app: Bot, message: Message) -> None:
 
     _, plugin_name, key, value = message.command
     if plugin_name not in app.get_plugins():
-        await message.reply(f"Plugin {plugin_name} doesn't exist.")
+        await message.reply(f"Plugin **{plugin_name}** doesn't exist.")
         return
 
     result = Settings.setdata(key, value, plugin_name=plugin_name)
@@ -36,11 +36,17 @@ async def getdata(app: Bot, message: Message) -> None:
 
     _, plugin_name, key = message.command
     if plugin_name not in app.get_plugins():
-        await message.reply(f"Plugin {plugin_name} doesn't exist.")
+        await message.reply(f"Plugin **{plugin_name}** doesn't exist.")
         return
 
     result = Settings.getdata(key, plugin_name=plugin_name)
-    await message.reply(f"Value: `{result}`")
+
+    if result is None:
+        await message.reply(
+            f"Key `{key}` not found in plugin **{plugin_name}**."
+        )
+    else:
+        await message.reply(f"Value: `{result}`")
 
 
 @Bot.on_message(
@@ -55,12 +61,12 @@ async def deldata(app: Bot, message: Message) -> None:
 
     _, plugin_name, key = message.command
     if plugin_name not in app.get_plugins():
-        await message.reply(f"Plugin {plugin_name} doesn't exist.")
+        await message.reply(f"Plugin **{plugin_name}** doesn't exist.")
         return
 
     result = Settings.deldata(key, plugin_name=plugin_name)
     await app.call_data_change(plugin_name)
-    await message.reply("Done." if result else "Failed.")
+    await message.reply("Done." if result else "Failed (Key might not exist).")
 
 
 __all__ = ("deldata", "getdata", "setdata")
