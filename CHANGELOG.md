@@ -1,3 +1,50 @@
+## v0.21.0 (2026-06-01)
+
+### Features
+
+- **types**: add pyrogram type re-exports
+- **types**: add arguments parser to message
+- **types**: add custom callback query type stub
+
+### Bug Fixes
+
+- **settings**: allow config.get to return none for missing keys
+- **types**: use our message type in callback query
+- **bot**: update dependency file paths
+- **plugin-manager**: bypass disabled check for builtin plugins
+
+### Code Refactoring
+
+- **plugins**: improve response clarity and formatting
+- **plugins**: simplify message.command check
+- **bot**: reformat codebase
+- **plugins**: switch to our types
+- **dispatcher**: small tidy up
+- **bot**: add type annotation for dependency_files
+
+### Maintenance
+
+- **ruff**: expand lint rules
+- **deps**: add pytest-asyncio
+
+### Build System
+
+- **deps**: Bump the dependencies group across 1 directory with 6 updates
+- **docker**: rename minimal flavor dockerfile
+- **deps**: Bump docker/setup-buildx-action from 3 to 4
+- **deps**: Bump docker/build-push-action from 6 to 7
+- **deps**: Bump docker/metadata-action from 5 to 6
+- **deps**: Bump docker/login-action from 3 to 4
+- **deps**: Bump actions/checkout from 4 to 6
+
+### Continuous Integration
+
+- **github**: restrict push trigger to main to prevent duplicate runs
+- **github**: fix python tests skip logic
+- **github**: limit python tests to python 3.14 only
+- **github**: add python tests
+- **github**: configure dependabot
+
 ## v0.20.0 (2026-05-17)
 
 ### Features
