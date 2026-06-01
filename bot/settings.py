@@ -1,16 +1,17 @@
+import inspect
+import logging
+import logging.handlers
 import os
 import re
 import time
-import yaml
-import inspect
-import logging
-import sqlalchemy
-import logging.handlers
-from pyrogram import filters
-from zoneinfo import ZoneInfo
 from typing import Any, ClassVar
-from sqlalchemy import String, Boolean, JSON
-from sqlalchemy.orm import Session, DeclarativeBase, Mapped, mapped_column
+from zoneinfo import ZoneInfo
+
+import sqlalchemy
+import yaml
+from pyrogram import filters
+from sqlalchemy import JSON, Boolean, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 
 class Config:
@@ -39,24 +40,23 @@ class Config:
         self.config = {}
 
         if os.path.exists(self.config_path):
-            with open(self.config_path, "r") as file:
+            with open(self.config_path) as file:
                 self.config = yaml.safe_load(file)
 
-    def __getitem__(self, key: str) -> "Value":
-        return Value(
-            next(
-                (
-                    value
-                    for value in (
-                        os.getenv(key.upper()),
-                        self.config.get(key.lower()),
-                        self.default_values.get(key),
-                    )
-                    if value is not None
-                ),
-                None,
-            )
+    def __getitem__(self, key: str) -> "Value | None":
+        value = next(
+            (
+                value
+                for value in (
+                    os.getenv(key.upper()),
+                    self.config.get(key.lower()),
+                    self.default_values.get(key),
+                )
+                if value is not None
+            ),
+            None,
         )
+        return Value(value) if value is not None else None
 
     get = __getitem__
 

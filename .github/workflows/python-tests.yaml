@@ -1,0 +1,61 @@
+name: python tests
+run-name: python tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test with Python ${{ matrix.python-version }}
+    if: >
+      !(
+        contains(github.event.head_commit.message || '', '[skip tests]') ||
+        contains(github.event.pull_request.title || '', '[skip tests]') ||
+        contains(github.event.pull_request.body || '', '[skip tests]')
+      )
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.14"
+
+    env:
+      UV_CACHE_DIR: /tmp/.uv-cache
+      UV_LINK_MODE: copy
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Restore uv cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.UV_CACHE_DIR }}
+          key: uv-${{ runner.os }}-python${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            uv-${{ runner.os }}-python${{ matrix.python-version }}-
+            uv-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: uv sync --locked --extra dev
+
+      - name: Type check
+        run: uv run mypy
+
+      - name: Lint check
+        run: uv run ruff check .

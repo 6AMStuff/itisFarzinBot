@@ -1,13 +1,12 @@
 from bot import Bot
-from pyrogram import filters
-from bot.types import Message
-from pyrogram.types import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    CallbackQuery,
-)
-
 from bot.settings import Settings
+from bot.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
+from pyrogram import filters
 
 
 async def plugins_status(client: Bot, update: Message | CallbackQuery) -> None:

@@ -1,12 +1,14 @@
-import bot
+import asyncio
 import inspect
 import logging
-import asyncio
-import bot.types
-import pyrogram.types
 from typing import Any
-import pyrogram.handlers
+
 import pyrogram.dispatcher
+import pyrogram.handlers
+import pyrogram.types
+
+import bot
+import bot.types
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
@@ -35,13 +37,14 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         update, users, chats = packet
         parser = self.update_parsers.get(type(update), None)  # type: ignore[call-overload]
 
-        parsed_update, handler_type = (
-            await parser(update, users, chats)
-            if parser is not None
-            else (None, type(None))
-        )
+        if parser is None:
+            return
 
-        if not parsed_update or not isinstance(
+        parsed_update, handler_type = await parser(update, users, chats)
+
+        if not isinstance(
+            parsed_update, pyrogram.types.Update
+        ) or not isinstance(
             handler_type, type(pyrogram.handlers.handler.Handler)
         ):
             return
@@ -96,6 +99,10 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
             args[0].__class__ = bot.types.Message
             if args[0].reply_to_message:
                 args[0].reply_to_message.__class__ = bot.types.Message
+        elif isinstance(args[0], pyrogram.types.CallbackQuery):
+            args[0].__class__ = bot.types.CallbackQuery
+            if args[0].message:
+                args[0].message.__class__ = bot.types.Message
 
         return await self.invoke_handler(handler, args)
 
