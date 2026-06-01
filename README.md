@@ -1,5 +1,7 @@
 # itisFarzinBot
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9d8fde863b17449caeea8b4cc39d6004)](https://app.codacy.com/gh/6AMStuff/itisFarzinBot?utm_source=github.com&utm_medium=referral&utm_content=6AMStuff/itisFarzinBot&utm_campaign=Badge_Grade)
+
 A lightweight, modular Telegram bot framework built on [Kurigram](https://docs.kurigram.live/).
 
 ## Features
