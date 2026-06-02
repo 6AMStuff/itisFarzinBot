@@ -1,9 +1,9 @@
 FROM python:3.14-alpine AS base
 
 ENV \
-  PYTHONUNBUFFERED=1 \
-  PYTHONDONTWRITEBYTECODE=1 \
-  UV_INSTALL_DIR=/opt/uv
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_INSTALL_DIR=/opt/uv
 
 RUN apk add --no-cache git su-exec
 
@@ -11,8 +11,8 @@ RUN wget -qO- https://astral.sh/uv/install.sh | sh
 ENV PATH="$UV_INSTALL_DIR:$PATH"
 
 RUN rm -f /usr/local/bin/pip /usr/local/bin/pip3 && \
-  printf '#!/bin/sh\nexec uv pip "$@"\n' > /usr/local/bin/pip && \
-  chmod +x /usr/local/bin/pip
+    printf '#!/bin/sh\nexec uv pip "$@"\n' > /usr/local/bin/pip && \
+    chmod +x /usr/local/bin/pip
 
 FROM base AS dependencies
 
@@ -29,13 +29,13 @@ ARG VERSION
 ARG REVISION
 
 LABEL \
-  org.opencontainers.image.authors="Farzin Kazemzadeh <itisFarzin@proton.me>" \
-  org.opencontainers.image.source="https://github.com/6AMStuff/itisFarzinBot" \
-  org.opencontainers.image.title="itisFarzinBot" \
-  org.opencontainers.image.description="A base for Telegram (user)bots" \
-  org.opencontainers.image.created=$BUILDTIME \
-  org.opencontainers.image.version=$VERSION \
-  org.opencontainers.image.revision=$REVISION
+    org.opencontainers.image.authors="Farzin Kazemzadeh <itisFarzin@proton.me>" \
+    org.opencontainers.image.source="https://github.com/6AMStuff/itisFarzinBot" \
+    org.opencontainers.image.title="itisFarzinBot" \
+    org.opencontainers.image.description="A base for Telegram (user)bots" \
+    org.opencontainers.image.created=$BUILDTIME \
+    org.opencontainers.image.version=$VERSION \
+    org.opencontainers.image.revision=$REVISION
 
 WORKDIR /app
 
