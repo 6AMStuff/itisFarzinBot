@@ -109,7 +109,7 @@ class Settings:
             r":(?P<port>\d+)$"  # Port
         )
 
-        result = pattern.match(str(url))
+        result = pattern.match(url)
         if not result:
             return None
 
@@ -156,7 +156,7 @@ class Settings:
             return False
 
         with Session(Settings.engine) as session:
-            data = session.execute(
+            data: dict[str, Any] | None = session.execute(
                 sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
@@ -190,7 +190,7 @@ class Settings:
             return Value()
 
         with Session(Settings.engine) as session:
-            data = session.execute(
+            data: dict[str, Any] | None = session.execute(
                 sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )

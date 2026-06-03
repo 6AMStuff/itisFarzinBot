@@ -4,6 +4,7 @@ import logging
 import os
 from collections.abc import Iterator
 from pathlib import Path
+from typing import override
 
 from pyrogram.client import Client
 from pyrogram.handlers.handler import Handler
@@ -14,11 +15,14 @@ from bot.settings import DataBase, PluginDatabase, Settings
 
 
 class PluginManager(Client):
-    plugins: dict[str, str | list[str]]
+    plugins: dict[str, str | list[str]] | None
     plugins_path: str
     builtin_plugins: str
 
     def _post_init(self) -> None:
+        if not self.plugins:
+            return
+
         self.plugins_path = str(self.plugins["root"])
         self.custom_load_plugins(folder=self.builtin_plugins)
 
@@ -117,6 +121,7 @@ class PluginManager(Client):
             ).scalar()
             return bool(enabled)
 
+    @override
     def load_plugins(self) -> None:
         self.custom_load_plugins()
 

@@ -18,7 +18,7 @@ def format_uptime(seconds: float) -> str:
     hours, seconds = divmod(seconds, 3600)
     minutes, seconds = divmod(seconds, 60)
 
-    parts = []
+    parts: list[str] = []
     if days:
         parts.append(f"{days:.0f}d")
     if hours:
@@ -63,7 +63,7 @@ async def status(app: Bot, message: Message) -> None:
         "OS": f"{uname.system} {uname.release}",
     }
 
-    filtered_data = {k: str(v) for k, v in data.items() if v is not None}
+    filtered_data = {k: v for k, v in data.items() if v is not None}
 
     if app.is_bot:
         keyboard = InlineKeyboardMarkup(

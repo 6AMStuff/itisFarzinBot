@@ -1,7 +1,7 @@
 import asyncio
 import inspect
 import logging
-from typing import Any
+from typing import Any, override
 
 import pyrogram.dispatcher
 import pyrogram.handlers
@@ -12,9 +12,10 @@ import bot.types
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
-    def __init__(self, client: "bot.Bot"):
+    def __init__(self, client: "bot.Bot") -> None:
         super().__init__(client)
 
+    @override
     async def handler_worker(self, lock: asyncio.locks.Lock) -> None:
         while True:
             packet = await self.updates_queue.get()

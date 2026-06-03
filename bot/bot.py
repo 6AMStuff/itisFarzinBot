@@ -1,5 +1,5 @@
 import time
-from typing import Any
+from typing import Any, override
 
 from pyrogram.client import Client
 
@@ -16,6 +16,7 @@ class BotMeta(type):
 
 
 class Bot(Core, Client, metaclass=BotMeta):  # type: ignore[misc]
+    @override
     def _post_init(self) -> None:
         self.builtin_plugins = "bot/plugins"
         self.uptime = time.time()
