@@ -55,7 +55,7 @@ jobs:
         run: uv sync --locked --extra dev
 
       - name: Type check
-        run: uv run mypy
+        run: uv run pyrefly check
 
       - name: Lint check
         run: uv run ruff check .
