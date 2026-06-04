@@ -1,6 +1,5 @@
 import logging
 import os
-import shlex
 import shutil
 import subprocess
 from pathlib import Path
@@ -48,8 +47,13 @@ def install_requirements(plugins_folder: str) -> None:
             f"Installing dependencies for {dependency_file.parent.name}."
         )
         try:
+            uv = shutil.which("uv")
+            if not uv:
+                logging.error("Can't find 'uv' in the system PATH.")
+                return
+
             subprocess.run(  # noqa: S603
-                shlex.split(f"uv pip install -r {dependency_file}"),
+                [uv, "pip", "install", "-r", dependency_file],
                 capture_output=True,
                 text=True,
                 check=True,
