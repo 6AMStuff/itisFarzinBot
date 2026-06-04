@@ -7,7 +7,7 @@ ENV \
 
 RUN apk add --no-cache git su-exec
 
-RUN wget -qO- https://astral.sh/uv/install.sh | sh
+COPY --from=astral/uv:latest /uv /uvx $UV_INSTALL_DIR/
 ENV PATH="$UV_INSTALL_DIR:$PATH"
 
 RUN rm -f /usr/local/bin/pip /usr/local/bin/pip3 && \
@@ -41,7 +41,7 @@ WORKDIR /app
 
 COPY --from=dependencies --chown=1000:1000 /app/.venv /app/.venv
 
-ENV PATH="/app/.venv/bin:/opt/uv/bin:$PATH"
+ENV PATH="/app/.venv/bin:$PATH"
 ENV VERSION=$VERSION
 ENV PLUGINS_REPO=""
 ENV DISABLE_REQUIREMENTS=true
