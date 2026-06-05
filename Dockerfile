@@ -5,8 +5,7 @@ ENV \
     PYTHONDONTWRITEBYTECODE=1 \
     UV_INSTALL_DIR=/opt/uv
 
-RUN apk add --no-cache \
-    build-base python3-dev libffi-dev openssl-dev git su-exec
+RUN apk add --no-cache build-base linux-headers git su-exec
 
 COPY --from=astral/uv:latest /uv /uvx $UV_INSTALL_DIR/
 ENV PATH="$UV_INSTALL_DIR:$PATH"
