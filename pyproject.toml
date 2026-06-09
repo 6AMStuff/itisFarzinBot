@@ -44,6 +44,7 @@ select = [
   "F",
   "W",
   "C90",
+  "C901",
   "SIM",
   "RUF",
   "B",
@@ -55,6 +56,9 @@ select = [
   "FURB",
   "ARG",
 ]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
 
 [tool.ruff.format]
 quote-style = "double"
