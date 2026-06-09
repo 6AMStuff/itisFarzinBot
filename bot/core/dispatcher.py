@@ -96,16 +96,19 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         if not args:
             return False
 
-        if isinstance(args[0], pyrogram.types.Message):
-            args[0].__class__ = bot.types.Message
-            if args[0].reply_to_message:
-                args[0].reply_to_message.__class__ = bot.types.Message
-        elif isinstance(args[0], pyrogram.types.CallbackQuery):
-            args[0].__class__ = bot.types.CallbackQuery
-            if args[0].message:
-                args[0].message.__class__ = bot.types.Message
+        self.set_custom_update_types(args[0])
 
         return await self.invoke_handler(handler, args)
+
+    def set_custom_update_types(self, update: Any) -> None:
+        if isinstance(update, pyrogram.types.Message):
+            update.__class__ = bot.types.Message
+            if update.reply_to_message:
+                update.reply_to_message.__class__ = bot.types.Message
+        elif isinstance(update, pyrogram.types.CallbackQuery):
+            update.__class__ = bot.types.CallbackQuery
+            if update.message:
+                update.message.__class__ = bot.types.Message
 
     async def invoke_handler(
         self,
