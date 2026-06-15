@@ -145,7 +145,6 @@ dependencies = [
     { name = "kurigram" },
     { name = "psutil" },
     { name = "pymysql" },
-    { name = "pytest-asyncio" },
     { name = "pyyaml" },
     { name = "socksio" },
     { name = "sqlalchemy" },
@@ -155,6 +154,7 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "pyrefly" },
+    { name = "pytest-asyncio" },
     { name = "ruff" },
     { name = "types-psutil" },
     { name = "types-pyyaml" },
@@ -170,7 +170,7 @@ requires-dist = [
     { name = "psutil", specifier = ">=7.2.2" },
     { name = "pymysql", specifier = ">=1.2.0" },
     { name = "pyrefly", marker = "extra == 'dev'", specifier = ">=1.0.0" },
-    { name = "pytest-asyncio", specifier = ">=1.3.0" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=1.3.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.15.14" },
     { name = "socksio", specifier = ">=1.0.0" },
