@@ -2,6 +2,7 @@ import importlib
 import inspect
 import logging
 import os
+import sys
 from collections.abc import Iterator
 from pathlib import Path
 from typing import override
@@ -60,6 +61,23 @@ class PluginManager(Client):
             if getattr(module, "__plugin__", False):
                 yield path.stem
 
+    def module_handlers(
+        self, module: object, group_offset: int
+    ) -> Iterator[tuple[Handler, int]]:
+        for _, obj in inspect.getmembers(module):
+            handlers = getattr(obj, "handlers", None)
+            if not isinstance(handlers, list):
+                continue
+
+            for handler, group in handlers:
+                if isinstance(handler, Handler) and isinstance(group, int):
+                    group = (
+                        0
+                        if (group < 0 and group_offset != 0)
+                        else (group + group_offset)
+                    )
+                    yield (handler, group)
+
     def get_handlers(
         self,
         plugins: str | list[str] | set[str] | None = None,
@@ -75,22 +93,17 @@ class PluginManager(Client):
                 continue
 
             module_path = ".".join(path.with_suffix("").parts)
+            if old_module := sys.modules.get(module_path):
+                for handler, group in self.module_handlers(
+                    old_module, group_offset
+                ):
+                    if self.handler_is_loaded(handler, group):
+                        self.remove_handler(handler, group)
+
+                del sys.modules[module_path]
+
             module = importlib.import_module(module_path)
-            # TODO: reload the module after import
-
-            for _, obj in inspect.getmembers(module):
-                handlers = getattr(obj, "handlers", None)
-                if not isinstance(handlers, list):
-                    continue
-
-                for handler, group in handlers:
-                    if isinstance(handler, Handler) and isinstance(group, int):
-                        group = (
-                            0
-                            if (group < 0 and group_offset != 0)
-                            else (group + group_offset)
-                        )
-                        yield (handler, group)
+            yield from self.module_handlers(module, group_offset)
 
     def handler_is_loaded(self, handler: Handler, group: int = 0) -> bool:
         result = self.dispatcher.groups.get(group)
