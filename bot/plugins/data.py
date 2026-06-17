@@ -39,14 +39,14 @@ async def getdata(app: Bot, message: Message) -> None:
         await message.reply(f"Plugin **{plugin_name}** doesn't exist.")
         return
 
-    result = Settings.getdata(key, plugin_name=plugin_name)
-
-    if result is None:
+    result = Settings.getdata(key, plugin_name=plugin_name).as_optional()
+    if not result:
         await message.reply(
             f"Key `{key}` not found in plugin **{plugin_name}**."
         )
-    else:
-        await message.reply(f"Value: `{result}`")
+        return
+
+    await message.reply(f"Value: `{result}`")
 
 
 @Bot.on_message(
