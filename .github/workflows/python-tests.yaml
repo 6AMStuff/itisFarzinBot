@@ -5,8 +5,18 @@ on:
   push:
     branches:
       - dev
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/python-tests.yaml'
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/python-tests.yaml'
   workflow_dispatch:
 
 jobs:
