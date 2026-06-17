@@ -31,8 +31,7 @@ async def plugins_status(client: Bot, update: Message | CallbackQuery) -> None:
             for plugin in plugins
         ]
         reply_markup = InlineKeyboardMarkup(
-            keyboard
-            or [[InlineKeyboardButton("No were plugin found.", "None")]]
+            keyboard or [[InlineKeyboardButton("No plugins found.", "None")]]
         )
 
     else:
@@ -117,10 +116,10 @@ async def load_unload(app: Bot, message: Message) -> None:
     else:
         result = app.unload_plugins(plugins)
 
-    responce = "\n".join(
+    response = "\n".join(
         [f"**{plugin}**: {result[plugin]}" for plugin in result]
     )
-    await message.reply(responce)
+    await message.reply(response)
 
 
 __all__ = ("handlers", "load_unload", "plugins", "plugins_callback")
