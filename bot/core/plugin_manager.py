@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
 from typing import override
 
@@ -13,6 +14,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from bot.settings import DataBase, PluginDatabase, Settings
+
+
+@dataclass
+class PluginInfo:
+    path: Path
+    enabled: bool
+    size: int
+    handlers: list[tuple[Handler, int]]
 
 
 class PluginManager(Client):
@@ -60,6 +69,26 @@ class PluginManager(Client):
             module = importlib.import_module(module_path)
             if getattr(module, "__plugin__", False):
                 yield path.stem
+
+    def collect_plugins(
+        self, folder: str | list[str] | set[str] | None = None
+    ) -> dict[str, PluginInfo]:
+        plugins: dict[str, PluginInfo] = {}
+
+        for path in self.modules_list(folder=folder):
+            module_path = ".".join(path.with_suffix("").parts)
+            module = importlib.import_module(module_path)
+            if not getattr(module, "__plugin__", False):
+                continue
+
+            plugins[path.stem] = PluginInfo(
+                path=path,
+                enabled=self.get_plugin_status(path.stem),
+                size=path.stat().st_size,
+                handlers=list(self.get_handlers([path.stem], folder=folder)),
+            )
+
+        return plugins
 
     def module_handlers(
         self, module: object, group_offset: int
