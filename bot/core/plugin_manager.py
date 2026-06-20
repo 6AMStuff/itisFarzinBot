@@ -82,6 +82,7 @@ class PluginManager(Client):
         self,
         plugins: str | list[str] | set[str] | None = None,
         folder: str | list[str] | set[str] | None = None,
+        reload: bool = False,
     ) -> Iterator[tuple[Handler, int]]:
         group_offset = 0 if folder == self.builtin_plugins else 1
         plugins_set: set[str] = set(
@@ -93,7 +94,7 @@ class PluginManager(Client):
                 continue
 
             module_path = ".".join(path.with_suffix("").parts)
-            if old_module := sys.modules.get(module_path):
+            if reload and (old_module := sys.modules.get(module_path)):
                 for handler, group in self.module_handlers(
                     old_module, group_offset
                 ):
@@ -169,7 +170,9 @@ class PluginManager(Client):
         )
         self.set_plugins_status(plugins_set, True)
 
-        for handler in self.get_handlers(plugins_set, folder=folder):
+        for handler in self.get_handlers(
+            plugins_set, folder=folder, reload=True
+        ):
             callback_name = handler[0].callback.__name__
             if not self.handler_is_loaded(*handler):
                 self.add_handler(*handler)
