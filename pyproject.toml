@@ -16,7 +16,7 @@ dependencies = [
     "pymysql>=1.2.0",
     "pyyaml>=6.0.2",
     "socksio>=1.0.0",
-    "sqlalchemy>=2.0.50",
+    "sqlalchemy>=2.0.51",
     "uvloop>=0.22.0",
 ]
 
@@ -26,9 +26,9 @@ full = [
 ]
 dev = [
     "pre-commit>=4.5.1",
-    "pyrefly>=1.0.0",
+    "pyrefly>=1.1.1",
     "pytest-asyncio>=1.4.0",
-    "ruff>=0.15.16",
+    "ruff>=0.15.18",
     "types-psutil>=7.2.2.20260518",
     "types-pyyaml>=6.0.12.20260518",
 ]
