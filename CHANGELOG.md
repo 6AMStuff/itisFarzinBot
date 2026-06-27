@@ -1,3 +1,53 @@
+## v0.22.0 (2026-06-27)
+
+### Features
+
+- **plugins**: add plugin detail view
+- **core**: add collect_plugins for read-only plugin metadata
+
+### Bug Fixes
+
+- **core**: make get_handlers non-destructive unless reload requested
+- **core**: reload the plugin before reimport
+
+### Code Refactoring
+
+- **plugins**: improve getdata
+- **plugins**: fix typos
+- **bot**: simplify _post_init call logic
+- **core**: extract custom update type handling
+- **bot**: resolve uv binary via shutil and pass args as list
+- **bot**: prepare for pyrefly
+
+### Maintenance
+
+- **ruff**: enable cyclomatic complexity check
+- **pyproject**: switch to pyrefly from mypy
+
+### Documentation
+
+- **readme**: improve setup and configuration docs
+
+### Build System
+
+- **deps**: Bump actions/checkout from 6.0.3 to 7.0.0
+- **deps**: Bump the dependencies group across 1 directory with 3 updates
+- **deps**: Bump the dependencies group across 1 directory with 3 updates
+- **deps**: move pytest-asyncio into dev dependencies
+- **docker**: optimize apk dependencies
+- **docker**: optimize uv installation
+- **docker**: reformat dockerfile
+
+### Continuous Integration
+
+- **dependabot**: change target-branch to main
+- **python-tests**: scope workflow token to contents:read
+- **dependabot**: set cooldown and group dependency for every ecosystem
+- **python-tests**: only run on code changes
+- **pre-commit**: enforce ruff, pyrefly, and conventional commits
+- **github**: lock actions to exact commits
+- **github**: change push trigger branch from main to dev
+
 ## v0.21.0 (2026-06-01)
 
 ### Features
