@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
 from typing import override
 
@@ -13,6 +14,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from bot.settings import DataBase, PluginDatabase, Settings
+
+
+@dataclass
+class PluginInfo:
+    path: Path
+    enabled: bool
+    size: int
+    handlers: list[tuple[Handler, int]]
 
 
 class PluginManager(Client):
@@ -61,6 +70,26 @@ class PluginManager(Client):
             if getattr(module, "__plugin__", False):
                 yield path.stem
 
+    def collect_plugins(
+        self, folder: str | list[str] | set[str] | None = None
+    ) -> dict[str, PluginInfo]:
+        plugins: dict[str, PluginInfo] = {}
+
+        for path in self.modules_list(folder=folder):
+            module_path = ".".join(path.with_suffix("").parts)
+            module = importlib.import_module(module_path)
+            if not getattr(module, "__plugin__", False):
+                continue
+
+            plugins[path.stem] = PluginInfo(
+                path=path,
+                enabled=self.get_plugin_status(path.stem),
+                size=path.stat().st_size,
+                handlers=list(self.get_handlers([path.stem], folder=folder)),
+            )
+
+        return plugins
+
     def module_handlers(
         self, module: object, group_offset: int
     ) -> Iterator[tuple[Handler, int]]:
@@ -82,6 +111,7 @@ class PluginManager(Client):
         self,
         plugins: str | list[str] | set[str] | None = None,
         folder: str | list[str] | set[str] | None = None,
+        reload: bool = False,
     ) -> Iterator[tuple[Handler, int]]:
         group_offset = 0 if folder == self.builtin_plugins else 1
         plugins_set: set[str] = set(
@@ -93,7 +123,7 @@ class PluginManager(Client):
                 continue
 
             module_path = ".".join(path.with_suffix("").parts)
-            if old_module := sys.modules.get(module_path):
+            if reload and (old_module := sys.modules.get(module_path)):
                 for handler, group in self.module_handlers(
                     old_module, group_offset
                 ):
@@ -169,7 +199,9 @@ class PluginManager(Client):
         )
         self.set_plugins_status(plugins_set, True)
 
-        for handler in self.get_handlers(plugins_set, folder=folder):
+        for handler in self.get_handlers(
+            plugins_set, folder=folder, reload=True
+        ):
             callback_name = handler[0].callback.__name__
             if not self.handler_is_loaded(*handler):
                 self.add_handler(*handler)

@@ -6,7 +6,7 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 7
-    target-branch: "dev"
+    target-branch: "main"
     groups:
       dependencies:
         patterns:
@@ -16,10 +16,22 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    target-branch: "dev"
+    cooldown:
+      default-days: 7
+    target-branch: "main"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "daily"
-    target-branch: "dev"
+    cooldown:
+      default-days: 7
+    target-branch: "main"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
