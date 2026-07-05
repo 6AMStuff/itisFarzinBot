@@ -8,7 +8,7 @@ updates:
       default-days: 7
     target-branch: "main"
     groups:
-      dependencies:
+      uv-dependencies:
         patterns:
           - "*"
 
@@ -20,7 +20,7 @@ updates:
       default-days: 7
     target-branch: "main"
     groups:
-      dependencies:
+      github-actions-dependencies:
         patterns:
           - "*"
 
@@ -32,6 +32,6 @@ updates:
       default-days: 7
     target-branch: "main"
     groups:
-      dependencies:
+      docker-dependencies:
         patterns:
           - "*"
