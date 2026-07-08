@@ -49,6 +49,7 @@ async def status(app: Bot, message: Message) -> None:
     disk = shutil.disk_usage("/")
     uname = platform.uname()
     battery = psutil.sensors_battery()
+    plugins = app.get_plugins()
 
     data = {
         "Bot Uptime": bot_uptime,
@@ -61,9 +62,10 @@ async def status(app: Bot, message: Message) -> None:
         ),
         "Python": platform.python_version(),
         "OS": f"{uname.system} {uname.release}",
+        "Plugin Count": len(list(plugins)),
     }
 
-    filtered_data = {k: v for k, v in data.items() if v is not None}
+    filtered_data = {k: str(v) for k, v in data.items() if v is not None}
 
     if app.is_bot:
         keyboard = InlineKeyboardMarkup(
