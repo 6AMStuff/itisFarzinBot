@@ -1,3 +1,22 @@
+## v0.22.1 (2026-07-14)
+
+### Bug Fixes
+
+- **core**: only reload plugins when force_load is enabled
+
+### Code Refactoring
+
+- **status**: add plugin count
+
+### Build System
+
+- **deps**: Bump the uv-dependencies group across 1 directory with 2 updates
+- **deps**: Bump the github-actions-dependencies group across 1 directory with 7 updates
+
+### Continuous Integration
+
+- **dependabot**: rename dependency groups
+
 ## v0.22.0 (2026-06-27)
 
 ### Features
