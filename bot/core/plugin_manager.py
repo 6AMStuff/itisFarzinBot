@@ -200,7 +200,7 @@ class PluginManager(Client):
         self.set_plugins_status(plugins_set, True)
 
         for handler in self.get_handlers(
-            plugins_set, folder=folder, reload=True
+            plugins_set, folder=folder, reload=force_load
         ):
             callback_name = handler[0].callback.__name__
             if not self.handler_is_loaded(*handler):
