@@ -206,7 +206,7 @@ class PluginManager(Client):
             else:
                 result[callback_name] = "Failed to load handler"
                 logging.warning(
-                    f"Failed to load {callback_name} handler, "
+                    f"Failed to load {callback_name} handler "
                     "because it is already loaded"
                 )
 
@@ -235,7 +235,7 @@ class PluginManager(Client):
                 result[callback_name] = "Failed to unload handler"
                 logging.warning(
                     f"Failed to unload {callback_name} handler, "
-                    "it is not loaded already."
+                    "it is not loaded."
                 )
 
         return result
