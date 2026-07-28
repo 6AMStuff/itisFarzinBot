@@ -100,11 +100,7 @@ class PluginManager(Client):
 
             for handler, group in handlers:
                 if isinstance(handler, Handler) and isinstance(group, int):
-                    group = (
-                        0
-                        if (group < 0 and group_offset != 0)
-                        else (group + group_offset)
-                    )
+                    group = max(group + group_offset, 0)
                     yield (handler, group)
 
     def get_handlers(
