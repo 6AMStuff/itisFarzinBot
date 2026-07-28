@@ -155,7 +155,7 @@ class PluginManager(Client):
         with Session(Settings.engine) as session:
             enabled = session.execute(
                 select(PluginDatabase.enabled).where(
-                    PluginDatabase.name.is_(plugin)
+                    PluginDatabase.name == plugin
                 )
             ).scalar()
             return bool(enabled)
