@@ -124,6 +124,9 @@ async def plugins(app: Bot, message: Message) -> None:
     )
 )
 async def plugins_callback(app: Bot, query: CallbackQuery) -> None:
+    if not isinstance(query.matches, list):
+        return
+
     action, plugin = query.matches[0].groups()
 
     if action in ("toggle", "switch") and plugin:
