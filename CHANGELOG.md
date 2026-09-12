@@ -1,3 +1,29 @@
+## v0.22.2 (2026-09-12)
+
+### Bug Fixes
+
+- **plugins**: add regex matches type check
+- **bot**: pass proxy as is to pyrogram
+- **core**: validate callbackquery message type before class change
+
+### Code Refactoring
+
+- **core**: use equality for plugin name filter
+- **core**: simplify handler group calculation
+
+### Maintenance
+
+- **core**: improve warning messages
+
+### Build System
+
+- **deps**: Bump the uv-dependencies group across 1 directory with 5 updates
+- **deps**: Bump the github-actions-dependencies group across 1 directory with 3 updates
+- **deps**: Bump the uv-dependencies group across 1 directory with 5 updates
+- **deps**: Bump the uv-dependencies group with 4 updates
+- **deps**: Bump the github-actions-dependencies group across 1 directory with 3 updates
+- **deps**: Bump the uv-dependencies group across 1 directory with 3 updates
+
 ## v0.22.1 (2026-07-14)
 
 ### Bug Fixes
