@@ -95,9 +95,7 @@ class Value(str):
 
 class Settings:
     @staticmethod
-    def url_parser(
-        url: str | None, is_a_proxy: bool = False
-    ) -> dict[str, int | str | Any] | None:
+    def url_parser(url: str | None) -> dict[str, int | str | Any] | None:
         if not url:
             return None
 
@@ -111,11 +109,6 @@ class Settings:
 
         result = pattern.match(url)
         if not result:
-            return None
-
-        if is_a_proxy and (
-            result["scheme"] not in ["http", "socks5", "socks4"]
-        ):
             return None
 
         return {

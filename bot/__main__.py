@@ -21,7 +21,7 @@ async def main() -> None:
         api_hash=Settings.getenv("api_hash"),
         bot_token=Settings.getenv("bot_token"),
         in_memory=Settings.getenv("in_memory").is_enabled,
-        proxy=Settings.url_parser(Settings.PROXY, is_a_proxy=True),
+        proxy=Settings.PROXY,
         plugins=dict(root=plugins_folder),
     )
     await app.start()
