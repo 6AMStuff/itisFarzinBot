@@ -107,7 +107,7 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
                 update.reply_to_message.__class__ = bot.types.Message
         elif isinstance(update, pyrogram.types.CallbackQuery):
             update.__class__ = bot.types.CallbackQuery
-            if update.message:
+            if isinstance(update.message, pyrogram.types.Message):
                 update.message.__class__ = bot.types.Message
 
     async def invoke_handler(
