@@ -108,7 +108,7 @@ async def plugin_detail(
                 [
                     InlineKeyboardButton(
                         "Disable" if info.enabled else "Enable",
-                        callback_data=f"plugins switch {plugin}",
+                        callback_data=f"plugins toggle2 {plugin}",
                     ),
                     InlineKeyboardButton("« Back", callback_data="plugins"),
                 ]
@@ -127,7 +127,7 @@ async def plugins(app: Bot, message: Message) -> None:
 @Bot.on_callback_query(
     Settings.IS_ADMIN
     & filters.regex(
-        r"^plugins(?: (?P<action>info|toggle|switch) (?P<plugin>[\w\-]+))?$"
+        r"^plugins(?: (?P<action>info|toggle|toggle2) (?P<plugin>[\w\-]+))?$"
     )
 )
 async def plugins_callback(app: Bot, query: CallbackQuery) -> None:
@@ -135,17 +135,20 @@ async def plugins_callback(app: Bot, query: CallbackQuery) -> None:
         return
 
     action, plugin = query.matches[0].groups()
+    if not isinstance(action, str) or not isinstance(plugin, str):
+        await plugins_status(app, query)
+        return
 
-    if action in ("toggle", "switch") and plugin:
+    if action in ("toggle", "toggle2"):
         if app.get_plugin_status(plugin):
             app.unload_plugins(plugin)
         else:
-            app.custom_load_plugins(plugin, force_load=True)
+            _ = app.custom_load_plugins(plugin, force_load=True)
 
-    if action in ("info", "switch") and plugin:
-        await plugin_detail(app, query, plugin)
-    else:
+    if action == "toggle":
         await plugins_status(app, query)
+    else:
+        await plugin_detail(app, query, plugin)
 
 
 @Bot.on_message(
