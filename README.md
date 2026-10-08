@@ -49,7 +49,7 @@ uv sync --locked
 4. Run the bot:
 
 ```bash
-uv run -m bot
+uv run -m itisfarzinbot
 ```
 
 ### Docker Setup

@@ -4,10 +4,15 @@ import shutil
 import time
 
 import psutil
-from bot import Bot
-from bot.settings import Settings
-from bot.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from pyrogram import filters, raw
+
+from itisfarzinbot import Bot
+from itisfarzinbot.settings import Settings
+from itisfarzinbot.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
 
 pid = os.getpid()
 proc = psutil.Process(pid)

@@ -8,8 +8,8 @@ import uvloop
 from git import Repo
 from pyrogram.methods.utilities.idle import idle
 
-from bot import Bot
-from bot.settings import Settings
+from itisfarzinbot import Bot
+from itisfarzinbot.settings import Settings
 
 plugins_folder = Settings.getenv("plugins_folder")
 

@@ -7,12 +7,12 @@ import pyrogram.dispatcher
 import pyrogram.handlers
 import pyrogram.types
 
-import bot
-import bot.types
+import itisfarzinbot
+import itisfarzinbot.types
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
-    def __init__(self, client: "bot.Bot") -> None:
+    def __init__(self, client: "itisfarzinbot.Bot") -> None:
         super().__init__(client)
 
     @override
@@ -102,13 +102,13 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
 
     def set_custom_update_types(self, update: Any) -> None:
         if isinstance(update, pyrogram.types.Message):
-            update.__class__ = bot.types.Message
+            update.__class__ = itisfarzinbot.types.Message
             if update.reply_to_message:
-                update.reply_to_message.__class__ = bot.types.Message
+                update.reply_to_message.__class__ = itisfarzinbot.types.Message
         elif isinstance(update, pyrogram.types.CallbackQuery):
-            update.__class__ = bot.types.CallbackQuery
+            update.__class__ = itisfarzinbot.types.CallbackQuery
             if isinstance(update.message, pyrogram.types.Message):
-                update.message.__class__ = bot.types.Message
+                update.message.__class__ = itisfarzinbot.types.Message
 
     async def invoke_handler(
         self,

@@ -20,6 +20,10 @@ dependencies = [
     "uvloop>=0.22.0",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["itisfarzinbot*"]
+
 [project.optional-dependencies]
 full = [
     "tgcrypto>=1.2.5",
@@ -38,7 +42,7 @@ exclude-newer = "1 week"
 
 [tool.ruff]
 line-length = 79
-src = ["src", "tests"]
+src = ["itisfarzinbot", "tests"]
 
 [tool.ruff.lint]
 select = [
@@ -59,6 +63,12 @@ select = [
   "ARG",
 ]
 
+[tool.ruff.lint.flake8-builtins]
+allowed-modules = ["types"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["itisfarzinbot"]
+
 [tool.ruff.lint.mccabe]
 max-complexity = 8
 
@@ -66,7 +76,7 @@ max-complexity = 8
 quote-style = "double"
 
 [tool.pyrefly]
-project-includes = ["bot"]
+project-includes = ["itisfarzinbot"]
 preset = "strict"
 strict-callable-subtyping = true
 errors = { implicit-any = true, implicit-any-attribute = true, implicit-any-empty-container = true, implicit-any-parameter = true, implicit-any-type-argument = true, unannotated-parameter = true, unannotated-attribute = true, unannotated-return = true, unannotated-protocol-member = true, bad-override = true, bad-override-mutable-attribute = true, bad-override-param-name = true, bad-param-name-override = true, missing-override-decorator = true, inconsistent-inheritance = true, unused-ignore = true, unused-coroutine = true, redundant-cast = true, unreachable = true, redefinition = true, deprecated = true }

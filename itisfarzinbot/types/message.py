@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, Any
 import pyrogram.types
 
 if TYPE_CHECKING:
-    import bot
+    import itisfarzinbot
 
 
 class Message(pyrogram.types.Message):
-    def __init__(self, client: "bot.Bot", **kwargs: Any) -> None:
+    def __init__(self, client: "itisfarzinbot.Bot", **kwargs: Any) -> None:
         super().__init__(client=client, **kwargs)
 
     def parse_arguments(self) -> dict[str, Any]:

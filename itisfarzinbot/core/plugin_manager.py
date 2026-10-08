@@ -13,7 +13,7 @@ from pyrogram.handlers.handler import Handler
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from bot.settings import DataBase, PluginDatabase, Settings
+from itisfarzinbot.settings import DataBase, PluginDatabase, Settings
 
 
 @dataclass

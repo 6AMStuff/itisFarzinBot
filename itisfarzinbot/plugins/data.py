@@ -1,7 +1,8 @@
-from bot import Bot
-from bot.settings import Settings
-from bot.types import Message
 from pyrogram import filters
+
+from itisfarzinbot import Bot
+from itisfarzinbot.settings import Settings
+from itisfarzinbot.types import Message
 
 
 @Bot.on_message(

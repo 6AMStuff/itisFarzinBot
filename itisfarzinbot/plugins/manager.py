@@ -3,15 +3,16 @@ from __future__ import annotations
 from datetime import datetime
 
 import humanize
-from bot import Bot
-from bot.settings import Settings
-from bot.types import (
+from pyrogram import filters
+
+from itisfarzinbot import Bot
+from itisfarzinbot.settings import Settings
+from itisfarzinbot.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Message,
 )
-from pyrogram import filters
 
 
 def pretty_name(plugin: str) -> str:
