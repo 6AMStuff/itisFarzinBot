@@ -27,17 +27,24 @@ async def plugins_status(client: Bot, update: Message | CallbackQuery) -> None:
         keyboard = [
             [
                 InlineKeyboardButton(
-                    pretty_name(plugin), f"plugins info {plugin}"
+                    pretty_name(plugin), callback_data=f"plugins info {plugin}"
                 ),
                 InlineKeyboardButton(
                     "✅" if client.get_plugin_status(plugin) else "❌",
-                    f"plugins toggle {plugin}",
+                    callback_data=f"plugins toggle {plugin}",
                 ),
             ]
             for plugin in plugins
         ]
         reply_markup = InlineKeyboardMarkup(
-            keyboard or [[InlineKeyboardButton("No plugins found.", "None")]]
+            keyboard
+            or [
+                [
+                    InlineKeyboardButton(
+                        "No plugins found.", callback_data="noop"
+                    )
+                ]
+            ]
         )
     else:
         text += "\n" + "\n".join(
@@ -101,9 +108,9 @@ async def plugin_detail(
                 [
                     InlineKeyboardButton(
                         "Disable" if info.enabled else "Enable",
-                        f"plugins switch {plugin}",
+                        callback_data=f"plugins switch {plugin}",
                     ),
-                    InlineKeyboardButton("« Back", "plugins"),
+                    InlineKeyboardButton("« Back", callback_data="plugins"),
                 ]
             ]
         ),
