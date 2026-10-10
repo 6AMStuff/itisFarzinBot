@@ -1,3 +1,9 @@
+## v0.23.1 (2026-10-10)
+
+### Bug Fixes
+
+- **core**: check handler type before calling handler.check
+
 ## v0.23.0 (2026-10-10)
 
 ### BREAKING CHANGE
