@@ -1,3 +1,32 @@
+## v0.23.0 (2026-10-10)
+
+### BREAKING CHANGE
+
+- the `bot` package is now `itisfarzinbot`; update all references.
+
+### Features
+
+- **settings**: use stdout logging when in_memory is enabled
+
+### Bug Fixes
+
+- resolve all pyrefly diagnostics with preset all
+- **plugins**: define callback_data for inline buttons
+
+### Code Refactoring
+
+- package as itisfarzinbot
+- **manager**: simplify plugins callback
+
+### Build System
+
+- **deps**: add typing-extensions to dev dependencies
+- **deps**: Bump astral-sh/setup-uv (#47)
+- **deps**: Bump the uv-dependencies group with 4 updates (#48)
+- **deps**: Bump virtualenv (#46)
+- **deps**: Bump the github-actions-dependencies group across 1 directory with 3 updates (#44)
+- **deps**: Bump the uv-dependencies group across 1 directory with 8 updates (#45)
+
 ## v0.22.2 (2026-09-12)
 
 ### Bug Fixes
