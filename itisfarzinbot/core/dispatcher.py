@@ -87,8 +87,9 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
             | None
         ) = None
         try:
-            check_result = await handler.check(self.client, parsed_update)
-            if isinstance(handler, handler_type) and bool(check_result):
+            if isinstance(handler, handler_type) and bool(
+                await handler.check(self.client, parsed_update)
+            ):
                 args = (parsed_update,)
                 self.set_custom_update_types(args[0])
             elif isinstance(
