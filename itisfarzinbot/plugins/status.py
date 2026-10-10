@@ -24,13 +24,13 @@ def format_uptime(seconds: float) -> str:
     minutes, seconds = divmod(seconds, 60)
 
     parts: list[str] = []
-    if days:
+    if days > 0:
         parts.append(f"{days:.0f}d")
-    if hours:
+    if hours > 0:
         parts.append(f"{hours:.0f}h")
-    if minutes:
+    if minutes > 0:
         parts.append(f"{minutes:.0f}m")
-    if seconds or not parts:
+    if seconds > 0 or len(parts) == 0:
         parts.append(f"{seconds:.0f}s")
 
     return " ".join(parts)
@@ -60,7 +60,9 @@ async def status(app: Bot, message: Message) -> None:
         "Bot Uptime": bot_uptime,
         "System Uptime": system_uptime,
         "Memory Usage": f"{proc.memory_info().rss / 1024**2:.2f} MB",
-        "Battery Percentage": f"{battery.percent}%" if battery else None,
+        "Battery Percentage": None
+        if battery is None
+        else f"{battery.percent}%",
         "Ping": f"{ping:.3f} ms",
         "Disk Usage": (
             f"{disk.used / 1024**3:.2f} / {disk.total / 1024**3:.2f} GB"

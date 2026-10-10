@@ -25,7 +25,7 @@ async def main() -> None:
         plugins=dict(root=plugins_folder),
     )
     await app.start()
-    await idle()  # type: ignore[no-untyped-call]
+    await idle()
     await app.stop()
 
 
@@ -48,11 +48,11 @@ def install_requirements(plugins_folder: str) -> None:
         )
         try:
             uv = shutil.which("uv")
-            if not uv:
+            if uv is None:
                 logging.error("Can't find 'uv' in the system PATH.")
                 return
 
-            subprocess.run(  # noqa: S603
+            _ = subprocess.run(  # noqa: S603
                 [uv, "pip", "install", "-r", dependency_file],
                 capture_output=True,
                 text=True,
@@ -67,7 +67,7 @@ def install_requirements(plugins_folder: str) -> None:
 
 def setup_plugins() -> None:
     plugins_repo = Settings.getenv("plugins_repo")
-    if not plugins_repo:
+    if not bool(plugins_repo):
         logging.warning("Skipping setting up plugins.")
         return
 
@@ -91,14 +91,14 @@ def setup_plugins() -> None:
             )
             logging.info(f"Removing {repo_name}'s folder.")
             shutil.rmtree(repo_path)
-            Repo.clone_from(plugins_repo, repo_path, branch=branch)
+            _ = Repo.clone_from(plugins_repo, repo_path, branch=branch)
             logging.info(f"Cloned {repo_name}.")
 
-        repo.remote().fetch()
+        _ = repo.remote().fetch()
         repo.git.pull()
         logging.info(f"Updated {repo_name}.")
     else:
-        Repo.clone_from(plugins_repo, repo_path, branch=branch)
+        _ = Repo.clone_from(plugins_repo, repo_path, branch=branch)
         logging.info(f"Cloned {repo_name}.")
 
 

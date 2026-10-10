@@ -1,5 +1,5 @@
 import shlex
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pyrogram.types
 
@@ -8,12 +8,12 @@ if TYPE_CHECKING:
 
 
 class Message(pyrogram.types.Message):
-    def __init__(self, client: "itisfarzinbot.Bot", **kwargs: Any) -> None:
-        super().__init__(client=client, **kwargs)
+    def __init__(self, client: "itisfarzinbot.Bot", **kwargs: object) -> None:
+        super().__init__(client=client, **kwargs)  # type: ignore[arg-type]
 
-    def parse_arguments(self) -> dict[str, Any]:
+    def parse_arguments(self) -> dict[str, object]:
         # Limit it to filter.command
-        if not self.command:
+        if self.command is None or len(self.command) == 0:
             return {}
 
         raw = self.content.split(maxsplit=1)
@@ -21,7 +21,7 @@ class Message(pyrogram.types.Message):
             return {}
 
         tokens = shlex.split(raw[1])
-        arguments: dict[str, Any] = {}
+        arguments: dict[str, object] = {}
 
         i = 0
 

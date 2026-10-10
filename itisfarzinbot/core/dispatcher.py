@@ -1,7 +1,7 @@
 import asyncio
 import inspect
 import logging
-from typing import Any, override
+from typing import override
 
 import pyrogram.dispatcher
 import pyrogram.handlers
@@ -32,7 +32,11 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
 
     async def process_packet(
         self,
-        packet: tuple[Any, dict[int, Any], dict[Any, Any]],
+        packet: tuple[
+            pyrogram.raw.base.update.Update,
+            dict[int, pyrogram.raw.base.user.User],
+            dict[int, pyrogram.raw.base.chat.Chat],
+        ],
         lock: asyncio.locks.Lock,
     ) -> None:
         update, users, chats = packet
@@ -53,6 +57,7 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         async with lock:
             for group in self.groups.values():
                 for handler in group:
+                    handler: pyrogram.handlers.handler.Handler
                     if await self.process_handler(
                         handler,
                         parsed_update,
@@ -67,43 +72,41 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         self,
         handler: pyrogram.handlers.handler.Handler,
         parsed_update: pyrogram.types.Update,
-        update: pyrogram.types.Update,
-        users: dict[int, pyrogram.raw.types.user.User],
-        chats: dict[int, pyrogram.raw.types.chat.Chat],
+        update: pyrogram.raw.base.update.Update,
+        users: dict[int, pyrogram.raw.base.user.User],
+        chats: dict[int, pyrogram.raw.base.chat.Chat],
         handler_type: type[pyrogram.handlers.handler.Handler],
     ) -> bool:
         args: (
             tuple[pyrogram.types.Update]
             | tuple[
-                Any,
-                dict[int, pyrogram.raw.types.user.User],
-                dict[int, pyrogram.raw.types.chat.Chat],
+                pyrogram.raw.base.update.Update,
+                dict[int, pyrogram.raw.base.user.User],
+                dict[int, pyrogram.raw.base.chat.Chat],
             ]
             | None
         ) = None
         try:
-            if isinstance(handler, handler_type) and await handler.check(
-                self.client, parsed_update
-            ):
+            check_result = await handler.check(self.client, parsed_update)
+            if isinstance(handler, handler_type) and bool(check_result):
                 args = (parsed_update,)
+                self.set_custom_update_types(args[0])
             elif isinstance(
                 handler, pyrogram.handlers.raw_update_handler.RawUpdateHandler
-            ) and await handler.check(self.client, update):
+            ) and bool(await handler.check(self.client, update)):  # type: ignore[bad-argument-type]
                 args = (update, users, chats)
         except Exception as e:
             logging.exception(e)
 
-        if not args:
+        if args is None:
             return False
-
-        self.set_custom_update_types(args[0])
 
         return await self.invoke_handler(handler, args)
 
-    def set_custom_update_types(self, update: Any) -> None:
+    def set_custom_update_types(self, update: pyrogram.types.Update) -> None:
         if isinstance(update, pyrogram.types.Message):
             update.__class__ = itisfarzinbot.types.Message
-            if update.reply_to_message:
+            if update.reply_to_message is not None:
                 update.reply_to_message.__class__ = itisfarzinbot.types.Message
         elif isinstance(update, pyrogram.types.CallbackQuery):
             update.__class__ = itisfarzinbot.types.CallbackQuery
@@ -113,7 +116,7 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
     async def invoke_handler(
         self,
         handler: pyrogram.handlers.handler.Handler,
-        args: tuple[Any] | tuple[Any, Any, Any],
+        args: tuple[object] | tuple[object, object, object],
     ) -> bool:
         sig = inspect.signature(handler.callback)
         custom_args = (

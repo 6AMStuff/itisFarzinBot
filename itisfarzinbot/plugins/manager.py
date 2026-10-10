@@ -39,7 +39,8 @@ async def plugins_status(client: Bot, update: Message | CallbackQuery) -> None:
         ]
         reply_markup = InlineKeyboardMarkup(
             keyboard
-            or [
+            if len(keyboard) > 0
+            else [
                 [
                     InlineKeyboardButton(
                         "No plugins found.", callback_data="noop"
@@ -94,7 +95,7 @@ async def plugin_detail(
         ]
     )
 
-    if info.handlers:
+    if len(info.handlers) > 0:
         text += "\n\n**Handlers:**"
         for handler, _ in info.handlers:
             text += (
@@ -132,7 +133,7 @@ async def plugins(app: Bot, message: Message) -> None:
     )
 )
 async def plugins_callback(app: Bot, query: CallbackQuery) -> None:
-    if not isinstance(query.matches, list):
+    if not isinstance(query.matches, list) or len(query.matches) == 0:
         return
 
     action, plugin = query.matches[0].groups()
@@ -142,7 +143,7 @@ async def plugins_callback(app: Bot, query: CallbackQuery) -> None:
 
     if action in ("toggle", "toggle2"):
         if app.get_plugin_status(plugin):
-            app.unload_plugins(plugin)
+            _ = app.unload_plugins(plugin)
         else:
             _ = app.custom_load_plugins(plugin, force_load=True)
 
@@ -164,7 +165,9 @@ async def handlers(app: Bot, message: Message) -> None:
         for name, info in plugins.items()
         for handler, group in info.handlers
     ]
-    response = "**Handlers**:\n" + ("\n".join(lines) or "No handlers found.")
+    response = "**Handlers**:\n" + (
+        "\n".join(lines) if len(lines) > 0 else "No handlers found."
+    )
     await message.reply(response)
 
 
@@ -173,7 +176,7 @@ async def handlers(app: Bot, message: Message) -> None:
     & filters.command(["load", "unload"], Settings.CMD_PREFIXES)
 )
 async def load_unload(app: Bot, message: Message) -> None:
-    if not message.command:
+    if message.command is None or len(message.command) == 0:
         return
 
     plugins = (

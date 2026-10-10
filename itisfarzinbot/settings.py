@@ -4,7 +4,7 @@ import logging.handlers
 import os
 import re
 import time
-from typing import Any, ClassVar
+from typing import ClassVar, cast
 from zoneinfo import ZoneInfo
 
 import sqlalchemy
@@ -15,9 +15,9 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 
 class Config:
-    config: dict[str, Any]
+    config: dict[str, object]
     config_path = "config/config.yaml"
-    default_values: ClassVar[dict[str, str | bool | int | None]] = {
+    default_values: ClassVar[dict[str, object]] = {
         "client_name": "itisFarzin",
         "api_id": None,
         "api_hash": None,
@@ -65,9 +65,9 @@ config = Config()
 
 
 class Value(str):
-    def __new__(cls, value: str | int | bool | None = None) -> "Value":
+    def __new__(cls, value: object = None) -> "Value":
         s = "" if value is None else str(value)
-        return str.__new__(cls, s)
+        return cast("Value", super().__new__(cls, s))
 
     @property
     def is_enabled(self) -> bool:
@@ -90,13 +90,13 @@ class Value(str):
         return str(self)
 
     def as_optional(self) -> str | None:
-        return str(self) if self else None
+        return str(self) if len(self) > 0 else None
 
 
 class Settings:
     @staticmethod
-    def url_parser(url: str | None) -> dict[str, int | str | Any] | None:
-        if not url:
+    def url_parser(url: str | None) -> dict[str, int | str] | None:
+        if url is None:
             return None
 
         pattern = re.compile(
@@ -108,7 +108,7 @@ class Settings:
         )
 
         result = pattern.match(url)
-        if not result:
+        if result is None:
             return None
 
         return {
@@ -117,7 +117,7 @@ class Settings:
         }
 
     @staticmethod
-    def getenv(key: str, default: Any = None) -> Value:
+    def getenv(key: str, default: object = None) -> Value:
         value = config.get(key.lower())
         return Value(value if value is not None else default)
 
@@ -125,7 +125,11 @@ class Settings:
     def infer_plugin_name() -> str | None:
         frame = inspect.currentframe()
         try:
-            if not frame or not frame.f_back or not frame.f_back.f_back:
+            if (
+                frame is None
+                or frame.f_back is None
+                or frame.f_back.f_back is None
+            ):
                 return None
 
             module = frame.f_back.f_back.f_globals.get("__name__")
@@ -139,22 +143,27 @@ class Settings:
     @staticmethod
     def _createdata(plugin_name: str) -> None:
         with Session(Settings.engine) as session:
-            session.merge(PluginDatabase(name=plugin_name, enabled=True))
+            _ = session.merge(PluginDatabase(name=plugin_name, enabled=True))
             session.commit()
 
     @staticmethod
-    def setdata(key: str, value: Any, plugin_name: str | None = None) -> bool:
-        plugin_name = plugin_name or Settings.infer_plugin_name()
-        if not plugin_name:
-            return False
+    def setdata(
+        key: str, value: object, plugin_name: str | None = None
+    ) -> bool:
+        if plugin_name is None:
+            inferred = Settings.infer_plugin_name()
+            if inferred is None:
+                return False
+
+            plugin_name = inferred
 
         with Session(Settings.engine) as session:
-            data: dict[str, Any] | None = session.execute(
+            data: dict[str, object] | None = session.execute(
                 sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
-            if not data:
+            if data is None:
                 Settings._createdata(plugin_name)
                 data = {}
 
@@ -174,36 +183,41 @@ class Settings:
     @staticmethod
     def getdata(
         key: str,
-        default: Any = None,
+        default: str | int | bool | None = None,
         use_env: bool = False,
         plugin_name: str | None = None,
     ) -> Value:
-        plugin_name = plugin_name or Settings.infer_plugin_name()
-        if not plugin_name:
-            return Value()
+        if plugin_name is None:
+            inferred = Settings.infer_plugin_name()
+            if inferred is None:
+                return Value()
+
+            plugin_name = inferred
 
         with Session(Settings.engine) as session:
-            data: dict[str, Any] | None = session.execute(
+            data: dict[str, object] | None = session.execute(
                 sqlalchemy.select(PluginDatabase.custom_data).where(
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
-            if not data:
+            if data is None:
                 Settings._createdata(plugin_name)
                 data = {}
 
-            return Value(
-                data.get(
-                    key,
-                    Settings.getenv(key, default) if use_env else default,
-                )
+            value = data.get(
+                key,
+                Settings.getenv(key, default) if use_env else default,
             )
+            return Value(value)
 
     @staticmethod
     def deldata(key: str, plugin_name: str | None = None) -> bool:
-        plugin_name = plugin_name or Settings.infer_plugin_name()
-        if not plugin_name:
-            return False
+        if plugin_name is None:
+            inferred = Settings.infer_plugin_name()
+            if inferred is None:
+                return False
+
+            plugin_name = inferred
 
         with Session(Settings.engine) as session:
             data = session.execute(
@@ -211,7 +225,7 @@ class Settings:
                     PluginDatabase.name == plugin_name
                 )
             ).scalar()
-            if not data:
+            if data is None:
                 Settings._createdata(plugin_name)
                 return True
 
@@ -236,11 +250,11 @@ class Settings:
     def apply_timezone() -> Value:
         tz = config.get("tz")
 
-        if not isinstance(tz, Value) or not tz:
+        if not isinstance(tz, Value) or tz.as_optional() is None:
             tz = Value("Europe/London")
 
         try:
-            ZoneInfo(tz)
+            _ = ZoneInfo(tz)
         except Exception:
             tz = Value("Europe/London")
 
@@ -254,7 +268,11 @@ class Settings:
     PROXY = getenv(
         "proxy",
         (
-            getenv("http_proxy") or getenv("https_proxy")
+            (
+                getenv("http_proxy")
+                if len(getenv("http_proxy")) > 0
+                else getenv("https_proxy")
+            )
             if getenv("use_system_proxy").is_enabled
             else None
         ),
@@ -276,7 +294,9 @@ class PluginDatabase(DataBase):
 
     name: Mapped[str] = mapped_column(String(40), primary_key=True)
     enabled: Mapped[bool] = mapped_column(Boolean())
-    custom_data: Mapped[dict[str, Any]] = mapped_column(JSON(), default=dict())
+    custom_data: Mapped[dict[str, object]] = mapped_column(
+        JSON(), default=dict()
+    )
 
 
 logger = logging.getLogger("bot")

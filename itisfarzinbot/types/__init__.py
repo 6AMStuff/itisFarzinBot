@@ -3,10 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pyrogram.types import *  # pyright: ignore # noqa: F403
 
-    from .callback_query import (  # type: ignore[assignment]
-        CallbackQuery as CallbackQuery,
-    )
-    from .message import Message as Message  # type: ignore[assignment]
+    from .callback_query import CallbackQuery as CallbackQuery
+    from .message import Message as Message
 else:
     import sys
 

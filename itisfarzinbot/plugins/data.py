@@ -9,7 +9,7 @@ from itisfarzinbot.types import Message
     Settings.IS_ADMIN & filters.command("setdata", Settings.CMD_PREFIXES)
 )
 async def setdata(app: Bot, message: Message) -> None:
-    if not message.command or len(message.command) != 4:
+    if message.command is None or len(message.command) != 4:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}setdata [plugin name] [key] [value]"
         )
@@ -29,7 +29,7 @@ async def setdata(app: Bot, message: Message) -> None:
     Settings.IS_ADMIN & filters.command("getdata", Settings.CMD_PREFIXES)
 )
 async def getdata(app: Bot, message: Message) -> None:
-    if not message.command or len(message.command) != 3:
+    if message.command is None or len(message.command) != 3:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}getdata [plugin name] [key]"
         )
@@ -41,7 +41,7 @@ async def getdata(app: Bot, message: Message) -> None:
         return
 
     result = Settings.getdata(key, plugin_name=plugin_name).as_optional()
-    if not result:
+    if result is None:
         await message.reply(
             f"Key `{key}` not found in plugin **{plugin_name}**."
         )
@@ -54,7 +54,7 @@ async def getdata(app: Bot, message: Message) -> None:
     Settings.IS_ADMIN & filters.command("deldata", Settings.CMD_PREFIXES)
 )
 async def deldata(app: Bot, message: Message) -> None:
-    if not message.command or len(message.command) != 3:
+    if message.command is None or len(message.command) != 3:
         await message.reply(
             f"{Settings.CMD_PREFIXES[0]}deldata [plugin name] [key]"
         )

@@ -30,19 +30,19 @@ class PluginManager(Client):
     builtin_plugins: str
 
     def _post_init(self) -> None:
-        if not self.plugins:
+        if self.plugins is None:
             return
 
         self.plugins_path = str(self.plugins["root"])
-        self.custom_load_plugins(folder=self.builtin_plugins)
+        _ = self.custom_load_plugins(folder=self.builtin_plugins)
 
     def modules_list(
         self, folder: str | list[str] | set[str] | None = None
     ) -> Iterator[Path]:
-        targets = (
-            folder
+        targets: list[str] = (
+            list(folder)
             if isinstance(folder, (list, set))
-            else [folder or self.plugins_path]
+            else [folder if folder is not None else self.plugins_path]
         )
 
         for path_str in targets:
@@ -58,10 +58,10 @@ class PluginManager(Client):
     def get_plugins(
         self, folder: str | list[str] | set[str] | None = None
     ) -> Iterator[str]:
-        targets = (
-            folder
+        targets: list[str] = (
+            list(folder)
             if isinstance(folder, (list, set))
-            else [folder or self.plugins_path]
+            else [folder if folder is not None else self.plugins_path]
         )
 
         for path in self.modules_list(targets):
@@ -111,7 +111,9 @@ class PluginManager(Client):
     ) -> Iterator[tuple[Handler, int]]:
         group_offset = 0 if folder == self.builtin_plugins else 1
         plugins_set: set[str] = set(
-            plugins.split(",") if isinstance(plugins, str) else plugins or []
+            plugins.split(",")
+            if isinstance(plugins, str)
+            else (plugins if plugins is not None else [])
         )
 
         for path in self.modules_list(folder=folder):
@@ -119,14 +121,16 @@ class PluginManager(Client):
                 continue
 
             module_path = ".".join(path.with_suffix("").parts)
-            if reload and (old_module := sys.modules.get(module_path)):
-                for handler, group in self.module_handlers(
-                    old_module, group_offset
-                ):
-                    if self.handler_is_loaded(handler, group):
-                        self.remove_handler(handler, group)
+            if reload:
+                old_module = sys.modules.get(module_path)
+                if old_module is not None:
+                    for handler, group in self.module_handlers(
+                        old_module, group_offset
+                    ):
+                        if self.handler_is_loaded(handler, group):
+                            self.remove_handler(handler, group)
 
-                del sys.modules[module_path]
+                    del sys.modules[module_path]
 
             module = importlib.import_module(module_path)
             yield from self.module_handlers(module, group_offset)
@@ -138,7 +142,7 @@ class PluginManager(Client):
     def set_plugins_status(
         self, plugins: list[str] | set[str] | str | None, enabled: bool = True
     ) -> None:
-        if not plugins:
+        if plugins is None:
             return
 
         plugins_set: set[str] = set(
@@ -147,7 +151,7 @@ class PluginManager(Client):
 
         with Session(Settings.engine) as session:
             for plugin in plugins_set:
-                session.merge(PluginDatabase(name=plugin, enabled=enabled))
+                _ = session.merge(PluginDatabase(name=plugin, enabled=enabled))
 
             session.commit()
 
@@ -162,7 +166,7 @@ class PluginManager(Client):
 
     @override
     def load_plugins(self) -> None:
-        self.custom_load_plugins()
+        _ = self.custom_load_plugins()
 
     def custom_load_plugins(
         self,
@@ -172,10 +176,12 @@ class PluginManager(Client):
     ) -> dict[str, str]:
         result = {}
         plugins_set: set[str] = set(
-            plugins.split(",") if isinstance(plugins, str) else plugins or []
+            plugins.split(",")
+            if isinstance(plugins, str)
+            else (plugins if plugins is not None else [])
         )
         all_plugins = set(self.get_plugins(folder=folder))
-        plugins_set = plugins_set or all_plugins
+        plugins_set = plugins_set if len(plugins_set) > 0 else all_plugins
         valid_plugins = plugins_set.intersection(all_plugins)
         disabled_plugins = set()
 
@@ -200,7 +206,7 @@ class PluginManager(Client):
         ):
             callback_name = handler[0].callback.__name__
             if not self.handler_is_loaded(*handler):
-                self.add_handler(*handler)
+                _ = self.add_handler(*handler)
                 result[callback_name] = "Handler loaded"
                 logging.info(f"{callback_name} handler has been loaded")
             else:
@@ -220,7 +226,9 @@ class PluginManager(Client):
     ) -> dict[str, str]:
         result = {}
         plugins_set: set[str] = set(
-            plugins.split(",") if isinstance(plugins, str) else plugins or []
+            plugins.split(",")
+            if isinstance(plugins, str)
+            else (plugins if plugins is not None else [])
         ).intersection(self.get_plugins(folder=folder))
 
         self.set_plugins_status(plugins_set, False)
@@ -249,7 +257,8 @@ class PluginManager(Client):
 
             module_path = ".".join(path.with_suffix("").parts)
             module = importlib.import_module(module_path)
-            if on_data_change := getattr(module, "on_data_change", None):
+            on_data_change = getattr(module, "on_data_change", None)
+            if on_data_change is not None:
                 try:
                     if inspect.iscoroutinefunction(on_data_change):
                         await on_data_change()
