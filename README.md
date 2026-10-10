@@ -79,7 +79,7 @@ Then edit `config/config.yaml`. At minimum, set `api_id`, `api_hash`, and `bot_t
 | `client_name` | Session name for the Telegram client. |
 | `api_id` / `api_hash` | Telegram API credentials from [my.telegram.org](https://my.telegram.org/apps). |
 | `bot_token` | Bot token from [@BotFather](https://t.me/BotFather). |
-| `in_memory` | Keep the session in memory instead of writing it to disk. |
+| `in_memory` | Keep the session in memory instead of writing it to disk. When enabled, logs are written to stdout instead of rotating log files. |
 | `plugins_folder` | Directory plugins are loaded from. |
 | `log_level` | Logging level as a Python numeric level (e.g. `20` = `INFO`). |
 | `log_max_size_mb` | Maximum size of a log file before it rotates. |

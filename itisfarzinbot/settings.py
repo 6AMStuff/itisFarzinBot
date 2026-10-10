@@ -285,25 +285,28 @@ log_level = (
     if Settings.getenv("log_level").is_digit
     else logging.INFO
 )
-file_handler = logging.handlers.RotatingFileHandler(
-    filename="config/bot.log",
-    maxBytes=Settings.getenv("log_max_size_mb").to_int * 1024 * 1024,
-    backupCount=Settings.getenv("log_backup_count").to_int,
-)
-file_handler.setLevel(
-    Settings.getenv("log_level").to_int
-    if Settings.getenv("log_level").is_digit
-    else logging.INFO
-)
+
+in_memory = Settings.getenv("in_memory").is_enabled
+
+if in_memory:
+    log_handler = logging.StreamHandler()
+else:
+    log_handler = logging.handlers.RotatingFileHandler(
+        filename="config/bot.log",
+        maxBytes=Settings.getenv("log_max_size_mb").to_int * 1024 * 1024,
+        backupCount=Settings.getenv("log_backup_count").to_int,
+    )
+
+log_handler.setLevel(log_level)
 formatter = logging.Formatter(
     fmt="[%(asctime)s] %(levelname)s: %(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p",
 )
-file_handler.setFormatter(formatter)
+log_handler.setFormatter(formatter)
 logging.basicConfig(
-    level=file_handler.level,
-    format=formatter._fmt or "",
+    level=log_handler.level,
+    format=formatter._style._fmt,
     datefmt=formatter.datefmt,
-    handlers=[file_handler],
+    handlers=[log_handler],
 )
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
