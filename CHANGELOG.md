@@ -1,3 +1,15 @@
+## v0.23.2 (2026-10-22)
+
+### Code Refactoring
+
+- resolve all pyrefly diagnostics found in #52
+
+### Build System
+
+- **deps**: Bump the uv-dependencies group across 1 directory with 2 updates (#52)
+- **deps**: Bump gitpython (#50)
+- **deps**: Bump astral-sh/setup-uv (#49)
+
 ## v0.23.1 (2026-10-10)
 
 ### Bug Fixes
