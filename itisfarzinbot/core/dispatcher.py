@@ -1,7 +1,7 @@
 import asyncio
 import inspect
 import logging
-from typing import override
+from typing import TYPE_CHECKING, override
 
 import pyrogram.dispatcher
 import pyrogram.handlers
@@ -9,6 +9,9 @@ import pyrogram.types
 
 import itisfarzinbot
 import itisfarzinbot.types
+
+if TYPE_CHECKING:
+    from collections import OrderedDict
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
@@ -54,10 +57,11 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         ):
             return
 
+        self.groups: OrderedDict[int, list[pyrogram.handlers.handler.Handler]]
+
         async with lock:
             for group in self.groups.values():
                 for handler in group:
-                    handler: pyrogram.handlers.handler.Handler
                     if await self.process_handler(
                         handler,
                         parsed_update,

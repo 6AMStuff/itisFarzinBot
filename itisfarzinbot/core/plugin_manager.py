@@ -25,9 +25,9 @@ class PluginInfo:
 
 
 class PluginManager(Client):
-    plugins: dict[str, str | list[str]] | None
-    plugins_path: str
-    builtin_plugins: str
+    plugins: dict[str, str | list[str]] | None = None
+    plugins_path: str = ""
+    builtin_plugins: str = ""
 
     def _post_init(self) -> None:
         if self.plugins is None:
@@ -94,14 +94,15 @@ class PluginManager(Client):
         self, module: object, group_offset: int
     ) -> Iterator[tuple[Handler, int]]:
         for _, obj in inspect.getmembers(module):
-            handlers = getattr(obj, "handlers", None)
+            handlers: list[tuple[Handler, int]] | None = getattr(
+                obj, "handlers", None
+            )
             if not isinstance(handlers, list):
                 continue
 
             for handler, group in handlers:
-                if isinstance(handler, Handler) and isinstance(group, int):
-                    group = max(group + group_offset, 0)
-                    yield (handler, group)
+                group = max(group + group_offset, 0)
+                yield (handler, group)
 
     def get_handlers(
         self,

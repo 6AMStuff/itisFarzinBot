@@ -16,8 +16,8 @@ class BotMeta(type):
 
 
 class Bot(Core, Client, metaclass=BotMeta):
-    uptime: float
-    is_bot: bool
+    uptime: float = 0
+    is_bot: bool = False
 
     @override
     def _post_init(self) -> None:
