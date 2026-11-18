@@ -18,7 +18,7 @@ class Config:
     config: dict[str, object]
     config_path = "config/config.yaml"
     default_values: ClassVar[dict[str, object]] = {
-        "client_name": "itisFarzin",
+        "client_name": "itisFarzinBot",
         "api_id": None,
         "api_hash": None,
         "bot_token": None,
