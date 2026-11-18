@@ -2,6 +2,7 @@ import importlib
 import inspect
 import logging
 import os
+import pkgutil
 import sys
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -38,7 +39,7 @@ class PluginManager(Client):
 
     def modules_list(
         self, folder: str | list[str] | set[str] | None = None
-    ) -> Iterator[Path]:
+    ) -> Iterator[tuple[str, Path]]:
         targets: list[str] = (
             list(folder)
             if isinstance(folder, (list, set))
@@ -46,6 +47,10 @@ class PluginManager(Client):
         )
 
         for path_str in targets:
+            if path_str == self.builtin_plugins:
+                yield from self.internal_modules_list()
+                continue
+
             for root, dirs, files in os.walk(
                 path_str.replace(".", os.sep), followlinks=True
             ):
@@ -53,7 +58,18 @@ class PluginManager(Client):
                 dirs[:] = [d for d in dirs if not d.startswith(".")]
                 for file in files:
                     if file.endswith(".py"):
-                        yield Path(root) / file
+                        path = Path(root) / file
+                        yield ".".join(path.with_suffix("").parts), path
+
+    def internal_modules_list(self) -> Iterator[tuple[str, Path]]:
+        package = importlib.import_module(
+            self.builtin_plugins.replace("/", ".")
+        )
+        for info in pkgutil.iter_modules(package.__path__):
+            name = f"{package.__name__}.{info.name}"
+            file = importlib.import_module(name).__file__
+            if file is not None:
+                yield name, Path(file)
 
     def get_plugins(
         self, folder: str | list[str] | set[str] | None = None
@@ -64,9 +80,8 @@ class PluginManager(Client):
             else [folder if folder is not None else self.plugins_path]
         )
 
-        for path in self.modules_list(targets):
-            module_path = ".".join(path.with_suffix("").parts)
-            module = importlib.import_module(module_path)
+        for module_name, path in self.modules_list(targets):
+            module = importlib.import_module(module_name)
             if getattr(module, "__plugin__", False):
                 yield path.stem
 
@@ -75,9 +90,8 @@ class PluginManager(Client):
     ) -> dict[str, PluginInfo]:
         plugins: dict[str, PluginInfo] = {}
 
-        for path in self.modules_list(folder=folder):
-            module_path = ".".join(path.with_suffix("").parts)
-            module = importlib.import_module(module_path)
+        for module_name, path in self.modules_list(folder=folder):
+            module = importlib.import_module(module_name)
             if not getattr(module, "__plugin__", False):
                 continue
 
@@ -117,13 +131,12 @@ class PluginManager(Client):
             else (plugins if plugins is not None else [])
         )
 
-        for path in self.modules_list(folder=folder):
+        for module_name, path in self.modules_list(folder=folder):
             if path.stem not in plugins_set:
                 continue
 
-            module_path = ".".join(path.with_suffix("").parts)
             if reload:
-                old_module = sys.modules.get(module_path)
+                old_module = sys.modules.get(module_name)
                 if old_module is not None:
                     for handler, group in self.module_handlers(
                         old_module, group_offset
@@ -131,9 +144,9 @@ class PluginManager(Client):
                         if self.handler_is_loaded(handler, group):
                             self.remove_handler(handler, group)
 
-                    del sys.modules[module_path]
+                    del sys.modules[module_name]
 
-            module = importlib.import_module(module_path)
+            module = importlib.import_module(module_name)
             yield from self.module_handlers(module, group_offset)
 
     def handler_is_loaded(self, handler: Handler, group: int = 0) -> bool:
@@ -252,12 +265,11 @@ class PluginManager(Client):
     async def call_data_change(self, name: str) -> bool:
         name = Path(name).stem
 
-        for path in self.modules_list():
+        for module_name, path in self.modules_list():
             if path.stem != name:
                 continue
 
-            module_path = ".".join(path.with_suffix("").parts)
-            module = importlib.import_module(module_path)
+            module = importlib.import_module(module_name)
             on_data_change = getattr(module, "on_data_change", None)
             if on_data_change is not None:
                 try:
@@ -268,7 +280,7 @@ class PluginManager(Client):
                 except Exception as e:
                     logging.error(
                         "Error executing 'on_data_change' in"
-                        f" {module_path}: {e}"
+                        f" {module_name}: {e}"
                     )
                     return False
 
