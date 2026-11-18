@@ -1,3 +1,28 @@
+## v0.23.3 (2026-11-18)
+
+### Bug Fixes
+
+- **core**: discover builtin plugins independently of cwd
+
+### Code Refactoring
+
+- **settings**: update default client name
+
+### Build System
+
+- **deps**: bump all packages
+- **deps**: Bump the uv-dependencies group with 5 updates (#60)
+- **deps**: Bump the uv-dependencies group with 3 updates (#58)
+- **deps**: Bump astral-sh/setup-uv (#57)
+- **deps**: Bump virtualenv (#55)
+- **deps**: Bump the github-actions-dependencies group with 3 updates (#53)
+- **deps**: Bump the uv-dependencies group with 2 updates (#54)
+
+### Continuous Integration
+
+- **docker**: build multi-arch images with a per-platform matrix
+- **docker**: build images per architecture with a matrix
+
 ## v0.23.2 (2026-10-22)
 
 ### Code Refactoring
