@@ -10,13 +10,13 @@ else:
 
     import pyrogram.types as pg_types
 
-    from .callback_query import CallbackQuery
-    from .message import Message
+    from .callback_query import CallbackQuery as _CallbackQuery
+    from .message import Message as _Message
 
     _current_module = sys.modules[__name__]
     for _name in dir(pg_types):
         if not _name.startswith("_"):
             setattr(_current_module, _name, getattr(pg_types, _name))
 
-    _current_module.CallbackQuery = CallbackQuery
-    _current_module.Message = Message
+    _current_module.CallbackQuery = _CallbackQuery
+    _current_module.Message = _Message
