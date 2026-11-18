@@ -4,7 +4,7 @@ import logging
 import os
 import pkgutil
 import sys
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import override
@@ -22,7 +22,7 @@ class PluginInfo:
     path: Path
     enabled: bool
     size: int
-    handlers: list[tuple[Handler, int]]
+    handlers: list[tuple[Handler[Callable[..., object]], int]]
 
 
 class PluginManager(Client):
@@ -106,11 +106,11 @@ class PluginManager(Client):
 
     def module_handlers(
         self, module: object, group_offset: int
-    ) -> Iterator[tuple[Handler, int]]:
+    ) -> Iterator[tuple[Handler[Callable[..., object]], int]]:
         for _, obj in inspect.getmembers(module):
-            handlers: list[tuple[Handler, int]] | None = getattr(
-                obj, "handlers", None
-            )
+            handlers: (
+                list[tuple[Handler[Callable[..., object]], int]] | None
+            ) = getattr(obj, "handlers", None)
             if not isinstance(handlers, list):
                 continue
 
@@ -123,7 +123,7 @@ class PluginManager(Client):
         plugins: str | list[str] | set[str] | None = None,
         folder: str | list[str] | set[str] | None = None,
         reload: bool = False,
-    ) -> Iterator[tuple[Handler, int]]:
+    ) -> Iterator[tuple[Handler[Callable[..., object]], int]]:
         group_offset = 0 if folder == self.builtin_plugins else 1
         plugins_set: set[str] = set(
             plugins.split(",")
@@ -149,7 +149,9 @@ class PluginManager(Client):
             module = importlib.import_module(module_name)
             yield from self.module_handlers(module, group_offset)
 
-    def handler_is_loaded(self, handler: Handler, group: int = 0) -> bool:
+    def handler_is_loaded(
+        self, handler: Handler[Callable[..., object]], group: int = 0
+    ) -> bool:
         result = self.dispatcher.groups.get(group)
         return result is not None and handler in result
 
