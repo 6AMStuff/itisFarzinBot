@@ -20,7 +20,11 @@ class Message(pyrogram.types.Message):
         if len(raw) < 2:
             return {}
 
-        tokens = shlex.split(raw[1])
+        try:
+            tokens = shlex.split(raw[1])
+        except ValueError:
+            return {}
+
         arguments: dict[str, object] = {}
 
         i = 0
