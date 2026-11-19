@@ -248,7 +248,7 @@ full = [
 requires-dist = [
     { name = "gitpython", specifier = ">=3.1.55" },
     { name = "humanize", specifier = ">=4.16.0" },
-    { name = "kurigram", specifier = ">=2.2.24" },
+    { name = "kurigram", specifier = ">=2.2.27" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.6.1" },
     { name = "psutil", specifier = ">=7.2.2" },
     { name = "pymysql", specifier = ">=1.2.0" },
