@@ -1,5 +1,4 @@
 import logging
-import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -73,14 +72,7 @@ def setup_plugins() -> None:
 
     repo_name = plugins_repo.rstrip("/").split("/")[-1]
     repo_name = repo_name.removesuffix(".git")
-
     repo_path = Path(plugins_folder) / repo_name
-
-    try:
-        _repo = Repo(".")
-        branch = "dev" if _repo.active_branch.name == "dev" else "main"
-    except Exception:
-        branch = "dev" if os.getenv("VERSION") == "dev" else "main"
 
     if repo_path.exists():
         repo = Repo(repo_path)
@@ -91,14 +83,14 @@ def setup_plugins() -> None:
             )
             logging.info(f"Removing {repo_name}'s folder.")
             shutil.rmtree(repo_path)
-            _ = Repo.clone_from(plugins_repo, repo_path, branch=branch)
+            _ = Repo.clone_from(plugins_repo, repo_path)
             logging.info(f"Cloned {repo_name}.")
 
         _ = repo.remote().fetch()
         repo.git.pull()
         logging.info(f"Updated {repo_name}.")
     else:
-        _ = Repo.clone_from(plugins_repo, repo_path, branch=branch)
+        _ = Repo.clone_from(plugins_repo, repo_path)
         logging.info(f"Cloned {repo_name}.")
 
 
