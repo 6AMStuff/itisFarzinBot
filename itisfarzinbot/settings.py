@@ -125,18 +125,14 @@ class Settings:
     def infer_plugin_name() -> str | None:
         frame = inspect.currentframe()
         try:
-            if (
-                frame is None
-                or frame.f_back is None
-                or frame.f_back.f_back is None
-            ):
-                return None
+            while frame is not None:
+                if frame.f_globals.get("__plugin__", False):
+                    module = frame.f_globals.get("__name__")
+                    if isinstance(module, str):
+                        return module.rsplit(".", 1)[-1]
+                frame = frame.f_back
 
-            module = frame.f_back.f_back.f_globals.get("__name__")
-            if not isinstance(module, str):
-                return None
-
-            return module.rsplit(".", 1)[-1]
+            return None
         finally:
             del frame
 
