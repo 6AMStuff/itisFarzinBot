@@ -36,7 +36,9 @@ def format_uptime(seconds: float) -> str:
     return " ".join(parts)
 
 
-@Bot.on_message(Settings.IS_ADMIN & filters.command("status"))
+@Bot.on_message(
+    Settings.IS_ADMIN & filters.command("status", Settings.CMD_PREFIXES)
+)
 async def status(app: Bot, message: Message) -> None:
     now = time.time()
     text = "**Bot Status**:\n\n"
