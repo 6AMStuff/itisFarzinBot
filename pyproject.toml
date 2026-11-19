@@ -7,7 +7,7 @@ license = { text = "MIT" }
 authors = [
   { name = "Farzin Kazemzadeh", email = "itisFarzin@proton.me" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "gitpython>=3.1.55",
     "humanize>=4.16.0",

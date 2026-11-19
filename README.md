@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://app.codacy.com/gh/6AMStuff/itisFarzinBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=6AMStuff/itisFarzinBot&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/9d8fde863b17449caeea8b4cc39d6004" alt="Codacy Badge" /></a>
-  <a href="https://www.python.org"><img src="https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
+  <a href="https://www.python.org"><img src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
   <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/badge/managed%20by-uv-F43F5E?style=flat-square" alt="uv"></a>
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/badge/lint-ruff-000000?style=flat-square" alt="Ruff"></a>
   <a href="https://github.com/facebook/pyrefly"><img src="https://img.shields.io/badge/types-pyrefly-blue?style=flat-square" alt="Type Checked"></a>
@@ -23,7 +23,7 @@
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.11+
 - [uv](https://github.com/astral-sh/uv) package manager
 - Telegram [API credentials](https://my.telegram.org/apps) (`api_id` and `api_hash`)
 - A bot token from [@BotFather](https://t.me/BotFather)
