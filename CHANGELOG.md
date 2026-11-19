@@ -1,3 +1,25 @@
+## v0.23.4 (2026-11-19)
+
+### Bug Fixes
+
+- **core**: handle unbalanced quotes in parse_arguments
+- **plugins**: honor configured prefixes for status command
+- **core**: re-export custom types after pyrogram types
+- align dispatcher and plugin manager with the latest kurigram version
+
+### Code Refactoring
+
+- clone the plugins repository’s default branch
+- **settings**: improve plugin name retrieval
+
+### Maintenance
+
+- drop python 3.10 support
+
+### Build System
+
+- **deps**: bump minimum kurigram version to 2.2.27
+
 ## v0.23.3 (2026-11-18)
 
 ### Bug Fixes

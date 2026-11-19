@@ -95,7 +95,7 @@ wheels = [
 
 [[package]]
 name = "itisfarzinbot"
-version = "0.23.3"
+version = "0.23.4"
 source = { virtual = "." }
 dependencies = [
     { name = "gitpython" },
