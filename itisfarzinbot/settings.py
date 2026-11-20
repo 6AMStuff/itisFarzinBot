@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 import sqlalchemy
 import yaml
 from pyrogram import filters
-from sqlalchemy import JSON, Boolean, String
+from sqlalchemy import JSON, BigInteger, Boolean, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 
@@ -293,6 +293,15 @@ class PluginDatabase(DataBase):
     custom_data: Mapped[dict[str, object]] = mapped_column(
         JSON(), default=dict()
     )
+
+
+class AdminDatabase(DataBase):
+    __tablename__ = "admins"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    by_user: Mapped[int] = mapped_column(BigInteger)
+    full_name: Mapped[str] = mapped_column(String(100))
+    promote_time: Mapped[int] = mapped_column(BigInteger)
 
 
 logger = logging.getLogger("bot")

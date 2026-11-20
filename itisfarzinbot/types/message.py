@@ -2,6 +2,9 @@ import shlex
 from typing import TYPE_CHECKING
 
 import pyrogram.types
+from sqlalchemy.orm import Session
+
+from itisfarzinbot.settings import AdminDatabase, Settings
 
 if TYPE_CHECKING:
     import itisfarzinbot
@@ -10,6 +13,20 @@ if TYPE_CHECKING:
 class Message(pyrogram.types.Message):
     def __init__(self, client: "itisfarzinbot.Bot", **kwargs: object) -> None:
         super().__init__(client=client, **kwargs)  # type: ignore[arg-type]
+
+    @property
+    def is_admin(self) -> bool:
+        user = self.from_user
+        if user is None:
+            return False
+
+        if user.username is not None and f"@{user.username.lower()}" in (
+            admin.lower() for admin in Settings.ADMINS
+        ):
+            return True
+
+        with Session(Settings.engine) as session:
+            return session.get(AdminDatabase, user.id) is not None
 
     def parse_arguments(self) -> dict[str, object]:
         # Limit it to filter.command
