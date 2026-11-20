@@ -11,6 +11,7 @@ requires-python = ">=3.11"
 dependencies = [
     "gitpython>=3.1.55",
     "humanize>=4.16.0",
+    "kuricrypt>=0.1.2",
     "kurigram>=2.2.27",
     "psutil>=7.2.2",
     "pymysql>=1.2.0",
@@ -25,9 +26,6 @@ where = ["."]
 include = ["itisfarzinbot*"]
 
 [project.optional-dependencies]
-full = [
-    "kuricrypt>=0.1.2",
-]
 dev = [
     "pre-commit>=4.6.1",
     "pyrefly>=1.1.1",
