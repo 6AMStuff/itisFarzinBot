@@ -20,7 +20,7 @@ WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
 
-RUN uv sync --locked --extra full
+RUN uv sync --locked
 
 FROM base AS runtime
 

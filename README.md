@@ -43,8 +43,6 @@ cd itisFarzinBot
 uv sync --locked
 ```
 
-> For faster MTProto encryption, include the `full` extra: `uv sync --locked --extra full`
-
 3. Configure the bot (see [Configuration](#configuration)).
 4. Run the bot:
 
