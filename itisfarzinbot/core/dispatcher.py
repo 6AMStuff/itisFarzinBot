@@ -13,10 +13,6 @@ import itisfarzinbot.types
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
-    def __init__(self, client: "itisfarzinbot.Bot") -> None:
-        super().__init__(client)
-        self._lock = asyncio.Lock()
-
     @override
     async def handler_worker(self) -> None:
         while True:
@@ -26,7 +22,7 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
                 break
 
             try:
-                await self.process_packet(packet, self._lock)
+                await self.process_packet(packet)
             except pyrogram.StopPropagation:
                 pass
             except Exception as e:
@@ -39,7 +35,6 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
             dict[int, pyrogram.raw.base.user.User],
             dict[int, pyrogram.raw.base.chat.Chat],
         ],
-        lock: asyncio.locks.Lock,
     ) -> None:
         update, users, chats = packet
         parser = self.update_parsers.get(type(update), None)  # type: ignore[call-overload]
@@ -56,18 +51,17 @@ class Dispatcher(pyrogram.dispatcher.Dispatcher):
         ):
             return
 
-        async with lock:
-            for group in self.groups.values():
-                for handler in group:
-                    if await self.process_handler(
-                        handler,
-                        parsed_update,
-                        update,
-                        users,
-                        chats,
-                        handler_type,
-                    ):
-                        break
+        for group in self._copy_groups().values():
+            for handler in group:
+                if await self.process_handler(
+                    handler,
+                    parsed_update,
+                    update,
+                    users,
+                    chats,
+                    handler_type,
+                ):
+                    break
 
     async def process_handler(
         self,
