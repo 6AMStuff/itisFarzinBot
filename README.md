@@ -88,11 +88,11 @@ Then edit `config/config.yaml`. At minimum, set `api_id`, `api_hash`, and `bot_t
 | `use_system_proxy` | Fall back to the system proxy when `proxy` is unset. |
 | `cmd_prefixes` | Space-separated command prefixes (e.g. `. /`). |
 | `db_uri` | SQLAlchemy database URI. |
-| `plugins_repo` | Git repository used to fetch plugins. |
+| `plugins_repo` | Optional Git repository used to fetch plugins. Unset by default; set it (or use `PLUGINS_REPO`) to enable cloning. |
 
 ## Plugins
 
-Users can expand their bot's functionality by obtaining plugins from the official repository: [itisFarzinBotPlugins](https://github.com/6AMStuff/itisFarzinBotPlugins).
+Users can expand their bot's functionality by obtaining plugins from the official repository: [itisFarzinBotPlugins](https://github.com/6AMStuff/itisFarzinBotPlugins). No plugin repository is fetched unless `plugins_repo` is configured, so projects using itisFarzinBot as a dependency won't clone the default plugins.
 
 ## Development
 
