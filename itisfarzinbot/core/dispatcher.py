@@ -1,140 +1,81 @@
-import asyncio
+import functools
 import inspect
-import logging
+import weakref
 from collections.abc import Awaitable, Callable
-from typing import cast, override
+from typing import TypeVar, override
 
 import pyrogram.dispatcher
 import pyrogram.handlers
 import pyrogram.types
 
-import itisfarzinbot
 import itisfarzinbot.types
+
+_Callback = Callable[..., object]
+_ParsedUpdate = tuple[object, object]
+_Parser = TypeVar("_Parser", bound=Callable[..., Awaitable[_ParsedUpdate]])
+_ADAPTED: weakref.WeakSet[_Callback] = weakref.WeakSet()
+
+
+def _set_custom_types(parsed: object) -> None:
+    if isinstance(parsed, pyrogram.types.Message):
+        parsed.__class__ = itisfarzinbot.types.Message
+        reply = parsed.reply_to_message
+        if isinstance(reply, pyrogram.types.Message):
+            reply.__class__ = itisfarzinbot.types.Message
+
+    elif isinstance(parsed, pyrogram.types.CallbackQuery):
+        parsed.__class__ = itisfarzinbot.types.CallbackQuery
+        if isinstance(parsed.message, pyrogram.types.Message):
+            parsed.message.__class__ = itisfarzinbot.types.Message
+
+
+def _custom_types(parser: _Parser) -> _Parser:
+    @functools.wraps(parser)
+    async def wrapped(*args: object, **kwargs: object) -> _ParsedUpdate:
+        parsed, handler_type = await parser(*args, **kwargs)
+        _set_custom_types(parsed)
+
+        return parsed, handler_type
+
+    return wrapped  # type: ignore[return-value]
+
+
+def _clientless(callback: _Callback) -> _Callback:
+    if inspect.iscoroutinefunction(callback):
+
+        @functools.wraps(callback)
+        async def async_adapted(_client: object, update: object) -> object:
+            return await callback(update)
+
+        return async_adapted
+
+    @functools.wraps(callback)
+    def sync_adapted(_client: object, update: object) -> object:
+        return callback(update)
+
+    return sync_adapted
 
 
 class Dispatcher(pyrogram.dispatcher.Dispatcher):
+    def __init__(self, client: "itisfarzinbot.Bot") -> None:
+        super().__init__(client)
+
+        self.update_parsers = {  # type: ignore[bad-assignment]
+            update_type: _custom_types(parser)
+            for update_type, parser in self.update_parsers.items()
+        }
+
     @override
-    async def handler_worker(self) -> None:
-        while True:
-            packet = await self.updates_queue.get()
-
-            if not isinstance(packet, tuple):
-                break
-
-            try:
-                await self.process_packet(packet)
-            except pyrogram.StopPropagation:
-                pass
-            except Exception as e:
-                logging.exception(e)
-
-    async def process_packet(
+    def add_handler(
         self,
-        packet: tuple[
-            pyrogram.raw.base.update.Update,
-            dict[int, pyrogram.raw.base.user.User],
-            dict[int, pyrogram.raw.base.chat.Chat],
-        ],
+        handler: pyrogram.handlers.handler.Handler[_Callback],
+        group: int,
     ) -> None:
-        update, users, chats = packet
-        parser = self.update_parsers.get(type(update), None)  # type: ignore[call-overload]
+        callback = handler.callback
+        params = inspect.signature(callback).parameters
+        if len(params) == 1 and callback not in _ADAPTED:
+            adapted = _clientless(callback)
+            _ADAPTED.add(adapted)
+            handler.callback = adapted
 
-        if parser is None:
-            return
-
-        parsed_update, handler_type = await parser(update, users, chats)
-
-        if not isinstance(
-            parsed_update, pyrogram.types.Update
-        ) or not isinstance(
-            handler_type, type(pyrogram.handlers.handler.Handler)
-        ):
-            return
-
-        for group in self._copy_groups().values():
-            for handler in group:
-                if await self.process_handler(
-                    handler,
-                    parsed_update,
-                    update,
-                    users,
-                    chats,
-                    handler_type,
-                ):
-                    break
-
-    async def process_handler(
-        self,
-        handler: pyrogram.handlers.handler.Handler[Callable[..., object]],
-        parsed_update: pyrogram.types.Update,
-        update: pyrogram.raw.base.update.Update,
-        users: dict[int, pyrogram.raw.base.user.User],
-        chats: dict[int, pyrogram.raw.base.chat.Chat],
-        handler_type: type[
-            pyrogram.handlers.handler.Handler[Callable[..., object]]
-        ],
-    ) -> bool:
-        args: (
-            tuple[pyrogram.types.Update]
-            | tuple[
-                pyrogram.raw.base.update.Update,
-                dict[int, pyrogram.raw.base.user.User],
-                dict[int, pyrogram.raw.base.chat.Chat],
-            ]
-            | None
-        ) = None
-        try:
-            if isinstance(handler, handler_type) and await handler.check(
-                self.client, parsed_update
-            ):
-                args = (parsed_update,)
-                self.set_custom_update_types(args[0])
-            elif isinstance(
-                handler, pyrogram.handlers.raw_update_handler.RawUpdateHandler
-            ) and bool(await handler.check(self.client, update)):  # type: ignore[bad-argument-type]
-                args = (update, users, chats)
-        except Exception as e:
-            logging.exception(e)
-
-        if args is None:
-            return False
-
-        return await self.invoke_handler(handler, args)
-
-    def set_custom_update_types(self, update: pyrogram.types.Update) -> None:
-        if isinstance(update, pyrogram.types.Message):
-            update.__class__ = itisfarzinbot.types.Message
-            if update.reply_to_message is not None:
-                update.reply_to_message.__class__ = itisfarzinbot.types.Message
-        elif isinstance(update, pyrogram.types.CallbackQuery):
-            update.__class__ = itisfarzinbot.types.CallbackQuery
-            if isinstance(update.message, pyrogram.types.Message):
-                update.message.__class__ = itisfarzinbot.types.Message
-
-    async def invoke_handler(
-        self,
-        handler: pyrogram.handlers.handler.Handler[Callable[..., object]],
-        args: tuple[object] | tuple[object, object, object],
-    ) -> bool:
-        sig = inspect.signature(handler.callback)
-        custom_args = (
-            args if len(sig.parameters) == 1 else (self.client, *args)
-        )
-
-        try:
-            if inspect.iscoroutinefunction(handler.callback):
-                await cast("Awaitable[object]", handler.callback(*custom_args))
-            else:
-                await asyncio.get_running_loop().run_in_executor(
-                    self.client.executor,
-                    handler.callback,
-                    *custom_args,
-                )
-        except pyrogram.StopPropagation:
-            raise
-        except pyrogram.ContinuePropagation:
-            return False
-        except Exception as e:
-            logging.exception(e)
-
-        return True
+        super().add_handler(handler, group)
