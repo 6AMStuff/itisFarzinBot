@@ -84,4 +84,3 @@ async def admin(app: Bot, message: Message) -> None:  # noqa: C901
 
 __all__ = ("admin",)
 __plugin__ = True
-__bot_only__ = False

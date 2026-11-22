@@ -42,7 +42,6 @@ def format_uptime(seconds: float) -> str:
 async def status(app: Bot, message: Message) -> None:
     now = time.time()
     text = "**Bot Status**:\n\n"
-    keyboard = None
 
     bot_uptime = format_uptime(now - app.uptime)
     system_uptime = format_uptime(now - psutil.boot_time())
@@ -76,24 +75,18 @@ async def status(app: Bot, message: Message) -> None:
 
     filtered_data = {k: str(v) for k, v in data.items() if v is not None}
 
-    if app.is_bot:
-        keyboard = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton(key, callback_data="noop"),
-                    InlineKeyboardButton(value, callback_data="noop"),
-                ]
-                for key, value in filtered_data.items()
+                InlineKeyboardButton(key, callback_data="noop"),
+                InlineKeyboardButton(value, callback_data="noop"),
             ]
-        )
-    else:
-        text += "\n".join(
-            [f"• **{key}:** {value}" for key, value in filtered_data.items()]
-        )
+            for key, value in filtered_data.items()
+        ]
+    )
 
     await message.reply(text, reply_markup=keyboard)
 
 
 __all__ = ("status",)
 __plugin__ = True
-__bot_only__ = False

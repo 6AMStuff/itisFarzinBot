@@ -72,4 +72,3 @@ async def deldata(app: Bot, message: Message) -> None:
 
 __all__ = ("deldata", "getdata", "setdata")
 __plugin__ = True
-__bot_only__ = False

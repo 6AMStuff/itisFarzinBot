@@ -22,38 +22,27 @@ def pretty_name(plugin: str) -> str:
 async def plugins_status(client: Bot, update: Message | CallbackQuery) -> None:
     plugins = client.get_plugins()
     text = "**Plugins**:"
-    reply_markup = None
-
-    if client.is_bot:
-        keyboard = [
-            [
-                InlineKeyboardButton(
-                    pretty_name(plugin), callback_data=f"plugins info {plugin}"
-                ),
-                InlineKeyboardButton(
-                    "✅" if client.get_plugin_status(plugin) else "❌",
-                    callback_data=f"plugins toggle {plugin}",
-                ),
-            ]
-            for plugin in plugins
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                pretty_name(plugin), callback_data=f"plugins info {plugin}"
+            ),
+            InlineKeyboardButton(
+                "✅" if client.get_plugin_status(plugin) else "❌",
+                callback_data=f"plugins toggle {plugin}",
+            ),
         ]
-        reply_markup = InlineKeyboardMarkup(
-            keyboard
-            if len(keyboard) > 0
-            else [
-                [
-                    InlineKeyboardButton(
-                        "No plugins found.", callback_data="noop"
-                    )
-                ]
+        for plugin in plugins
+    ]
+    reply_markup = InlineKeyboardMarkup(
+        keyboard
+        if len(keyboard) > 0
+        else [
+            [
+                InlineKeyboardButton("No plugins found.", callback_data="noop")
             ]
-        )
-    else:
-        text += "\n" + "\n".join(
-            f"{pretty_name(plugin)}: "
-            f"{'✅' if client.get_plugin_status(plugin) else '❌'}"
-            for plugin in plugins
-        )
+        ]
+    )
 
     if isinstance(update, Message):
         await update.reply(
@@ -61,16 +50,10 @@ async def plugins_status(client: Bot, update: Message | CallbackQuery) -> None:
             reply_markup=reply_markup,
         )
     elif isinstance(update, CallbackQuery):
-        # Thanks for the great type annotations, kurigram!
-        if reply_markup is not None:
-            await update.edit_message_text(
-                text=text,
-                reply_markup=reply_markup,
-            )
-        else:
-            await update.edit_message_text(
-                text=text,
-            )
+        await update.edit_message_text(
+            text=text,
+            reply_markup=reply_markup,
+        )
 
 
 async def plugin_detail(
@@ -195,4 +178,3 @@ async def load_unload(app: Bot, message: Message) -> None:
 
 __all__ = ("handlers", "load_unload", "plugins", "plugins_callback")
 __plugin__ = True
-__bot_only__ = False

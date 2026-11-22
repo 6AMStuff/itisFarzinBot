@@ -17,13 +17,11 @@ class BotMeta(type):
 
 class Bot(Core, Client, metaclass=BotMeta):
     uptime: float = 0
-    is_bot: bool = False
 
     @override
     def _post_init(self) -> None:
         self.builtin_plugins = "itisfarzinbot/plugins"
         self.uptime = time.time()
-        self.is_bot = bool(self.bot_token)
         self.dispatcher = Dispatcher(self)
         DataBase.metadata.create_all(Settings.engine)
 
